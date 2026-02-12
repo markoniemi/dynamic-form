@@ -1,0 +1,57 @@
+{
+  "title": "Contact Us",
+  "description": "Get in touch with our team",
+  "fields": [
+    {
+      "name": "name",
+      "label": "Your Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "John Doe"
+    },
+    {
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "john.doe@example.com"
+    },
+    {
+      "name": "phone",
+      "label": "Phone Number",
+      "type": "tel",
+      "required": false,
+      "placeholder": "+1 (555) 123-4567"
+    },
+    {
+      "name": "subject",
+      "label": "Subject",
+      "type": "select",
+      "required": true,
+      "options": [
+        {"value": "general", "label": "General Inquiry"},
+        {"value": "support", "label": "Technical Support"},
+        {"value": "sales", "label": "Sales Question"},
+        {"value": "billing", "label": "Billing Issue"}
+      ]
+    },
+    {
+      "name": "message",
+      "label": "Message",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "How can we help you?"
+    },
+    {
+      "name": "urgency",
+      "label": "Priority Level",
+      "type": "radio",
+      "required": true,
+      "options": [
+        {"value": "low", "label": "Low"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "high", "label": "High"}
+      ]
+    }
+  ]
+}

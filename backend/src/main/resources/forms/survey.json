@@ -1,0 +1,50 @@
+{
+  "title": "Customer Satisfaction Survey",
+  "description": "Help us improve our services by sharing your feedback",
+  "fields": [
+    {
+      "name": "fullName",
+      "label": "Full Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter your full name"
+    },
+    {
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "your.email@example.com"
+    },
+    {
+      "name": "rating",
+      "label": "Overall Satisfaction",
+      "type": "select",
+      "required": true,
+      "options": [
+        {"value": "5", "label": "Very Satisfied"},
+        {"value": "4", "label": "Satisfied"},
+        {"value": "3", "label": "Neutral"},
+        {"value": "2", "label": "Dissatisfied"},
+        {"value": "1", "label": "Very Dissatisfied"}
+      ]
+    },
+    {
+      "name": "feedback",
+      "label": "Additional Comments",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Tell us more about your experience..."
+    },
+    {
+      "name": "recommendToFriend",
+      "label": "Would you recommend us to a friend?",
+      "type": "radio",
+      "required": true,
+      "options": [
+        {"value": "yes", "label": "Yes"},
+        {"value": "no", "label": "No"}
+      ]
+    }
+  ]
+}
