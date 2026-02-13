@@ -3,41 +3,56 @@ package com.example.backend.e2e;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.backend.IntegrationTestBase;
-import com.example.backend.e2e.pages.ItemFormPage;
-import com.example.backend.e2e.pages.ItemsPage;
-import com.example.backend.e2e.pages.LoginPage;
+import com.example.backend.e2e.pages.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FrontendIT extends IntegrationTestBase {
-  @Autowired
-  private WebDriver driver;
-  private ItemsPage homePage;
+
+  @Autowired private WebDriver driver;
   private LoginPage loginPage;
-  private ItemFormPage itemFormPage;
+  private FormsPage formsPage;
+  private FormSubmissionPage formSubmissionPage;
+  private FormSubmissionsPage formSubmissionsPage;
+
   @BeforeEach
   void setup() {
-    homePage = new ItemsPage(driver);
     loginPage = new LoginPage(driver);
-    itemFormPage = new ItemFormPage(driver);
+    formsPage = new FormsPage(driver);
+    formSubmissionPage = new FormSubmissionPage(driver);
+    formSubmissionsPage = new FormSubmissionsPage(driver);
   }
+
   @Test
-  void loginAndItemManagement() {
-    // 1. Navigate to Home Page
+  void loginAndFormSubmission() {
+    // 1. Navigate to Home Page and login
     driver.get("http://localhost:8080");
     // 2. Login
-    homePage.clickLogin();
+    formsPage.clickLogin();
     // 3. Login on Auth Server
     loginPage.login("admin", "admin");
-    // 4. Add Item
-    homePage.clickAddItem();
-    itemFormPage.fillForm("Test Item", "This is a test item");
-    itemFormPage.submit();
-    // 5. Verify Item Added
-    assertTrue(homePage.isItemPresent("Test Item"), "Item should be present after addition");
-    // 6. Delete Item (Cleanup)
-    homePage.deleteItem("Test Item");
+    // 4. Navigate to the Forms list
+    formsPage.waitForLoad();
+    // 5. Open the "contact" form
+    formsPage.openForm("contact");
+    // 6. Verify the form page loaded
+    formSubmissionPage.waitForLoad();
+    assertTrue(formSubmissionPage.getFormTitle().contains("Contact"));
+    // 7. Fill in the contact form fields
+    formSubmissionPage.fillTextField("name", "Test User");
+    formSubmissionPage.fillTextField("email", "test@example.com");
+    formSubmissionPage.fillTextField("phone", "+1 555 000 0001");
+    formSubmissionPage.selectOption("subject", "General Inquiry");
+    formSubmissionPage.fillTextArea("message", "This is an automated e2e test message.");
+    formSubmissionPage.selectRadio("urgency", "low");
+    // 8. Submit the form
+    formSubmissionPage.submit();
+    // 9. Verify success message is shown
+    assertTrue(formSubmissionPage.isSuccessMessageDisplayed());
+    // 10. Navigate to Submissions page and verify the submission appears
+    formsPage.clickFormSubmissions();
+    assertTrue(formSubmissionsPage.isSubmissionPresent("contact"));
   }
 }

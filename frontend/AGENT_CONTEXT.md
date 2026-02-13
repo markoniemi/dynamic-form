@@ -22,10 +22,7 @@ This module is the React frontend application built with Vite. It consumes APIs 
 ## Key Files
 - `src/App.tsx`: Main application component and router setup.
 - `src/main.tsx`: Entry point, sets up `QueryClientProvider` and `BrowserRouter`.
-- `src/pages/`: React components for different routes (e.g., `Items.tsx`, `ItemForm.tsx`).
 - `src/services/apiClient.ts`: Generic API client.
-- `src/services/itemClient.ts`: Specific client for item-related API calls.
-- `src/hooks/useItem.ts`: Custom hook for item data fetching and mutation.
 - `test/`: Vitest test files for components.
 - `vitest.config.ts`: Vitest configuration.
 

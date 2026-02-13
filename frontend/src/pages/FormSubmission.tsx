@@ -119,7 +119,7 @@ export const FormSubmission: React.FC = () => {
               >
                 {mutation.isPending ? 'Submitting...' : 'Submit'}
               </Button>
-              <Button variant="secondary" onClick={() => navigate('/forms')}>
+              <Button variant="secondary" onClick={() => navigate('/submissions')}>
                 Cancel
               </Button>
             </div>

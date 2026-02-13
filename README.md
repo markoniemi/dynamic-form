@@ -1,6 +1,6 @@
-# Spring Boot & React Monolith Template
+# Dynamic form application
 
-A production-ready, multi-module Spring Boot 3 monolithic application with a modern React frontend.
+A dynamic form application using multi-module Spring Boot 3 application with a modern React frontend.
 
 ## Features
 

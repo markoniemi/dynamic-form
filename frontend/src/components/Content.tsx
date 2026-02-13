@@ -1,13 +1,11 @@
 import React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { useAuth } from 'react-oidc-context';
-import { Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap';
-import { Navigation } from './Navigation';
-import { Items } from '../pages/Items';
-import { ItemForm } from '../pages/ItemForm';
-import { Forms } from '../pages/Forms';
-import { FormSubmission } from '../pages/FormSubmission';
-import { FormSubmissions } from '../pages/FormSubmissions';
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {useAuth} from 'react-oidc-context';
+import {Button, Card, Col, Container, Row, Spinner} from 'react-bootstrap';
+import {Navigation} from './Navigation';
+import {Forms} from '../pages/Forms';
+import {FormSubmission} from '../pages/FormSubmission';
+import {FormSubmissions} from '../pages/FormSubmissions';
 
 export const Content: React.FC = () => {
   const { isAuthenticated, isLoading, error, signinRedirect } = useAuth();
@@ -50,15 +48,13 @@ export const Content: React.FC = () => {
       <Navigation />
       <Routes>
         {/* Public routes - Forms can be viewed by anyone */}
-        <Route path="/forms" element={<Forms />} />
-        <Route path="/forms/:formKey" element={<FormSubmission />} />
 
         {/* Protected routes - Require authentication */}
         {isAuthenticated ? (
           <>
-            <Route path="/" element={<Items />} />
-            <Route path="/item/new" element={<ItemForm />} />
-            <Route path="/item/:id" element={<ItemForm />} />
+            <Route path="/forms" element={<Forms />} />
+            <Route path="/forms/:formKey" element={<FormSubmission />} />
+            <Route path="/" element={<Forms />} />
             <Route path="/submissions" element={<FormSubmissions />} />
           </>
         ) : (
