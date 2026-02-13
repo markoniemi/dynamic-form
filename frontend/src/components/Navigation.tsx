@@ -10,7 +10,7 @@ export const Navigation: React.FC = () => {
     <Navbar bg="dark" data-bs-theme="dark" sticky="top" expand="lg">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          spring-boot-react-template
+          dynamic-form
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
