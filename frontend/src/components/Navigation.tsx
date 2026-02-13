@@ -17,9 +17,6 @@ export const Navigation: React.FC = () => {
           <Nav className="me-auto">
             {isAuthenticated && (
               <>
-                <Nav.Link as={Link} to="/">
-                  Items
-                </Nav.Link>
                 <Nav.Link as={Link} to="/submissions">
                   Submissions
                 </Nav.Link>

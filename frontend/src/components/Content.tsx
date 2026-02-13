@@ -67,7 +67,7 @@ export const Content: React.FC = () => {
                     <Card>
                       <Card.Body>
                         <Card.Title>Welcome</Card.Title>
-                        <Card.Text>Please log in to manage your items.</Card.Text>
+                        <Card.Text>Please log in.</Card.Text>
                         <Button variant="primary" onClick={() => signinRedirect()}>
                           Login with OAuth2
                         </Button>
