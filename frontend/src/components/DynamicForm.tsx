@@ -1,7 +1,11 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { FormField } from '../types/Form';
+import { TextField } from './TextField';
+import { TextAreaField } from './TextAreaField';
+import { SelectField } from './SelectField';
+import { RadioField } from './RadioField';
+import { CheckboxField } from './CheckboxField';
 
 interface DynamicFormProps {
   fields: FormField[];
@@ -23,104 +27,19 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       case 'tel':
       case 'number':
       case 'date':
-        return (
-          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
-            <Form.Label>
-              {field.label}
-              {field.required && <span className="text-danger"> *</span>}
-            </Form.Label>
-            <Form.Control
-              type={field.type}
-              placeholder={field.placeholder}
-              {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
-              isInvalid={!!errorMessage}
-            />
-            <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
-          </Form.Group>
-        );
+        return <TextField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
 
       case 'textarea':
-        return (
-          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
-            <Form.Label>
-              {field.label}
-              {field.required && <span className="text-danger"> *</span>}
-            </Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={4}
-              placeholder={field.placeholder}
-              {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
-              isInvalid={!!errorMessage}
-            />
-            <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
-          </Form.Group>
-        );
+        return <TextAreaField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
 
       case 'select':
-        return (
-          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
-            <Form.Label>
-              {field.label}
-              {field.required && <span className="text-danger"> *</span>}
-            </Form.Label>
-            <Form.Select
-              {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
-              isInvalid={!!errorMessage}
-            >
-              <option value="">Select an option...</option>
-              {field.options?.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
-          </Form.Group>
-        );
+        return <SelectField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
 
       case 'radio':
-        return (
-          <Form.Group className="mb-3" key={field.name}>
-            <Form.Label>
-              {field.label}
-              {field.required && <span className="text-danger"> *</span>}
-            </Form.Label>
-            {field.options?.map((option) => (
-              <Form.Check
-                key={option.value}
-                type="radio"
-                id={`${field.name}-${option.value}`}
-                label={option.label}
-                value={option.value}
-                {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
-                isInvalid={!!errorMessage}
-              />
-            ))}
-            {errorMessage && <div className="invalid-feedback d-block">{errorMessage}</div>}
-          </Form.Group>
-        );
+        return <RadioField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
 
       case 'checkbox':
-        return (
-          <Form.Group className="mb-3" key={field.name}>
-            <Form.Label>
-              {field.label}
-              {field.required && <span className="text-danger"> *</span>}
-            </Form.Label>
-            {field.options?.map((option) => (
-              <Form.Check
-                key={option.value}
-                type="checkbox"
-                id={`${field.name}-${option.value}`}
-                label={option.label}
-                value={option.value}
-                {...register(field.name)}
-              />
-            ))}
-            {errorMessage && <div className="invalid-feedback d-block">{errorMessage}</div>}
-          </Form.Group>
-        );
+        return <CheckboxField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
 
       default:
         return null;
