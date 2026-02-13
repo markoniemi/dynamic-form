@@ -3,13 +3,13 @@ import { Form } from 'react-bootstrap';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { FormField } from '../types/Form';
 
-interface DynamicFormRendererProps {
+interface DynamicFormProps {
   fields: FormField[];
   register: UseFormRegister<any>;
   errors: FieldErrors;
 }
 
-export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
+export const DynamicForm: React.FC<DynamicFormProps> = ({
   fields,
   register,
   errors,
@@ -24,7 +24,7 @@ export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
       case 'number':
       case 'date':
         return (
-          <Form.Group className="mb-3" key={field.name}>
+          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
             <Form.Label>
               {field.label}
               {field.required && <span className="text-danger"> *</span>}
@@ -41,7 +41,7 @@ export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
 
       case 'textarea':
         return (
-          <Form.Group className="mb-3" key={field.name}>
+          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
             <Form.Label>
               {field.label}
               {field.required && <span className="text-danger"> *</span>}
@@ -59,7 +59,7 @@ export const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
 
       case 'select':
         return (
-          <Form.Group className="mb-3" key={field.name}>
+          <Form.Group className="mb-3" key={field.name} controlId={field.name}>
             <Form.Label>
               {field.label}
               {field.required && <span className="text-danger"> *</span>}

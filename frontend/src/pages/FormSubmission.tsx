@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuth } from 'react-oidc-context';
 import { formClient } from '../services/formClient';
-import { DynamicFormRenderer } from '../components/DynamicFormRenderer';
+import { DynamicForm } from '../components/DynamicForm.tsx';
 
 export const FormSubmission: React.FC = () => {
   const { formKey } = useParams<{ formKey: string }>();
@@ -105,7 +105,7 @@ export const FormSubmission: React.FC = () => {
           )}
 
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <DynamicFormRenderer
+            <DynamicForm
               fields={formDefinition.fields}
               register={register}
               errors={errors}
