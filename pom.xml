@@ -33,6 +33,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <frontend.version>1.0.0</frontend.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -47,9 +48,15 @@
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <pluginManagement>
             <plugins>
