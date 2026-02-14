@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,11 +39,10 @@ class FormDataControllerTest {
   @MockitoBean private FormDataMapper formDataMapper;
 
   @Test
-  @WithMockUser
   void submitForm() throws Exception {
     Map<String, Object> data = Map.of("field1", "value1");
-    FormData formData = new FormData("form1", data, "username");
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "username");
+    FormData formData = new FormData("form1", data, "testuser");
+    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "testuser");
 
     when(formDataService.createFormSubmission(eq("form1"), any(FormData.class)))
         .thenReturn(formData);
@@ -52,6 +52,7 @@ class FormDataControllerTest {
         .perform(
             post("/api/form-data/form1")
                 .with(csrf())
+                .with(jwt().jwt(jwt -> jwt.claim("sub", "testuser")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(data)))
         .andExpect(status().isOk())
