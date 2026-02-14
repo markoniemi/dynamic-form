@@ -1,10 +1,14 @@
 package com.example.backend.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.example.backend.dto.FormDefinitionDto;
+import com.example.backend.dto.FormFieldDto;
+import com.example.backend.entity.FormDefinition;
+import com.example.backend.entity.FormFieldDefinition;
+import com.example.backend.mapper.FormDefinitionMapper;
 import com.example.backend.service.FormService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -20,6 +24,7 @@ class FormControllerTest {
 
   @Autowired private WebTestClient webTestClient;
   @MockitoBean private FormService formService;
+  @MockitoBean private FormDefinitionMapper formDefinitionMapper;
 
   @Test
   @WithMockUser
@@ -43,9 +48,40 @@ class FormControllerTest {
   @Test
   @WithMockUser
   void getFormDefinition() {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode mockForm = mapper.createObjectNode().put("title", "Test Form");
-    when(formService.getFormDefinition("form1")).thenReturn(mockForm);
+    FormDefinition mockFormDefinition =
+        FormDefinition.builder()
+            .id(1L)
+            .formKey("form1")
+            .title("Test Form")
+            .description("A test form")
+            .fields(
+                List.of(
+                    FormFieldDefinition.builder()
+                        .name("testField")
+                        .label("Test Field")
+                        .type("text")
+                        .required(true)
+                        .build()))
+            .build();
+
+    FormDefinitionDto mockDto =
+        FormDefinitionDto.builder()
+            .id(1L)
+            .formKey("form1")
+            .title("Test Form")
+            .description("A test form")
+            .fields(
+                List.of(
+                    FormFieldDto.builder()
+                        .name("testField")
+                        .label("Test Field")
+                        .type("text")
+                        .required(true)
+                        .build()))
+            .build();
+
+    when(formService.getFormDefinition("form1")).thenReturn(mockFormDefinition);
+    when(formDefinitionMapper.toDto(any(FormDefinition.class))).thenReturn(mockDto);
 
     webTestClient
         .get()

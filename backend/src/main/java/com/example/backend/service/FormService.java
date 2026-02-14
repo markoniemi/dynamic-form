@@ -1,20 +1,17 @@
 package com.example.backend.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
+import com.example.backend.entity.FormDefinition;
+import com.example.backend.repository.FormDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,45 +19,64 @@ import java.util.concurrent.ConcurrentHashMap;
 @InterfaceLog
 public class FormService {
 
-    private final ObjectMapper objectMapper;
-    private final Map<String, JsonNode> formDefinitions = new ConcurrentHashMap<>();
+  private final FormDefinitionRepository formDefinitionRepository;
 
-    @PostConstruct
-    @InterfaceLog
-    public void loadFormDefinitions() {
-        try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] resources = resolver.getResources("classpath:/forms/*.json");
+  @InterfaceLog
+  public Set<String> getAvailableFormKeys() {
+    return formDefinitionRepository.findAll().stream()
+        .map(FormDefinition::getFormKey)
+        .collect(Collectors.toSet());
+  }
 
-            for (Resource resource : resources) {
-                String filename = resource.getFilename();
-                if (filename != null) {
-                    String formKey = filename.replace(".json", "");
-                    JsonNode formDefinition = objectMapper.readTree(resource.getInputStream());
-                    formDefinitions.put(formKey, formDefinition);
-                    log.info("Loaded form definition: {}", formKey);
-                }
-            }
+  @InterfaceLog
+  public FormDefinition getFormDefinition(String formKey) {
+    return formDefinitionRepository.findByFormKey(formKey)
+        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+  }
 
-            log.info("Total forms loaded: {}", formDefinitions.size());
-        } catch (IOException e) {
-            log.error("Failed to load form definitions", e);
-            throw new RuntimeException("Failed to load form definitions", e);
-        }
-    }
+  @InterfaceLog
+  public Optional<FormDefinition> findByFormKey(String formKey) {
+    return formDefinitionRepository.findByFormKey(formKey);
+  }
 
-    @InterfaceLog
-    public Set<String> getAvailableFormKeys() {
-        return formDefinitions.keySet();
-    }
+  @InterfaceLog
+  public List<FormDefinition> getAllFormDefinitions() {
+    return formDefinitionRepository.findAll();
+  }
 
-    @InterfaceLog
-    public JsonNode getFormDefinition(String formKey) {
-        JsonNode definition = formDefinitions.get(formKey);
-        if (definition == null) {
-            throw new IllegalArgumentException("Form not found: " + formKey);
-        }
-        return definition;
-    }
+  @InterfaceLog
+  @Transactional
+  public FormDefinition saveFormDefinition(FormDefinition formDefinition) {
+    log.info("Saving form definition: {}", formDefinition.getFormKey());
+    return formDefinitionRepository.save(formDefinition);
+  }
+
+  @InterfaceLog
+  @Transactional
+  public FormDefinition updateFormDefinition(String formKey, FormDefinition updatedDefinition) {
+    FormDefinition existing = formDefinitionRepository.findByFormKey(formKey)
+        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+
+    existing.setTitle(updatedDefinition.getTitle());
+    existing.setDescription(updatedDefinition.getDescription());
+    existing.setFields(updatedDefinition.getFields());
+
+    log.info("Updating form definition: {}", formKey);
+    return formDefinitionRepository.save(existing);
+  }
+
+  @InterfaceLog
+  @Transactional
+  public void deleteFormDefinition(String formKey) {
+    FormDefinition existing = formDefinitionRepository.findByFormKey(formKey)
+        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+    formDefinitionRepository.delete(existing);
+    log.info("Deleted form definition: {}", formKey);
+  }
+
+  @InterfaceLog
+  public boolean existsByFormKey(String formKey) {
+    return formDefinitionRepository.existsByFormKey(formKey);
+  }
 
 }

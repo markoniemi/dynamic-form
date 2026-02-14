@@ -20,6 +20,9 @@ export const Navigation: React.FC = () => {
                 <Nav.Link as={Link} to="/submissions">
                   Submissions
                 </Nav.Link>
+                <Nav.Link as={Link} to="/create-form">
+                  Create Form
+                </Nav.Link>
               </>
             )}
             <Nav.Link as={Link} to="/forms">

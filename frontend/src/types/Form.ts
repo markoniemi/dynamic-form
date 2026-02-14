@@ -13,6 +13,15 @@ export interface FormFieldOption {
 }
 
 export interface FormDefinition {
+  id?: number;
+  formKey?: string;
+  title: string;
+  description: string;
+  fields: FormField[];
+}
+
+export interface CreateFormDefinition {
+  formKey: string;
   title: string;
   description: string;
   fields: FormField[];
