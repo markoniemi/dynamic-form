@@ -66,5 +66,6 @@ public class FrontendIT extends IntegrationTestBase {
     assertTrue(submissionDetailPage.containsText("General Inquiry"));
     assertTrue(submissionDetailPage.containsText("This is an automated e2e test message."));
     assertTrue(submissionDetailPage.containsText("Low"));
+    assertTrue(submissionDetailPage.containsText("admin"));
   }
 }

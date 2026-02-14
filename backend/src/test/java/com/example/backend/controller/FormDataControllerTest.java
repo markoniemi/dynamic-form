@@ -41,8 +41,8 @@ class FormDataControllerTest {
   @WithMockUser
   void submitForm() throws Exception {
     Map<String, Object> data = Map.of("field1", "value1");
-    FormData formData = new FormData("form1", data);
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now());
+    FormData formData = new FormData("form1", data, "username");
+    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "username");
 
     when(formDataService.createFormSubmission(eq("form1"), any(FormData.class)))
         .thenReturn(formData);
@@ -62,8 +62,9 @@ class FormDataControllerTest {
   @Test
   @WithMockUser
   void getAllSubmissions() throws Exception {
-    FormData formData = new FormData("form1", Map.of());
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now());
+    FormData formData = new FormData("form1", Map.of(), "username");
+    FormDataDto formDataDto =
+        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
 
     when(formDataService.getAllFormSubmissions()).thenReturn(Collections.singletonList(formData));
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
@@ -77,8 +78,9 @@ class FormDataControllerTest {
   @Test
   @WithMockUser
   void getSubmissionsByFormKey() throws Exception {
-    FormData formData = new FormData("form1", Map.of());
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now());
+    FormData formData = new FormData("form1", Map.of(), "username");
+    FormDataDto formDataDto =
+        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
 
     when(formDataService.getFormSubmissionsByKey("form1"))
         .thenReturn(Collections.singletonList(formData));
@@ -93,8 +95,9 @@ class FormDataControllerTest {
   @Test
   @WithMockUser
   void getSubmissionById() throws Exception {
-    FormData formData = new FormData("form1", Map.of());
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now());
+    FormData formData = new FormData("form1", Map.of(), "username");
+    FormDataDto formDataDto =
+        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
 
     when(formDataService.getFormSubmissionById(1L)).thenReturn(Optional.of(formData));
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
@@ -108,9 +111,7 @@ class FormDataControllerTest {
   @Test
   @WithMockUser
   void deleteSubmission() throws Exception {
-    mockMvc
-        .perform(delete("/api/form-data/submission/1").with(csrf()))
-        .andExpect(status().isOk());
+    mockMvc.perform(delete("/api/form-data/submission/1").with(csrf())).andExpect(status().isOk());
 
     verify(formDataService).deleteFormSubmission(1L);
   }

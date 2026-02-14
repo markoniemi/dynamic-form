@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,8 +28,10 @@ public class FormDataController {
     @InterfaceLog
     public FormDataDto submitForm(
             @PathVariable String key,
-            @RequestBody Map<String, Object> data) {
-        FormData formData = new FormData(key, data);
+            @RequestBody Map<String, Object> data,
+            @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("sub");
+        FormData formData = new FormData(key, data, username);
         FormData savedFormData = formDataService.createFormSubmission(key, formData);
         return formDataMapper.toDto(savedFormData);
     }

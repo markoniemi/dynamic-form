@@ -25,7 +25,7 @@ class FormDataServiceTest {
   @Test
   void createFormSubmission() {
     String formKey = "form1";
-    FormData formData = new FormData(formKey, Map.of("field", "value"));
+    FormData formData = new FormData(formKey, Map.of("field", "value"), "username");
 
     when(formService.getFormDefinition(formKey)).thenReturn(null);
     when(formDataRepository.save(formData)).thenReturn(formData);
@@ -40,7 +40,7 @@ class FormDataServiceTest {
   @Test
   void getFormSubmissionById() {
     Long id = 1L;
-    FormData formData = new FormData("form1", Map.of());
+    FormData formData = new FormData("form1", Map.of(), "username");
     when(formDataRepository.findById(id)).thenReturn(Optional.of(formData));
 
     Optional<FormData> result = formDataService.getFormSubmissionById(id);
@@ -51,7 +51,7 @@ class FormDataServiceTest {
 
   @Test
   void getAllFormSubmissions() {
-    FormData formData = new FormData("form1", Map.of());
+    FormData formData = new FormData("form1", Map.of(), "username");
     when(formDataRepository.findAll()).thenReturn(Collections.singletonList(formData));
 
     List<FormData> result = formDataService.getAllFormSubmissions();
@@ -63,7 +63,7 @@ class FormDataServiceTest {
   @Test
   void getFormSubmissionsByKey() {
     String formKey = "form1";
-    FormData formData = new FormData(formKey, Map.of());
+    FormData formData = new FormData(formKey, Map.of(), "username");
     when(formDataRepository.findByFormKeyOrderBySubmittedAtDesc(formKey))
         .thenReturn(Collections.singletonList(formData));
 

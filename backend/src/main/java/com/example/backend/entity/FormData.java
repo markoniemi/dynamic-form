@@ -16,7 +16,6 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class FormData {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,5 +32,9 @@ public class FormData {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime submittedAt;
+
+    @Column(nullable = false)
+    @NonNull
+    private String submittedBy;
 
 }

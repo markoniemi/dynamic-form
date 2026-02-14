@@ -88,6 +88,8 @@ export const SubmissionDetail: React.FC = () => {
             <strong>Form Key:</strong> {submission.formKey}
             <br />
             <strong>Submitted At:</strong> {new Date(submission.submittedAt).toLocaleString()}
+            <br />
+            <strong>Submitted By:</strong> {submission.submittedBy}
           </Alert>
 
           <ReadOnlyDynamicForm fields={formDefinition.fields} data={submission.data} />

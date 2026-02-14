@@ -18,9 +18,9 @@ class FormDataRepositoryTest {
 
   @Test
   void findByFormKeyOrderBySubmittedAtDesc() {
-    FormData formData1 = new FormData("form1", Map.of("field", "value1"));
-    FormData formData2 = new FormData("form1", Map.of("field", "value2"));
-    FormData formData3 = new FormData("form2", Map.of("field", "value3"));
+    FormData formData1 = new FormData("form1", Map.of("field", "value1"), "username");
+    FormData formData2 = new FormData("form1", Map.of("field", "value2"), "username");
+    FormData formData3 = new FormData("form2", Map.of("field", "value3"), "username");
 
     formDataRepository.save(formData1);
     formDataRepository.save(formData2);
