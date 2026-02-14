@@ -12,7 +12,7 @@ This document provides guidance for GitHub Copilot to assist in the development 
 
 ### Java (Backend)
 *   **Style Guide**: Follow the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
-*   **Formatting**: Use Google Java Format for consistent code formatting.
+*   **Formatting**: Use Google Java Format for consistent code formatting. Use two spaces for tabs.
 *   **Naming**: Use clear and descriptive names for classes, methods, and variables (e.g., `FormService`, `getFormById`).
 *   **Comments**: Use javadoc sparingly, only for external IDE and for complex structures or unusual implementations.
 *   **Immutability**: Prefer immutability where possible, especially for DTOs and configuration properties. Use @Value annotation where possible.

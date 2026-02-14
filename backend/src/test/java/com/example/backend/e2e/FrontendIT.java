@@ -16,6 +16,7 @@ public class FrontendIT extends IntegrationTestBase {
   private FormsPage formsPage;
   private FormSubmissionPage formSubmissionPage;
   private FormSubmissionsPage formSubmissionsPage;
+  private SubmissionDetailPage submissionDetailPage;
 
   @BeforeEach
   void setup() {
@@ -23,6 +24,7 @@ public class FrontendIT extends IntegrationTestBase {
     formsPage = new FormsPage(driver);
     formSubmissionPage = new FormSubmissionPage(driver);
     formSubmissionsPage = new FormSubmissionsPage(driver);
+    submissionDetailPage = new SubmissionDetailPage(driver);
   }
 
   @Test
@@ -54,5 +56,15 @@ public class FrontendIT extends IntegrationTestBase {
     // 10. Navigate to Submissions page and verify the submission appears
     formsPage.clickFormSubmissions();
     assertTrue(formSubmissionsPage.isSubmissionPresent("contact"));
+    // 11. View the submission details
+    formSubmissionsPage.viewFirstSubmission();
+    submissionDetailPage.waitForLoad();
+    // 12. Verify submission details are correct
+    assertTrue(submissionDetailPage.containsText("Test User"));
+    assertTrue(submissionDetailPage.containsText("test@example.com"));
+    assertTrue(submissionDetailPage.containsText("+1 555 000 0001"));
+    assertTrue(submissionDetailPage.containsText("General Inquiry"));
+    assertTrue(submissionDetailPage.containsText("This is an automated e2e test message."));
+    assertTrue(submissionDetailPage.containsText("Low"));
   }
 }

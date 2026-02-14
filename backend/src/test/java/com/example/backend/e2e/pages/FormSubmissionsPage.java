@@ -36,6 +36,16 @@ public class FormSubmissionsPage extends BasePage {
     }
   }
 
+  public void viewFirstSubmission() {
+    waitForLoad();
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table tbody tr")));
+    if (!submissionRows.isEmpty()) {
+      WebElement firstRow = submissionRows.getFirst();
+      WebElement viewButton = firstRow.findElement(By.xpath(".//button[contains(text(), 'View')]"));
+      viewButton.click();
+    }
+  }
+
   public int getSubmissionCount() {
     waitForLoad();
     return submissionRows.size();
