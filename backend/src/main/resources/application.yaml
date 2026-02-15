@@ -23,8 +23,3 @@ server:
   port: 8080
   servlet:
     context-path: /
-
-logging:
-  level:
-    root: INFO
-    com.example.backend: DEBUG
