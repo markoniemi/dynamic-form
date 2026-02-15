@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.example.backend.entity.FormDefinition;
-import com.example.backend.repository.FormDefinitionRepository;
+import com.example.backend.entity.Form;
+import com.example.backend.repository.FormRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DatabaseInitializerTest {
 
   @Mock
-  private FormDefinitionRepository formDefinitionRepository;
+  private FormRepository formRepository;
 
   private DatabaseInitializer databaseInitializer;
   private ObjectMapper objectMapper;
@@ -26,34 +26,34 @@ class DatabaseInitializerTest {
   @BeforeEach
   void setUp() {
     objectMapper = new ObjectMapper();
-    databaseInitializer = new DatabaseInitializer(formDefinitionRepository, objectMapper);
+    databaseInitializer = new DatabaseInitializer(formRepository, objectMapper);
   }
 
   @Test
-  void runLoadsFormDefinitionsFromResources() {
-    when(formDefinitionRepository.existsByFormKey(anyString())).thenReturn(false);
-    when(formDefinitionRepository.save(any(FormDefinition.class)))
+  void runLoadsFormsFromResources() {
+    when(formRepository.existsByFormKey(anyString())).thenReturn(false);
+    when(formRepository.save(any(Form.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-    when(formDefinitionRepository.count()).thenReturn(3L);
+    when(formRepository.count()).thenReturn(3L);
 
     databaseInitializer.run();
 
-    verify(formDefinitionRepository, atLeastOnce()).save(any(FormDefinition.class));
+    verify(formRepository, atLeastOnce()).save(any(Form.class));
   }
 
   @Test
-  void runSkipsExistingFormDefinitions() {
-    when(formDefinitionRepository.existsByFormKey("contact")).thenReturn(true);
-    when(formDefinitionRepository.existsByFormKey("feedback")).thenReturn(false);
-    when(formDefinitionRepository.existsByFormKey("survey")).thenReturn(false);
-    when(formDefinitionRepository.save(any(FormDefinition.class)))
+  void runSkipsExistingForms() {
+    when(formRepository.existsByFormKey("contact")).thenReturn(true);
+    when(formRepository.existsByFormKey("feedback")).thenReturn(false);
+    when(formRepository.existsByFormKey("survey")).thenReturn(false);
+    when(formRepository.save(any(Form.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-    when(formDefinitionRepository.count()).thenReturn(2L);
+    when(formRepository.count()).thenReturn(2L);
 
     databaseInitializer.run();
 
-    ArgumentCaptor<FormDefinition> captor = ArgumentCaptor.forClass(FormDefinition.class);
-    verify(formDefinitionRepository, atLeast(2)).save(captor.capture());
+    ArgumentCaptor<Form> captor = ArgumentCaptor.forClass(Form.class);
+    verify(formRepository, atLeast(2)).save(captor.capture());
 
     // Verify "contact" was not saved since it already exists
     assertTrue(captor.getAllValues().stream()
@@ -61,18 +61,18 @@ class DatabaseInitializerTest {
   }
 
   @Test
-  void runParsesFormDefinitionCorrectly() {
-    when(formDefinitionRepository.existsByFormKey(anyString())).thenReturn(false);
-    when(formDefinitionRepository.save(any(FormDefinition.class)))
+  void runParsesFormCorrectly() {
+    when(formRepository.existsByFormKey(anyString())).thenReturn(false);
+    when(formRepository.save(any(Form.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-    when(formDefinitionRepository.count()).thenReturn(3L);
+    when(formRepository.count()).thenReturn(3L);
 
     databaseInitializer.run();
 
-    ArgumentCaptor<FormDefinition> captor = ArgumentCaptor.forClass(FormDefinition.class);
-    verify(formDefinitionRepository, atLeastOnce()).save(captor.capture());
+    ArgumentCaptor<Form> captor = ArgumentCaptor.forClass(Form.class);
+    verify(formRepository, atLeastOnce()).save(captor.capture());
 
-    FormDefinition contactForm = captor.getAllValues().stream()
+    Form contactForm = captor.getAllValues().stream()
         .filter(fd -> "contact".equals(fd.getFormKey()))
         .findFirst()
         .orElse(null);

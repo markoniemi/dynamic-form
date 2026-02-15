@@ -5,13 +5,13 @@ import { useAuth } from 'react-oidc-context';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { formClient } from '../../src/services/formClient';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FormDataDto, FormDefinition } from '../../src/types/Form';
+import { FormDataDto, Form } from '../../src/types/Form';
 
 vi.mock('react-oidc-context');
 vi.mock('../../src/services/formClient', () => ({
   formClient: {
     getSubmissionById: vi.fn(),
-    getFormDefinition: vi.fn(),
+    getForm: vi.fn(),
   },
 }));
 
@@ -35,9 +35,10 @@ const mockSubmission: FormDataDto = {
   formKey: 'contact',
   data: { fullName: 'Jane Doe', email: 'jane@example.com', newsletter: true },
   submittedAt: '2024-06-01T10:00:00.000Z',
+  submittedBy: 'test-user',
 };
 
-const mockFormDefinition: FormDefinition = {
+const mockForm: Form = {
   title: 'Contact Form',
   description: 'Please fill out your contact information',
   fields: [
@@ -99,7 +100,7 @@ describe('SubmissionDetail Component', () => {
 
   it('renders submission details when data is loaded', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -110,7 +111,7 @@ describe('SubmissionDetail Component', () => {
 
   it('renders submission metadata', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -122,7 +123,7 @@ describe('SubmissionDetail Component', () => {
 
   it('renders field labels from form definition', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -134,7 +135,7 @@ describe('SubmissionDetail Component', () => {
 
   it('renders submitted field values', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -146,7 +147,7 @@ describe('SubmissionDetail Component', () => {
 
   it('navigates back to submissions when back button is clicked', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => screen.getByRole('button', { name: /back to submissions/i }));
@@ -158,7 +159,7 @@ describe('SubmissionDetail Component', () => {
 
   it('calls getSubmissionById with correct parameters', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail('42');
 
     await waitFor(() => {
@@ -166,13 +167,13 @@ describe('SubmissionDetail Component', () => {
     });
   });
 
-  it('calls getFormDefinition with the form key from submission', async () => {
+  it('calls getForm with the form key from submission', async () => {
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(formClient.getFormDefinition).toHaveBeenCalledWith('contact');
+      expect(formClient.getForm).toHaveBeenCalledWith('contact');
     });
   });
 

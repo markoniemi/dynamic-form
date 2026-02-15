@@ -3,8 +3,8 @@ package com.example.backend.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.backend.entity.Form;
 import com.example.backend.entity.FormData;
-import com.example.backend.entity.FormDefinition;
 import com.example.backend.repository.FormDataRepository;
 import java.util.Collections;
 import java.util.List;
@@ -27,9 +27,9 @@ class FormDataServiceTest {
   void createFormSubmission() {
     String formKey = "form1";
     FormData formData = new FormData(formKey, Map.of("field", "value"), "username");
-    FormDefinition mockDefinition = FormDefinition.builder().formKey(formKey).build();
+    Form mockDefinition = Form.builder().formKey(formKey).build();
 
-    when(formService.getFormDefinition(formKey)).thenReturn(mockDefinition);
+    when(formService.getForm(formKey)).thenReturn(mockDefinition);
     when(formDataRepository.save(formData)).thenReturn(formData);
 
     FormData result = formDataService.createFormSubmission(formKey, formData);

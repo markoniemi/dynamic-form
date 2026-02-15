@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.entity.FormDefinition;
-import com.example.backend.repository.FormDefinitionRepository;
+import com.example.backend.entity.Form;
+import com.example.backend.repository.FormRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -19,42 +19,42 @@ import java.util.stream.Collectors;
 @InterfaceLog
 public class FormService {
 
-  private final FormDefinitionRepository formDefinitionRepository;
+  private final FormRepository formRepository;
 
   @InterfaceLog
   public Set<String> getAvailableFormKeys() {
-    return formDefinitionRepository.findAll().stream()
-        .map(FormDefinition::getFormKey)
+    return formRepository.findAll().stream()
+        .map(Form::getFormKey)
         .collect(Collectors.toSet());
   }
 
   @InterfaceLog
-  public FormDefinition getFormDefinition(String formKey) {
-    return formDefinitionRepository.findByFormKey(formKey)
+  public Form getForm(String formKey) {
+    return formRepository.findByFormKey(formKey)
         .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
   }
 
   @InterfaceLog
-  public Optional<FormDefinition> findByFormKey(String formKey) {
-    return formDefinitionRepository.findByFormKey(formKey);
+  public Optional<Form> findByFormKey(String formKey) {
+    return formRepository.findByFormKey(formKey);
   }
 
   @InterfaceLog
-  public List<FormDefinition> getAllFormDefinitions() {
-    return formDefinitionRepository.findAll();
-  }
-
-  @InterfaceLog
-  @Transactional
-  public FormDefinition saveFormDefinition(FormDefinition formDefinition) {
-    log.info("Saving form definition: {}", formDefinition.getFormKey());
-    return formDefinitionRepository.save(formDefinition);
+  public List<Form> getAllForms() {
+    return formRepository.findAll();
   }
 
   @InterfaceLog
   @Transactional
-  public FormDefinition updateFormDefinition(String formKey, FormDefinition updatedDefinition) {
-    FormDefinition existing = formDefinitionRepository.findByFormKey(formKey)
+  public Form saveForm(Form form) {
+    log.info("Saving form definition: {}", form.getFormKey());
+    return formRepository.save(form);
+  }
+
+  @InterfaceLog
+  @Transactional
+  public Form updateForm(String formKey, Form updatedDefinition) {
+    Form existing = formRepository.findByFormKey(formKey)
         .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
 
     existing.setTitle(updatedDefinition.getTitle());
@@ -62,21 +62,21 @@ public class FormService {
     existing.setFields(updatedDefinition.getFields());
 
     log.info("Updating form definition: {}", formKey);
-    return formDefinitionRepository.save(existing);
+    return formRepository.save(existing);
   }
 
   @InterfaceLog
   @Transactional
-  public void deleteFormDefinition(String formKey) {
-    FormDefinition existing = formDefinitionRepository.findByFormKey(formKey)
+  public void deleteForm(String formKey) {
+    Form existing = formRepository.findByFormKey(formKey)
         .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
-    formDefinitionRepository.delete(existing);
+    formRepository.delete(existing);
     log.info("Deleted form definition: {}", formKey);
   }
 
   @InterfaceLog
   public boolean existsByFormKey(String formKey) {
-    return formDefinitionRepository.existsByFormKey(formKey);
+    return formRepository.existsByFormKey(formKey);
   }
 
 }

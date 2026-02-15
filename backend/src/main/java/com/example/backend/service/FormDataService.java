@@ -24,7 +24,7 @@ public class FormDataService {
     @InterfaceLog
     public FormData createFormSubmission(@NotNull String formKey, @Valid FormData formData) {
         // Validate that the form exists
-        formService.getFormDefinition(formKey);
+        formService.getForm(formKey);
 
         // Set the form key
         formData.setFormKey(formKey);

@@ -1,8 +1,8 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.FormDefinitionDto;
-import com.example.backend.entity.FormDefinition;
-import com.example.backend.mapper.FormDefinitionMapper;
+import com.example.backend.dto.FormDto;
+import com.example.backend.entity.Form;
+import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class FormController {
 
   private final FormService formService;
-  private final FormDefinitionMapper formDefinitionMapper;
+  private final FormMapper formMapper;
 
   @GetMapping
   @InterfaceLog
@@ -34,46 +34,46 @@ public class FormController {
 
   @GetMapping("/all")
   @InterfaceLog
-  public List<FormDefinitionDto> getAllFormDefinitions() {
-    return formService.getAllFormDefinitions().stream()
-        .map(formDefinitionMapper::toDto)
+  public List<FormDto> getAllForms() {
+    return formService.getAllForms().stream()
+        .map(formMapper::toDto)
         .collect(Collectors.toList());
   }
 
   @GetMapping("/{key}")
   @InterfaceLog
-  public FormDefinitionDto getFormDefinition(@PathVariable String key) {
-    FormDefinition definition = formService.getFormDefinition(key);
-    return formDefinitionMapper.toDto(definition);
+  public FormDto getForm(@PathVariable String key) {
+    Form definition = formService.getForm(key);
+    return formMapper.toDto(definition);
   }
 
   @PostMapping
   @InterfaceLog
   @ResponseStatus(HttpStatus.CREATED)
-  public FormDefinitionDto createFormDefinition(@Valid @RequestBody FormDefinitionDto dto) {
+  public FormDto createForm(@Valid @RequestBody FormDto dto) {
     if (formService.existsByFormKey(dto.getFormKey())) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Form with key '" + dto.getFormKey() + "' already exists");
     }
-    FormDefinition entity = formDefinitionMapper.toEntity(dto);
-    FormDefinition saved = formService.saveFormDefinition(entity);
-    return formDefinitionMapper.toDto(saved);
+    Form entity = formMapper.toEntity(dto);
+    Form saved = formService.saveForm(entity);
+    return formMapper.toDto(saved);
   }
 
   @PutMapping("/{key}")
   @InterfaceLog
-  public FormDefinitionDto updateFormDefinition(
+  public FormDto updateForm(
       @PathVariable String key,
-      @Valid @RequestBody FormDefinitionDto dto) {
-    FormDefinition entity = formDefinitionMapper.toEntity(dto);
-    FormDefinition updated = formService.updateFormDefinition(key, entity);
-    return formDefinitionMapper.toDto(updated);
+      @Valid @RequestBody FormDto dto) {
+    Form entity = formMapper.toEntity(dto);
+    Form updated = formService.updateForm(key, entity);
+    return formMapper.toDto(updated);
   }
 
   @DeleteMapping("/{key}")
   @InterfaceLog
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteFormDefinition(@PathVariable String key) {
-    formService.deleteFormDefinition(key);
+  public void deleteForm(@PathVariable String key) {
+    formService.deleteForm(key);
   }
 
 }

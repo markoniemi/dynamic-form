@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
-import { FormField, FormFieldOption } from '../types/Form';
+import { FormField, FieldOption } from '../types/Form';
 
 interface FieldTypeOption {
   value: string;
@@ -44,7 +44,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
     onChange(updated);
   };
 
-  const handleOptionChange = (optionIndex: number, key: keyof FormFieldOption, value: string) => {
+  const handleOptionChange = (optionIndex: number, key: keyof FieldOption, value: string) => {
     const newOptions = [...(field.options || [])];
     newOptions[optionIndex] = { ...newOptions[optionIndex], [key]: value };
     onChange({ ...field, options: newOptions });

@@ -1,15 +1,15 @@
 package com.example.backend.repository;
 
-import com.example.backend.entity.FormDefinition;
+import com.example.backend.entity.Form;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface FormDefinitionRepository extends JpaRepository<FormDefinition, Long> {
+public interface FormRepository extends JpaRepository<Form, Long> {
 
-  Optional<FormDefinition> findByFormKey(String formKey);
+  Optional<Form> findByFormKey(String formKey);
 
   boolean existsByFormKey(String formKey);
 

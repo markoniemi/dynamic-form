@@ -36,12 +36,14 @@ const mockSubmissions: FormDataDto[] = [
     formKey: 'contact',
     data: { fullName: 'Jane Doe', email: 'jane@example.com' },
     submittedAt: '2024-06-01T10:00:00.000Z',
+    submittedBy: 'test-user',
   },
   {
     id: 2,
     formKey: 'feedback',
     data: { message: 'Great service!' },
     submittedAt: '2024-06-02T14:30:00.000Z',
+    submittedBy: 'test-user',
   },
 ];
 

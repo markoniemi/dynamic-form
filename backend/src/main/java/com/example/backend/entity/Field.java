@@ -5,14 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FormFieldOption {
+public class Field {
 
-  private String value;
+  private String name;
   private String label;
+  private String type;
+  private boolean required;
+  private String placeholder;
+  private List<FieldOption> options;
 
 }
 

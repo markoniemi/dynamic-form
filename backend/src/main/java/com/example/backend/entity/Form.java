@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "form_definition")
+@Table(name = "form")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FormDefinition {
+public class Form {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class FormDefinition {
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(nullable = false)
-  private List<FormFieldDefinition> fields;
+  private List<Field> fields;
 
   @CreationTimestamp
   @Column(nullable = false, updatable = false)

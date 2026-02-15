@@ -5,13 +5,13 @@ import { useAuth } from 'react-oidc-context';
 import { BrowserRouter, useParams } from 'react-router-dom';
 import { formClient } from '../../src/services/formClient';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FormDefinition } from '../../src/types/Form';
+import { Form } from '../../src/types/Form';
 
 // Mock dependencies
 vi.mock('react-oidc-context');
 vi.mock('../../src/services/formClient', () => ({
   formClient: {
-    getFormDefinition: vi.fn(),
+    getForm: vi.fn(),
     submitForm: vi.fn(),
   },
 }));
@@ -35,7 +35,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const mockFormDefinition: FormDefinition = {
+const mockForm: Form = {
   title: 'Contact Form',
   description: 'Please fill in your details',
   fields: [
@@ -72,13 +72,13 @@ describe('FormSubmission Component', () => {
   });
 
   it('renders loading spinner while fetching form definition', () => {
-    vi.mocked(formClient.getFormDefinition).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(formClient.getForm).mockImplementation(() => new Promise(() => {}));
     renderFormSubmission();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('renders form fields after loading', async () => {
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderFormSubmission();
 
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe('FormSubmission Component', () => {
   });
 
   it('renders error alert when form definition fails to load', async () => {
-    vi.mocked(formClient.getFormDefinition).mockRejectedValue(new Error('Form not found'));
+    vi.mocked(formClient.getForm).mockRejectedValue(new Error('Form not found'));
     renderFormSubmission();
 
     await waitFor(() => {
@@ -100,7 +100,7 @@ describe('FormSubmission Component', () => {
   });
 
   it('navigates to /forms when "Back to Forms" is clicked on error', async () => {
-    vi.mocked(formClient.getFormDefinition).mockRejectedValue(new Error('Form not found'));
+    vi.mocked(formClient.getForm).mockRejectedValue(new Error('Form not found'));
     renderFormSubmission();
 
     await waitFor(() => screen.getByText('Back to Forms'));
@@ -114,7 +114,7 @@ describe('FormSubmission Component', () => {
       user: null,
       signinRedirect: mockSigninRedirect,
     });
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderFormSubmission();
 
     await waitFor(() => {
@@ -129,7 +129,7 @@ describe('FormSubmission Component', () => {
       user: null,
       signinRedirect: mockSigninRedirect,
     });
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderFormSubmission();
 
     await waitFor(() => screen.getByText('Click here to log in'));
@@ -138,12 +138,13 @@ describe('FormSubmission Component', () => {
   });
 
   it('submits form successfully and shows success alert', async () => {
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     vi.mocked(formClient.submitForm).mockResolvedValue({
       id: 1,
       formKey: 'contact',
       data: { fullName: 'Jane Doe', email: 'jane@example.com' },
       submittedAt: new Date().toISOString(),
+      submittedBy: 'test-user',
     });
     renderFormSubmission();
 
@@ -168,7 +169,7 @@ describe('FormSubmission Component', () => {
   });
 
   it('shows mutation error alert when form submission fails', async () => {
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     vi.mocked(formClient.submitForm).mockRejectedValue(new Error('Submission failed'));
     renderFormSubmission();
 
@@ -188,7 +189,7 @@ describe('FormSubmission Component', () => {
   });
 
   it('shows "Submitting..." text on the button while mutation is pending', async () => {
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     vi.mocked(formClient.submitForm).mockImplementation(() => new Promise(() => {}));
     renderFormSubmission();
 
@@ -208,7 +209,7 @@ describe('FormSubmission Component', () => {
   });
 
   it('navigates to /submissions when Cancel is clicked', async () => {
-    vi.mocked(formClient.getFormDefinition).mockResolvedValue(mockFormDefinition);
+    vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderFormSubmission();
 
     await waitFor(() => screen.getByText('Cancel'));

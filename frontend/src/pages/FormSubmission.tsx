@@ -22,12 +22,12 @@ export const FormSubmission: React.FC = () => {
   } = useForm();
 
   const {
-    data: formDefinition,
+    data: form,
     isLoading,
     error: fetchError,
   } = useQuery({
     queryKey: ['form', formKey],
-    queryFn: () => formClient.getFormDefinition(formKey!),
+    queryFn: () => formClient.getForm(formKey!),
     enabled: !!formKey,
   });
 
@@ -76,7 +76,7 @@ export const FormSubmission: React.FC = () => {
     );
   }
 
-  if (!formDefinition) {
+  if (!form) {
     return null;
   }
 
@@ -84,8 +84,8 @@ export const FormSubmission: React.FC = () => {
     <Container className="mt-5">
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title as="h2">{formDefinition.title}</Card.Title>
-          <Card.Text className="text-muted mb-4">{formDefinition.description}</Card.Text>
+          <Card.Title as="h2">{form.title}</Card.Title>
+          <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
           {showSuccess && (
             <Alert variant="success" onClose={() => setShowSuccess(false)} dismissible>
@@ -106,7 +106,7 @@ export const FormSubmission: React.FC = () => {
 
           <Form onSubmit={handleSubmit(onSubmit)}>
             <DynamicForm
-              fields={formDefinition.fields}
+              fields={form.fields}
               register={register}
               errors={errors}
             />

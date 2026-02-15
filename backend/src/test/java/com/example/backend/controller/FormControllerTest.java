@@ -3,11 +3,11 @@ package com.example.backend.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.example.backend.dto.FormDefinitionDto;
-import com.example.backend.dto.FormFieldDto;
-import com.example.backend.entity.FormDefinition;
-import com.example.backend.entity.FormFieldDefinition;
-import com.example.backend.mapper.FormDefinitionMapper;
+import com.example.backend.dto.FieldDto;
+import com.example.backend.dto.FormDto;
+import com.example.backend.entity.Field;
+import com.example.backend.entity.Form;
+import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +24,7 @@ class FormControllerTest {
 
   @Autowired private WebTestClient webTestClient;
   @MockitoBean private FormService formService;
-  @MockitoBean private FormDefinitionMapper formDefinitionMapper;
+  @MockitoBean private FormMapper formMapper;
 
   @Test
   @WithMockUser
@@ -47,16 +47,16 @@ class FormControllerTest {
 
   @Test
   @WithMockUser
-  void getFormDefinition() {
-    FormDefinition mockFormDefinition =
-        FormDefinition.builder()
+  void getForm() {
+    Form mockForm =
+        Form.builder()
             .id(1L)
             .formKey("form1")
             .title("Test Form")
             .description("A test form")
             .fields(
                 List.of(
-                    FormFieldDefinition.builder()
+                    Field.builder()
                         .name("testField")
                         .label("Test Field")
                         .type("text")
@@ -64,15 +64,15 @@ class FormControllerTest {
                         .build()))
             .build();
 
-    FormDefinitionDto mockDto =
-        FormDefinitionDto.builder()
+    FormDto mockDto =
+        FormDto.builder()
             .id(1L)
             .formKey("form1")
             .title("Test Form")
             .description("A test form")
             .fields(
                 List.of(
-                    FormFieldDto.builder()
+                    FieldDto.builder()
                         .name("testField")
                         .label("Test Field")
                         .type("text")
@@ -80,8 +80,8 @@ class FormControllerTest {
                         .build()))
             .build();
 
-    when(formService.getFormDefinition("form1")).thenReturn(mockFormDefinition);
-    when(formDefinitionMapper.toDto(any(FormDefinition.class))).thenReturn(mockDto);
+    when(formService.getForm("form1")).thenReturn(mockForm);
+    when(formMapper.toDto(any(Form.class))).thenReturn(mockDto);
 
     webTestClient
         .get()

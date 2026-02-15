@@ -1,36 +1,36 @@
 import { http } from './http';
-import { FormDefinition, FormDataDto, CreateFormDefinition } from '../types/Form';
+import { Form, FormDataDto, CreateForm } from '../types/Form';
 
 export const formClient = {
   async getAvailableForms(): Promise<string[]> {
     return http.request<string[]>('/forms', {});
   },
 
-  async getFormDefinition(formKey: string): Promise<FormDefinition> {
-    return http.request<FormDefinition>(`/forms/${formKey}`, {});
+  async getForm(formKey: string): Promise<Form> {
+    return http.request<Form>(`/forms/${formKey}`, {});
   },
 
-  async getAllFormDefinitions(token: string): Promise<FormDefinition[]> {
-    return http.request<FormDefinition[]>('/forms/all', { token });
+  async getAllForms(token: string): Promise<Form[]> {
+    return http.request<Form[]>('/forms/all', { token });
   },
 
-  async saveFormDefinition(formDefinition: CreateFormDefinition, token: string): Promise<FormDefinition> {
-    return http.request<FormDefinition>('/forms', {
+  async saveForm(form: CreateForm, token: string): Promise<Form> {
+    return http.request<Form>('/forms', {
       method: 'POST',
-      body: JSON.stringify(formDefinition),
+      body: JSON.stringify(form),
       token,
     });
   },
 
-  async updateFormDefinition(formKey: string, formDefinition: CreateFormDefinition, token: string): Promise<FormDefinition> {
-    return http.request<FormDefinition>(`/forms/${formKey}`, {
+  async updateForm(formKey: string, form: CreateForm, token: string): Promise<Form> {
+    return http.request<Form>(`/forms/${formKey}`, {
       method: 'PUT',
-      body: JSON.stringify(formDefinition),
+      body: JSON.stringify(form),
       token,
     });
   },
 
-  async deleteFormDefinition(formKey: string, token: string): Promise<void> {
+  async deleteForm(formKey: string, token: string): Promise<void> {
     await http.request<void>(`/forms/${formKey}`, {
       method: 'DELETE',
       token,

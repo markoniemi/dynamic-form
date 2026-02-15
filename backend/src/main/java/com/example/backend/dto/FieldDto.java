@@ -10,7 +10,7 @@ import java.util.List;
 
 @Value
 @Builder
-public class FormFieldDto {
+public class FieldDto {
 
   @NotBlank(message = "Field name is required")
   @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9]*$", message = "Field name must start with a letter and contain only alphanumeric characters")
@@ -28,7 +28,7 @@ public class FormFieldDto {
   String placeholder;
 
   @Valid
-  List<FormFieldOptionDto> options;
+  List<FieldOptionDto> options;
 
 }
 

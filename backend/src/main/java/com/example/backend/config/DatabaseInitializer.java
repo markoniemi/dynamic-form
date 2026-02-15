@@ -1,9 +1,9 @@
 package com.example.backend.config;
 
-import com.example.backend.entity.FormDefinition;
-import com.example.backend.entity.FormFieldDefinition;
-import com.example.backend.entity.FormFieldOption;
-import com.example.backend.repository.FormDefinitionRepository;
+import com.example.backend.entity.Field;
+import com.example.backend.entity.FieldOption;
+import com.example.backend.entity.Form;
+import com.example.backend.repository.FormRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +24,16 @@ import java.util.List;
 @Slf4j
 public class DatabaseInitializer implements CommandLineRunner {
 
-  private final FormDefinitionRepository formDefinitionRepository;
+  private final FormRepository formRepository;
   private final ObjectMapper objectMapper;
 
   @Override
   @Transactional
   public void run(String... args) {
-    loadFormDefinitionsFromResources();
+    loadFormsFromResources();
   }
 
-  private void loadFormDefinitionsFromResources() {
+  private void loadFormsFromResources() {
     try {
       ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
       Resource[] resources = resolver.getResources("classpath:/forms/*.json");
@@ -44,42 +44,42 @@ public class DatabaseInitializer implements CommandLineRunner {
         if (filename != null) {
           String formKey = filename.replace(".json", "");
 
-          if (formDefinitionRepository.existsByFormKey(formKey)) {
+          if (formRepository.existsByFormKey(formKey)) {
             log.debug("Form definition '{}' already exists, skipping", formKey);
             continue;
           }
 
-          FormDefinition formDefinition = parseFormDefinition(formKey, resource);
-          formDefinitionRepository.save(formDefinition);
+          Form form = parseForm(formKey, resource);
+          formRepository.save(form);
           loadedCount++;
           log.info("Loaded form definition: {}", formKey);
         }
       }
 
       log.info("Database initialization complete. Loaded {} new form definition(s). Total forms: {}",
-          loadedCount, formDefinitionRepository.count());
+          loadedCount, formRepository.count());
     } catch (IOException e) {
       log.error("Failed to load form definitions from resources", e);
       throw new RuntimeException("Failed to load form definitions", e);
     }
   }
 
-  private FormDefinition parseFormDefinition(String formKey, Resource resource) throws IOException {
+  private Form parseForm(String formKey, Resource resource) throws IOException {
     JsonNode rootNode = objectMapper.readTree(resource.getInputStream());
 
     String title = rootNode.path("title").asText("");
     String description = rootNode.path("description").asText("");
 
-    List<FormFieldDefinition> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     JsonNode fieldsNode = rootNode.path("fields");
     if (fieldsNode.isArray()) {
       for (JsonNode fieldNode : fieldsNode) {
-        FormFieldDefinition field = parseFieldDefinition(fieldNode);
+        Field field = parseFieldDefinition(fieldNode);
         fields.add(field);
       }
     }
 
-    return FormDefinition.builder()
+    return Form.builder()
         .formKey(formKey)
         .title(title)
         .description(description)
@@ -87,18 +87,18 @@ public class DatabaseInitializer implements CommandLineRunner {
         .build();
   }
 
-  private FormFieldDefinition parseFieldDefinition(JsonNode fieldNode) {
+  private Field parseFieldDefinition(JsonNode fieldNode) {
     String name = fieldNode.path("name").asText("");
     String label = fieldNode.path("label").asText("");
     String type = fieldNode.path("type").asText("text");
     boolean required = fieldNode.path("required").asBoolean(false);
     String placeholder = fieldNode.path("placeholder").asText(null);
 
-    List<FormFieldOption> options = new ArrayList<>();
+    List<FieldOption> options = new ArrayList<>();
     JsonNode optionsNode = fieldNode.path("options");
     if (optionsNode.isArray()) {
       for (JsonNode optionNode : optionsNode) {
-        FormFieldOption option = FormFieldOption.builder()
+        FieldOption option = FieldOption.builder()
             .value(optionNode.path("value").asText(""))
             .label(optionNode.path("label").asText(""))
             .build();
@@ -106,7 +106,7 @@ public class DatabaseInitializer implements CommandLineRunner {
       }
     }
 
-    return FormFieldDefinition.builder()
+    return Field.builder()
         .name(name)
         .label(label)
         .type(type)

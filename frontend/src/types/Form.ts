@@ -4,15 +4,15 @@ export interface FormField {
   type: 'text' | 'email' | 'tel' | 'number' | 'date' | 'textarea' | 'select' | 'radio' | 'checkbox';
   required: boolean;
   placeholder?: string;
-  options?: FormFieldOption[];
+  options?: FieldOption[];
 }
 
-export interface FormFieldOption {
+export interface FieldOption {
   value: string;
   label: string;
 }
 
-export interface FormDefinition {
+export interface Form {
   id?: number;
   formKey?: string;
   title: string;
@@ -20,7 +20,7 @@ export interface FormDefinition {
   fields: FormField[];
 }
 
-export interface CreateFormDefinition {
+export interface CreateForm {
   formKey: string;
   title: string;
   description: string;

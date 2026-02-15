@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class FormFieldOptionDto {
+public class FieldOptionDto {
 
   @NotBlank(message = "Option value is required")
   String value;

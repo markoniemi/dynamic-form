@@ -23,12 +23,12 @@ export const SubmissionDetail: React.FC = () => {
   });
 
   const {
-    data: formDefinition,
+    data: form,
     isLoading: isLoadingForm,
     error: formError,
   } = useQuery({
     queryKey: ['form', submission?.formKey],
-    queryFn: () => formClient.getFormDefinition(submission!.formKey),
+    queryFn: () => formClient.getForm(submission!.formKey),
     enabled: !!submission?.formKey,
   });
 
@@ -56,7 +56,7 @@ export const SubmissionDetail: React.FC = () => {
     );
   }
 
-  if (!submission || !formDefinition) {
+  if (!submission || !form) {
     return (
       <Container className="mt-5">
         <Alert variant="warning">Submission not found.</Alert>
@@ -79,8 +79,8 @@ export const SubmissionDetail: React.FC = () => {
 
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title as="h2">{formDefinition.title}</Card.Title>
-          <Card.Text className="text-muted mb-4">{formDefinition.description}</Card.Text>
+          <Card.Title as="h2">{form.title}</Card.Title>
+          <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
           <Alert variant="info" className="mb-4">
             <strong>Submission ID:</strong> {submission.id}
@@ -92,7 +92,7 @@ export const SubmissionDetail: React.FC = () => {
             <strong>Submitted By:</strong> {submission.submittedBy}
           </Alert>
 
-          <ReadOnlyDynamicForm fields={formDefinition.fields} data={submission.data} />
+          <ReadOnlyDynamicForm fields={form.fields} data={submission.data} />
         </Card.Body>
       </Card>
     </Container>

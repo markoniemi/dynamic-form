@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {formClient} from '../services/formClient';
-import {CreateFormDefinition, FormField} from '../types/Form';
+import {CreateForm, FormField} from '../types/Form';
 import {FieldEditor} from '../components/FieldEditor';
 
 const FIELD_TYPES = [
@@ -28,7 +28,7 @@ const createEmptyField = (): FormField => ({
   options: [],
 });
 
-export const CreateForm: React.FC = () => {
+export const EditForm: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const token = user?.access_token;
@@ -40,8 +40,8 @@ export const CreateForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
-    mutationFn: (formDefinition: CreateFormDefinition) =>
-      formClient.saveFormDefinition(formDefinition, token!),
+    mutationFn: (form: CreateForm) =>
+      formClient.saveForm(form, token!),
     onSuccess: () => {
       navigate('/forms');
     },
@@ -128,14 +128,14 @@ export const CreateForm: React.FC = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const formDefinition: CreateFormDefinition = {
+    const form: CreateForm = {
       formKey,
       title,
       description,
       fields,
     };
 
-    mutation.mutate(formDefinition);
+    mutation.mutate(form);
   };
 
   return (

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Value
 @Builder
-public class FormDefinitionDto {
+public class FormDto {
 
   Long id;
 
@@ -26,7 +26,7 @@ public class FormDefinitionDto {
 
   @NotEmpty(message = "At least one field is required")
   @Valid
-  List<FormFieldDto> fields;
+  List<FieldDto> fields;
 
 }
 

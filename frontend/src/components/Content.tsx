@@ -7,7 +7,7 @@ import {Forms} from '../pages/Forms';
 import {FormSubmission} from '../pages/FormSubmission';
 import {FormSubmissions} from '../pages/FormSubmissions';
 import {SubmissionDetail} from '../pages/SubmissionDetail';
-import {CreateForm} from '../pages/CreateForm';
+import {EditForm} from '../pages/EditForm.tsx';
 
 export const Content: React.FC = () => {
   const { isAuthenticated, isLoading, error, signinRedirect } = useAuth();
@@ -57,7 +57,7 @@ export const Content: React.FC = () => {
             <Route path="/forms" element={<Forms />} />
             <Route path="/forms/:formKey" element={<FormSubmission />} />
             <Route path="/forms/submissions/:id" element={<SubmissionDetail />} />
-            <Route path="/create-form" element={<CreateForm />} />
+            <Route path="/create-form" element={<EditForm />} />
             <Route path="/" element={<Forms />} />
             <Route path="/submissions" element={<FormSubmissions />} />
           </>
