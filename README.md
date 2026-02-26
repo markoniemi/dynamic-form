@@ -26,7 +26,6 @@ A dynamic form application using multi-module Spring Boot 3 application with a m
 
 ```
 monolith-parent/
-├── auth-server/              # OAuth2 Authorization Server (Port 9000)
 ├── frontend/                 # React + Vite (packaged as a WebJar)
 │   ├── src/                  # Source code
 │   └── test/                 # Vitest test files
@@ -44,13 +43,6 @@ monolith-parent/
 - Node.js 20+
 
 ### Development
-
-1. **Start Auth Server (Port 9000)**
-   ```bash
-   cd auth-server
-   mvn spring-boot:run
-   ```
-   - **Credentials**: `admin` / `admin`
 
 2. **Start Backend (Port 8080)**
    ```bash
