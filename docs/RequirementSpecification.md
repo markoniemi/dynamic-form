@@ -3,26 +3,12 @@
 ## 1. Maven Project Structure Setup
 
 - Create root aggregator pom.xml with Java 21 and Spring Boot 3.5.6 parent configuration
-- Define three modules: auth-server, frontend, backend
+- Define three modules: frontend, backend
 - Configure shared properties for Spring Boot 3.5.6, Lombok, and WebJars dependencies
 - Set up Maven compiler plugin for Java 21 with UTF-8 encoding
 - Add frontend module as packaging type "jar" with npm integration
 - Add backend module as packaging type "jar" with spring-boot-maven-plugin for executable JAR
 - Configure Spring Boot BOM for consistent dependency versions
-
-## 2. Auth Server Module (Port 9000)
-
-- Create auth-server module with spring-boot-starter-oauth2-authorization-server dependency
-- Add SLF4J logging starter (included by default)
-- Create application.yaml with fixed user credentials defined inline (username, password, roles)
-- Register single frontend client with Authorization Code Flow and PKCE support
-- Configure RegisteredClientRepository bean with client_secret_post disabled for public client
-- Set frontend client redirect URI to http://localhost:8080/callback
-- Create AuthorizationServerConfig class with SecurityFilterChain for OAuth2 endpoints
-- Configure token settings: access token TTL (typically 1 hour) and refresh token TTL
-- Set up authorization server issuer URL pointing to http://localhost:9000
-- Create simple login controller to display hardcoded user credentials
-- Add CORS configuration for development to accept localhost:8080 requests
 
 ## 3. Frontend Module (WebJars Distribution)
 
@@ -37,7 +23,7 @@
 - Add proxy for /login/oauth2 to http://localhost:9000
 - Create OAuth2 authentication service class with PKCE support
 - Implement PKCE helper: generate code_verifier, compute code_challenge
-- Create login handler that redirects to auth-server with correct parameters
+- Create login handler that redirects to oauth2-server with correct parameters
 - Create callback component to handle authorization code exchange
 - Implement token storage in React context/Redux using in-memory state
 - Add request interceptor to include JWT token in Authorization header
@@ -57,7 +43,7 @@
 - Create application.yaml for production profile with Supabase connection
 - Create application-dev.yaml with H2 database configuration
 - Create application-test.yaml with H2 test database configuration
-- Configure OAuth2 resource server to validate JWTs from auth-server issuer
+- Configure OAuth2 resource server to validate JWTs from oauth2-server issuer
 - Create WebSecurityConfig class with SecurityFilterChain
 - Configure security chain to permit GET /**, POST /**, PUT /**, DELETE /** for static resources (webjars)
 - Require OAuth2 authentication only for endpoints starting with /api/
@@ -74,8 +60,7 @@
 - Create src/test/java/com/example/DevelopmentApplication class
 - Add @SpringBootTest and @ActiveProfiles("test") annotations
 - Use testcontainers-spring-boot-test for OAuth server container
-- Create embedded testcontainer instance of auth-server module
-- Configure testcontainer to run auth-server on port 9000 during test
+- Configure testcontainer to run oauth2-server on port 9000 during test
 - Set up H2 database for backend module in test profile
 - Implement static method or @Bean to start both services programmatically
 - Create main method to allow running as standalone application for development
@@ -107,7 +92,7 @@
 
 ## 8. Build Pipeline and Maven Integration
 
-- Configure root pom.xml build order: auth-server first, frontend second, backend third
+- Configure root pom.xml build order: frontend second, backend third
 - Ensure frontend module completes npm build before backend dependency resolution
 - Set frontend dependency with classifier "webjars" in backend pom.xml
 - Configure spring-boot-maven-plugin to create executable JAR with webjars embedded
@@ -119,7 +104,6 @@
 ## 9. Development Workflow
 
 - Create separate startup commands documentation
-- Standalone auth-server: cd auth-server && mvn spring-boot:run (port 9000)
 - Standalone backend: cd backend && mvn spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=dev (port 8080)
 - Frontend development: cd frontend && npm run dev (port 5173 with proxies to backends)
 - Integration testing: Run DevelopmentApplication from IDE or mvn test
@@ -167,4 +151,4 @@
 
 ## Summary
 
-This refined approach creates a tightly integrated monolith where the frontend is packaged as WebJars within the backend module. Three Maven modules (auth-server, frontend, backend) build together into a single executable JAR containing both API and UI. DevelopmentApplication with testcontainers enables seamless local development and testing. Using Lombok and SLF4J throughout minimizes boilerplate code. The in-memory JWT storage in React combined with H2 testing database creates a lightweight, efficient development experience while maintaining production readiness with Supabase PostgreSQL.
+This refined approach creates a tightly integrated monolith where the frontend is packaged as WebJars within the backend module. Maven modules (frontend, backend) build together into a single executable JAR containing both API and UI. DevelopmentApplication with testcontainers enables seamless local development and testing. Using Lombok and SLF4J throughout minimizes boilerplate code. The in-memory JWT storage in React combined with H2 testing database creates a lightweight, efficient development experience while maintaining production readiness with Supabase PostgreSQL.

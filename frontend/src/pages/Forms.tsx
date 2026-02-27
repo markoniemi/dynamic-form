@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap';
+import { Alert, Button, Container, Row, Col, Spinner, Table } from 'react-bootstrap';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { formClient } from '../services/formClient';
@@ -46,29 +46,35 @@ export const Forms: React.FC = () => {
       ) : formKeys.length === 0 ? (
         <Alert variant="info">No forms available</Alert>
       ) : (
-        <Row>
-          {formKeys.map((formKey) => (
-            <Col md={4} key={formKey} className="mb-4">
-              <Card className="h-100 shadow-sm">
-                <Card.Body className="d-flex flex-column">
-                  <div className="mb-3 text-center">
-                    <FileText size={48} className="text-primary" />
-                  </div>
-                  <Card.Title className="text-center">{formatFormKey(formKey)}</Card.Title>
-                  <div className="mt-auto">
-                    <Button
-                      variant="primary"
-                      className="w-100"
-                      onClick={() => navigate(`/forms/${formKey}`)}
-                    >
-                      Open Form
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        <Table striped bordered hover responsive className="shadow-sm">
+          <thead className="table-light">
+            <tr>
+              <th scope="col">
+                <FileText size={20} className="me-2" />
+                Form Name
+              </th>
+              <th scope="col" className="text-center">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {formKeys.map((formKey) => (
+              <tr key={formKey}>
+                <td className="align-middle">{formatFormKey(formKey)}</td>
+                <td className="text-center">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => navigate(`/forms/${formKey}`)}
+                  >
+                    Open Form
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
     </Container>
   );

@@ -1,6 +1,5 @@
 package com.example.backend.e2e.pages;
 
-import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,8 +13,6 @@ public class FormsPage extends BasePage {
   @FindBy(xpath = "//h2[contains(text(), 'Available Forms')]")
   private WebElement heading;
 
-  @FindBy(xpath = "//button[contains(text(), 'Open Form')]")
-  private List<WebElement> openFormButtons;
   @FindBy(xpath = "//a[contains(text(), 'Submissions')]")
   private WebElement formSubmissionsLink;
 
@@ -38,19 +35,17 @@ public class FormsPage extends BasePage {
   public void openForm(String formKey) {
     waitForLoad();
     String formTitle = toTitleCase(formKey);
-    openFormButtons.stream()
-        .filter(btn -> btn.findElement(
-            By.xpath("./ancestor::div[contains(@class,'card')]"))
-            .getText().contains(formTitle))
-        .findFirst()
-        .orElseGet(() -> openFormButtons.getFirst())
-        .click();
+    WebElement formRow = wait.until(ExpectedConditions.visibilityOfElementLocated(
+        By.xpath("//td[contains(text(), '" + formTitle + "')]/..")));
+    WebElement openButton = formRow.findElement(By.xpath(".//button[contains(text(), 'Open Form')]"));
+    openButton.click();
   }
 
   public void openFirstForm() {
     waitForLoad();
-    wait.until(ExpectedConditions.elementToBeClickable(openFormButtons.getFirst()));
-    openFormButtons.getFirst().click();
+    WebElement firstButton = wait.until(ExpectedConditions.elementToBeClickable(
+        By.xpath("//tbody/tr[1]//button[contains(text(), 'Open Form')]")));
+    firstButton.click();
   }
 
   private String toTitleCase(String key) {

@@ -18,6 +18,13 @@ This document provides guidance for GitHub Copilot to assist in the development 
 *   **Immutability**: Prefer immutability where possible, especially for DTOs and configuration properties. Use @Value annotation where possible.
 * Use lombok whenever possible.
 * Use constructor injection.
+*   **Follow the Single Responsibility Principle**: Each class or method should have one, and only one, reason to change.
+*   **Meaningful Names**: Use clear, intention-revealing names for variables, methods, and classes.
+*   **Keep Methods Small**: Methods should be small and do one thing. If a method is doing too many things, break it down into smaller, more focused methods.
+*   **Comments are a Last Resort**: Code should be self-documenting. If you need to add a comment, consider refactoring the code to make it clearer.
+*   **Don't Repeat Yourself (DRY)**: Avoid duplicating code. Use abstraction to reuse common logic.
+*   **Favor Polymorphism over If/Else or Switch/Case**: When dealing with different behaviors based on type, use polymorphism to create more maintainable and scalable code.
+
 
 ### TypeScript/React (Frontend)
 *   **Style Guide**: Follow the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) and the official TypeScript guidelines.

@@ -24,7 +24,7 @@ public class TestcontainersConfig {
   @RestartScope
   public GenericContainer<?> authorizationServerContainer() {
     GenericContainer<?> authorizationServer =
-        new GenericContainer<>(DockerImageName.parse("auth-server:latest"))
+        new GenericContainer<>(DockerImageName.parse("ghcr.io/markoniemi/oauth2-server:latest"))
             .withExposedPorts(9000)
             .withLogConsumer(new Slf4jLogConsumer(log))
             .withCreateContainerCmdModifier(getPortConfig())
