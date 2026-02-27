@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +35,7 @@ public class FormController {
 
   @GetMapping("/all")
   @InterfaceLog
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public List<FormDto> getAllForms() {
     return formService.getAllForms().stream()
         .map(formMapper::toDto)
@@ -50,6 +52,7 @@ public class FormController {
   @PostMapping
   @InterfaceLog
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto createForm(@Valid @RequestBody FormDto dto) {
     if (formService.existsByFormKey(dto.getFormKey())) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Form with key '" + dto.getFormKey() + "' already exists");
@@ -61,6 +64,7 @@ public class FormController {
 
   @PutMapping("/{key}")
   @InterfaceLog
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto updateForm(
       @PathVariable String key,
       @Valid @RequestBody FormDto dto) {
@@ -72,6 +76,7 @@ public class FormController {
   @DeleteMapping("/{key}")
   @InterfaceLog
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public void deleteForm(@PathVariable String key) {
     formService.deleteForm(key);
   }

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class FormDataController {
 
     @PostMapping("/{key}")
     @InterfaceLog
+    @PreAuthorize("isAuthenticated()")
     public FormDataDto submitForm(
             @PathVariable String key,
             @RequestBody Map<String, Object> data,
@@ -38,6 +40,7 @@ public class FormDataController {
 
     @GetMapping
     @InterfaceLog
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<FormDataDto> getAllSubmissions() {
         return formDataService.getAllFormSubmissions().stream()
                 .map(formDataMapper::toDto)
@@ -46,6 +49,7 @@ public class FormDataController {
 
     @GetMapping("/{key}")
     @InterfaceLog
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<FormDataDto> getSubmissionsByFormKey(@PathVariable String key) {
         return formDataService.getFormSubmissionsByKey(key).stream()
                 .map(formDataMapper::toDto)
@@ -54,6 +58,7 @@ public class FormDataController {
 
     @GetMapping("/submission/{id}")
     @InterfaceLog
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public FormDataDto getSubmissionById(@PathVariable Long id) {
         return formDataService.getFormSubmissionById(id)
                 .map(formDataMapper::toDto)
@@ -62,6 +67,7 @@ public class FormDataController {
 
     @DeleteMapping("/submission/{id}")
     @InterfaceLog
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteSubmission(@PathVariable Long id) {
         formDataService.deleteFormSubmission(id);
     }

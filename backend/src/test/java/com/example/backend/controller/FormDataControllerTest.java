@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -61,7 +61,6 @@ class FormDataControllerTest {
   }
 
   @Test
-  @WithMockUser
   void getAllSubmissions() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
@@ -71,13 +70,12 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data"))
+        .perform(get("/api/form-data").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }
 
   @Test
-  @WithMockUser
   void getSubmissionsByFormKey() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
@@ -88,13 +86,12 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data/form1"))
+        .perform(get("/api/form-data/form1").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }
 
   @Test
-  @WithMockUser
   void getSubmissionById() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
@@ -104,15 +101,19 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data/submission/1"))
+        .perform(get("/api/form-data/submission/1").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L));
   }
 
   @Test
-  @WithMockUser
   void deleteSubmission() throws Exception {
-    mockMvc.perform(delete("/api/form-data/submission/1").with(csrf())).andExpect(status().isOk());
+    mockMvc
+        .perform(
+            delete("/api/form-data/submission/1")
+                .with(csrf())
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        .andExpect(status().isOk());
 
     verify(formDataService).deleteFormSubmission(1L);
   }
