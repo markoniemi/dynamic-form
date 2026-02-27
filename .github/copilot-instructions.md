@@ -24,6 +24,7 @@ This document provides guidance for GitHub Copilot to assist in the development 
 *   **Comments are a Last Resort**: Code should be self-documenting. If you need to add a comment, consider refactoring the code to make it clearer.
 *   **Don't Repeat Yourself (DRY)**: Avoid duplicating code. Use abstraction to reuse common logic.
 *   **Favor Polymorphism over If/Else or Switch/Case**: When dealing with different behaviors based on type, use polymorphism to create more maintainable and scalable code.
+*   **Exception Handling**: Throw standard Java exceptions from the service layer (`NoSuchElementException` for not-found, `IllegalArgumentException` for bad input, `IllegalStateException` for invalid state). Do **not** use HTTP-specific exceptions like `ResponseStatusException` in services. Map all exceptions to HTTP responses once, centrally, in a `@RestControllerAdvice`.
 
 
 ### TypeScript/React (Frontend)
@@ -116,7 +117,7 @@ When working on backend tasks, focus on:
     *   Unit and integration testing with JUnit 5 and Mockito
 *   **Key Priorities:**
     1.  Ensure data integrity and proper validation using Bean Validation annotations (`@NotNull`, `@Size`, `@Valid`)
-    2.  Implement proper exception handling with `@ControllerAdvice` or `@RestControllerAdvice` and custom exceptions
+    2.  Implement proper exception handling with `@RestControllerAdvice`. Use standard Java exceptions in the service layer — do **not** throw HTTP-specific exceptions (e.g. `ResponseStatusException`) from services. Map exceptions to HTTP status codes once, centrally, in the `@RestControllerAdvice`. Preferred mappings: `NoSuchElementException` → 404, `IllegalArgumentException` → 400, `IllegalStateException` → 409.
     3.  Use DTOs for API request/response objects, never expose entities directly
     4.  Use mapstruct for entity-DTO mapping
     5.  Include comprehensive logging with SLF4J
