@@ -4,25 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { formClient } from '../services/formClient';
 import { FileText } from 'lucide-react';
+import {useAuth} from "react-oidc-context";
 
 export const Forms: React.FC = () => {
   const navigate = useNavigate();
+    const { user } = useAuth();
+    const token = user?.access_token;
 
   const {
-    data: formKeys = [],
+    data: forms = [],
     isLoading,
     error,
   } = useQuery({
     queryKey: ['forms'],
-    queryFn: () => formClient.getAvailableForms(),
+    queryFn: () => formClient.getAvailableForms(token!),
   });
-
-  const formatFormKey = (key: string) => {
-    return key
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
 
   return (
     <Container className="mt-5">
@@ -43,7 +39,7 @@ export const Forms: React.FC = () => {
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         </div>
-      ) : formKeys.length === 0 ? (
+      ) : forms.length === 0 ? (
         <Alert variant="info">No forms available</Alert>
       ) : (
         <Table striped bordered hover responsive className="shadow-sm">
@@ -59,14 +55,14 @@ export const Forms: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {formKeys.map((formKey) => (
-              <tr key={formKey}>
-                <td className="align-middle">{formatFormKey(formKey)}</td>
+            {forms.map((form) => (
+              <tr key={form.formKey}>
+                <td className="align-middle">{form.title}</td>
                 <td className="text-center">
                   <Button
                     variant="primary"
                     size="sm"
-                    onClick={() => navigate(`/forms/${formKey}`)}
+                    onClick={() => navigate(`/forms/${form.formKey}`)}
                   >
                     Open Form
                   </Button>

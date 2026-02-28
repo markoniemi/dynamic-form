@@ -1,13 +1,13 @@
 import { http } from './http';
-import { Form, FormDataDto, CreateForm } from '../types/Form';
+import { Form, FormDataDto, CreateForm, FormListItem } from '../types/Form';
 
 export const formClient = {
-  async getAvailableForms(): Promise<string[]> {
-    return http.request<string[]>('/forms', {});
+  async getAvailableForms(token: string): Promise<FormListItem[]> {
+    return http.request<FormListItem[]>('/forms', {token});
   },
 
-  async getForm(formKey: string): Promise<Form> {
-    return http.request<Form>(`/forms/${formKey}`, {});
+  async getForm(formKey: string,token:string): Promise<Form> {
+    return http.request<Form>(`/forms/${formKey}`, {token});
   },
 
   async getAllForms(token: string): Promise<Form[]> {

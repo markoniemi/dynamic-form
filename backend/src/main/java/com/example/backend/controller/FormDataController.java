@@ -40,7 +40,7 @@ public class FormDataController {
 
     @GetMapping
     @InterfaceLog
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public List<FormDataDto> getAllSubmissions() {
         return formDataService.getAllFormSubmissions().stream()
                 .map(formDataMapper::toDto)
@@ -49,7 +49,7 @@ public class FormDataController {
 
     @GetMapping("/{key}")
     @InterfaceLog
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public List<FormDataDto> getSubmissionsByFormKey(@PathVariable String key) {
         return formDataService.getFormSubmissionsByKey(key).stream()
                 .map(formDataMapper::toDto)
@@ -58,7 +58,7 @@ public class FormDataController {
 
     @GetMapping("/submission/{id}")
     @InterfaceLog
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public FormDataDto getSubmissionById(@PathVariable Long id) {
         return formDataService.getFormSubmissionById(id)
                 .map(formDataMapper::toDto)

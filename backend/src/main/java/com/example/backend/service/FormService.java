@@ -1,17 +1,17 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Form;
 import com.example.backend.repository.FormRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +20,13 @@ import java.util.stream.Collectors;
 public class FormService {
 
   private final FormRepository formRepository;
+
+  @InterfaceLog
+  public List<FormListItemDto> getAvailableForms() {
+    return formRepository.findAll().stream()
+        .map(form -> new FormListItemDto(form.getFormKey(), form.getTitle()))
+        .collect(Collectors.toList());
+  }
 
   @InterfaceLog
   public Set<String> getAvailableFormKeys() {

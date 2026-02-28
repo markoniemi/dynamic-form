@@ -1,10 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.FormDto;
+import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -12,10 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/forms")
@@ -29,8 +28,8 @@ public class FormController {
 
   @GetMapping
   @InterfaceLog
-  public Set<String> getAvailableForms() {
-    return formService.getAvailableFormKeys();
+  public List<FormListItemDto> getAvailableForms() {
+    return formService.getAvailableForms();
   }
 
   @GetMapping("/all")

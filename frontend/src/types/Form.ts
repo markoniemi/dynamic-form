@@ -27,6 +27,11 @@ export interface CreateForm {
   fields: FormField[];
 }
 
+export interface FormListItem {
+  formKey: string;
+  title: string;
+}
+
 export interface FormDataDto {
   id: number;
   formKey: string;
