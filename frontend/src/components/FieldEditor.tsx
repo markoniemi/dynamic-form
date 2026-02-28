@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Card, Col, Form, Row } from 'react-bootstrap';
-import { FormField, FieldOption } from '../types/Form';
+import {Button, Card, Col, Form, Row} from 'react-bootstrap';
+import {FieldOption, FormField} from '../types/Form';
 
 interface FieldTypeOption {
   value: string;

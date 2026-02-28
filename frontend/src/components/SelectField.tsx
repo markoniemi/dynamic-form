@@ -1,12 +1,12 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
-import { UseFormRegister } from 'react-hook-form';
-import { FormField } from '../types/Form';
-import { FieldWrapper } from './FieldWrapper';
+import {Form} from 'react-bootstrap';
+import {UseFormRegister} from 'react-hook-form';
+import {FormField} from '../types/Form';
+import {FieldWrapper} from './FieldWrapper';
 
 interface FieldProps {
   field: FormField;
-  register: UseFormRegister<any>;
+  register: UseFormRegister<FormValues>;
   errorMessage?: string;
 }
 

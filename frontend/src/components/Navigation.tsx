@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Container, Nav, Navbar } from 'react-bootstrap';
-import { useAuth } from 'react-oidc-context';
-import { Link } from 'react-router-dom';
+import {Button, Container, Nav, Navbar} from 'react-bootstrap';
+import {useAuth} from 'react-oidc-context';
+import {Link} from 'react-router-dom';
 
 export const Navigation: React.FC = () => {
   const { isAuthenticated, signinRedirect, signoutRedirect } = useAuth();

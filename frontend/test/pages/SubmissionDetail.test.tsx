@@ -173,7 +173,7 @@ describe('SubmissionDetail Component', () => {
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(formClient.getForm).toHaveBeenCalledWith('contact');
+      expect(formClient.getForm).toHaveBeenCalledWith('contact', 'mock-token');
     });
   });
 

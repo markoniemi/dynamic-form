@@ -39,3 +39,5 @@ export interface FormDataDto {
   submittedAt: string;
   submittedBy: string;
 }
+
+export type FormValues = Record<string, string | string[] | boolean>

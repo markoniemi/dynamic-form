@@ -9,7 +9,7 @@ const mockRegister = vi.fn((name) => ({
     onChange: vi.fn(),
     onBlur: vi.fn(),
     ref: vi.fn(),
-})) as unknown as UseFormRegister<any>;
+})) as unknown as UseFormRegister<FormValues>;
 
 const mockErrors = {};
 

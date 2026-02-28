@@ -1,15 +1,15 @@
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { FormField } from '../types/Form';
-import { TextField } from './TextField';
-import { TextAreaField } from './TextAreaField';
-import { SelectField } from './SelectField';
-import { RadioField } from './RadioField';
-import { CheckboxField } from './CheckboxField';
+import {FieldErrors, UseFormRegister} from 'react-hook-form';
+import {FormField, FormValues} from '../types/Form';
+import {TextField} from './TextField';
+import {TextAreaField} from './TextAreaField';
+import {SelectField} from './SelectField';
+import {RadioField} from './RadioField';
+import {CheckboxField} from './CheckboxField';
 
 interface DynamicFormProps {
   fields: FormField[];
-  register: UseFormRegister<any>;
+  register: UseFormRegister<FormValues>;
   errors: FieldErrors;
 }
 

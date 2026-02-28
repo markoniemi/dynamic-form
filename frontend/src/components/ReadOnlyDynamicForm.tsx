@@ -1,7 +1,7 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
-import { FormField } from '../types/Form';
-import { FieldWrapper } from './FieldWrapper';
+import {Form} from 'react-bootstrap';
+import {FormField} from '../types/Form';
+import {FieldWrapper} from './FieldWrapper';
 
 interface ReadOnlyDynamicFormProps {
   fields: FormField[];
