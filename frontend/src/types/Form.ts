@@ -35,7 +35,7 @@ export interface FormListItem {
 export interface FormDataDto {
   id: number;
   formKey: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   submittedAt: string;
   submittedBy: string;
 }
