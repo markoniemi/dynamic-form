@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "compile": "tsc --noEmit -p tsconfig.app.json",
-    "test": "vitest --coverage",
-    "update": "npx npm-check-updates -u"
+    "test": "vitest run --coverage",
+    "update": "npx npm-check-updates -u",
+    "ci": "npm install && npm run build && npm test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
