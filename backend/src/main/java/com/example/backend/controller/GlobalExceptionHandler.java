@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -34,6 +36,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NoResourceFoundException.class)
   public ResponseEntity<ErrorDto> handleNoResourceFoundException(NoResourceFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDto.of(ex));
+  }
+  @ExceptionHandler(NoSuchElementException.class)
+  public ResponseEntity<ErrorDto> handleNoSuchElementException(NoSuchElementException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDto.of(ex));
   }
 

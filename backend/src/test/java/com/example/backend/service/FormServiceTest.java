@@ -7,6 +7,7 @@ import com.example.backend.entity.Form;
 import com.example.backend.entity.Field;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class FormServiceTest {
   void getFormWithNotFoundThrowsException() {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class, () -> formService.getForm("unknown"));
+    assertThrows(NoSuchElementException.class, () -> formService.getForm("unknown"));
   }
 
   @Test

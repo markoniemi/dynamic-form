@@ -4,6 +4,7 @@ import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Form;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class FormService {
   @InterfaceLog
   public Form getForm(String formKey) {
     return formRepository.findByFormKey(formKey)
-        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+        .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
   }
 
   @InterfaceLog
@@ -62,7 +63,7 @@ public class FormService {
   @Transactional
   public Form updateForm(String formKey, Form updatedDefinition) {
     Form existing = formRepository.findByFormKey(formKey)
-        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+        .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
 
     existing.setTitle(updatedDefinition.getTitle());
     existing.setDescription(updatedDefinition.getDescription());
@@ -76,7 +77,7 @@ public class FormService {
   @Transactional
   public void deleteForm(String formKey) {
     Form existing = formRepository.findByFormKey(formKey)
-        .orElseThrow(() -> new IllegalArgumentException("Form not found: " + formKey));
+        .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
     formRepository.delete(existing);
     log.info("Deleted form definition: {}", formKey);
   }

@@ -6,6 +6,7 @@ import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,9 +61,10 @@ public class FormDataController {
     @InterfaceLog
     @PreAuthorize("isAuthenticated()")
     public FormDataDto getSubmissionById(@PathVariable Long id) {
-        return formDataService.getFormSubmissionById(id)
-                .map(formDataMapper::toDto)
-                .orElseThrow(() -> new IllegalArgumentException("Form submission not found: " + id));
+    return formDataService
+        .getFormSubmissionById(id)
+        .map(formDataMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
     }
 
     @DeleteMapping("/submission/{id}")
