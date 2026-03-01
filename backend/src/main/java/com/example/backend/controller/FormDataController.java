@@ -7,7 +7,6 @@ import com.example.backend.service.FormDataService;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -45,7 +44,7 @@ public class FormDataController {
   public List<FormDataDto> getAllSubmissions() {
     return formDataService.getAllFormSubmissions().stream()
         .map(formDataMapper::toDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @GetMapping("/{key}")
@@ -54,7 +53,7 @@ public class FormDataController {
   public List<FormDataDto> getSubmissionsByFormKey(@PathVariable String key) {
     return formDataService.getFormSubmissionsByKey(key).stream()
         .map(formDataMapper::toDto)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @GetMapping("/submission/{id}")

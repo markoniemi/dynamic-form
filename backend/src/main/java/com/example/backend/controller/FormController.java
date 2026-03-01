@@ -7,7 +7,6 @@ import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -36,7 +35,7 @@ public class FormController {
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public List<FormDto> getAllForms() {
-    return formService.getAllForms().stream().map(formMapper::toDto).collect(Collectors.toList());
+    return formService.getAllForms().stream().map(formMapper::toDto).toList();
   }
 
   @GetMapping("/{key}")
