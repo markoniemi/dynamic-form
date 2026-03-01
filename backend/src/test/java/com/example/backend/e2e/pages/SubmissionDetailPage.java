@@ -28,23 +28,23 @@ public class SubmissionDetailPage extends BasePage {
     // This method might need similar logic if used, but for now we focus on containsText
     return containsText(value);
   }
-  
+
   public boolean containsText(String text) {
-      waitForLoad();
-      // Check visible text (labels, etc.)
-      if (detailsCard.getText().contains(text)) {
-          return true;
+    waitForLoad();
+    // Check visible text (labels, etc.)
+    if (detailsCard.getText().contains(text)) {
+      return true;
+    }
+
+    // Check input values (since ReadOnlyDynamicForm uses inputs for values)
+    List<WebElement> inputs = detailsCard.findElements(By.cssSelector("input, textarea"));
+    for (WebElement input : inputs) {
+      String val = input.getAttribute("value");
+      if (val != null && val.contains(text)) {
+        return true;
       }
-      
-      // Check input values (since ReadOnlyDynamicForm uses inputs for values)
-      List<WebElement> inputs = detailsCard.findElements(By.cssSelector("input, textarea"));
-      for (WebElement input : inputs) {
-          String val = input.getAttribute("value");
-          if (val != null && val.contains(text)) {
-              return true;
-          }
-      }
-      
-      return false;
+    }
+
+    return false;
   }
 }

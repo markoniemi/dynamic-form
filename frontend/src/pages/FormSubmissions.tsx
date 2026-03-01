@@ -1,12 +1,12 @@
 import React from 'react';
-import { Alert, Button, Card, Col, Container, Row, Spinner, Table } from 'react-bootstrap';
-import { useAuth } from 'react-oidc-context';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { formClient } from '../services/formClient';
+import {Alert, Button, Card, Col, Container, Row, Spinner, Table} from 'react-bootstrap';
+import {useAuth} from 'react-oidc-context';
+import {useQuery} from '@tanstack/react-query';
+import {useNavigate} from 'react-router-dom';
+import {formClient} from '../services/formClient';
 
 export const FormSubmissions: React.FC = () => {
-  const { user } = useAuth();
+  const {user} = useAuth();
   const navigate = useNavigate();
   const token = user?.access_token;
 
@@ -53,36 +53,32 @@ export const FormSubmissions: React.FC = () => {
           <Card.Body>
             <Table striped bordered hover responsive>
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Form Key</th>
-                  <th>Submitted At</th>
-                  <th>Data</th>
-                  <th>Actions</th>
-                </tr>
+              <tr>
+                <th>ID</th>
+                <th>Form Key</th>
+                <th>Submitted At</th>
+                <th>Submitted By</th>
+                <th>Actions</th>
+              </tr>
               </thead>
               <tbody>
-                {submissions.map((submission) => (
-                  <tr key={submission.id}>
-                    <td>{submission.id}</td>
-                    <td>{submission.formKey}</td>
-                    <td>{new Date(submission.submittedAt).toLocaleString()}</td>
-                    <td>
-                      <pre style={{ margin: 0, maxHeight: '100px', overflowY: 'auto' }}>
-                        {JSON.stringify(submission.data, null, 2)}
-                      </pre>
-                    </td>
-                    <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => navigate(`/forms/submissions/${submission.id}`)}
-                      >
-                        View Details
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+              {submissions.map((submission) => (
+                <tr key={submission.id}>
+                  <td>{submission.id}</td>
+                  <td>{submission.formKey}</td>
+                  <td>{new Date(submission.submittedAt).toLocaleString()}</td>
+                  <td>{submission.submittedBy}</td>
+                  <td>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => navigate(`/forms/submissions/${submission.id}`)}
+                    >
+                      View Details
+                    </Button>
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </Table>
           </Card.Body>

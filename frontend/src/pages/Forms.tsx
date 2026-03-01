@@ -1,15 +1,15 @@
 import React from 'react';
-import { Alert, Button, Container, Row, Col, Spinner, Table } from 'react-bootstrap';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { formClient } from '../services/formClient';
-import { FileText } from 'lucide-react';
+import {Alert, Button, Col, Container, Row, Spinner, Table} from 'react-bootstrap';
+import {useQuery} from '@tanstack/react-query';
+import {useNavigate} from 'react-router-dom';
+import {formClient} from '../services/formClient';
+import {FileText} from 'lucide-react';
 import {useAuth} from "react-oidc-context";
 
 export const Forms: React.FC = () => {
   const navigate = useNavigate();
-    const { user } = useAuth();
-    const token = user?.access_token;
+  const {user} = useAuth();
+  const token = user?.access_token;
 
   const {
     data: forms = [],
@@ -44,31 +44,31 @@ export const Forms: React.FC = () => {
       ) : (
         <Table striped bordered hover responsive className="shadow-sm">
           <thead className="table-light">
-            <tr>
-              <th scope="col">
-                <FileText size={20} className="me-2" />
-                Form Name
-              </th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
+          <tr>
+            <th scope="col">
+              <FileText size={20} className="me-2"/>
+              Form Name
+            </th>
+            <th scope="col" className="text-center">
+              Actions
+            </th>
+          </tr>
           </thead>
           <tbody>
-            {forms.map((form) => (
-              <tr key={form.formKey}>
-                <td className="align-middle">{form.title}</td>
-                <td className="text-center">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => navigate(`/forms/${form.formKey}`)}
-                  >
-                    Open Form
-                  </Button>
-                </td>
-              </tr>
-            ))}
+          {forms.map((form) => (
+            <tr key={form.formKey}>
+              <td className="align-middle">{form.title}</td>
+              <td className="text-center">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate(`/forms/${form.formKey}`)}
+                >
+                  Open Form
+                </Button>
+              </td>
+            </tr>
+          ))}
           </tbody>
         </Table>
       )}

@@ -34,8 +34,10 @@ public class TestcontainersConfig {
   }
 
   @Bean
-  public CommandLineRunner ensureContainerStarted(GenericContainer<?> authorizationServerContainer) {
-    return args -> log.info("Auth server container started: {}", authorizationServerContainer.isRunning());
+  public CommandLineRunner ensureContainerStarted(
+      GenericContainer<?> authorizationServerContainer) {
+    return args ->
+        log.info("Auth server container started: {}", authorizationServerContainer.isRunning());
   }
 
   private static @NonNull Consumer<CreateContainerCmd> getPortConfig() {

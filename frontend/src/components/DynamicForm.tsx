@@ -14,10 +14,10 @@ interface DynamicFormProps {
 }
 
 export const DynamicForm: React.FC<DynamicFormProps> = ({
-  fields,
-  register,
-  errors,
-}) => {
+                                                          fields,
+                                                          register,
+                                                          errors,
+                                                        }) => {
   const renderField = (field: FormField) => {
     const errorMessage = errors[field.name]?.message as string | undefined;
 
@@ -27,19 +27,24 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       case 'tel':
       case 'number':
       case 'date':
-        return <TextField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
+        return <TextField key={field.name} field={field} register={register}
+                          errorMessage={errorMessage}/>;
 
       case 'textarea':
-        return <TextAreaField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
+        return <TextAreaField key={field.name} field={field} register={register}
+                              errorMessage={errorMessage}/>;
 
       case 'select':
-        return <SelectField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
+        return <SelectField key={field.name} field={field} register={register}
+                            errorMessage={errorMessage}/>;
 
       case 'radio':
-        return <RadioField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
+        return <RadioField key={field.name} field={field} register={register}
+                           errorMessage={errorMessage}/>;
 
       case 'checkbox':
-        return <CheckboxField key={field.name} field={field} register={register} errorMessage={errorMessage} />;
+        return <CheckboxField key={field.name} field={field} register={register}
+                              errorMessage={errorMessage}/>;
 
       default:
         return null;

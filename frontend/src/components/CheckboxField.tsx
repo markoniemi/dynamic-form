@@ -10,7 +10,7 @@ interface FieldProps {
   errorMessage?: string;
 }
 
-export const CheckboxField: React.FC<FieldProps> = ({ field, register, errorMessage }) => (
+export const CheckboxField: React.FC<FieldProps> = ({field, register, errorMessage}) => (
   <FieldWrapper label={field.label} required={field.required}>
     {field.options?.map((option) => (
       <Form.Check

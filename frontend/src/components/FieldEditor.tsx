@@ -18,24 +18,24 @@ interface FieldEditorProps {
 }
 
 export const FieldEditor: React.FC<FieldEditorProps> = ({
-  field,
-  index,
-  totalFields,
-  fieldTypes,
-  onChange,
-  onRemove,
-  onMove,
-}) => {
+                                                          field,
+                                                          index,
+                                                          totalFields,
+                                                          fieldTypes,
+                                                          onChange,
+                                                          onRemove,
+                                                          onMove,
+                                                        }) => {
   const needsOptions = field.type === 'select' || field.type === 'radio';
 
   const handleChange = (key: keyof FormField, value: string | boolean) => {
-    const updated = { ...field, [key]: value };
+    const updated = {...field, [key]: value};
 
     // Reset options when switching to/from types that need them
     if (key === 'type') {
       const newNeedsOptions = value === 'select' || value === 'radio';
       if (newNeedsOptions && (!field.options || field.options.length === 0)) {
-        updated.options = [{ value: '', label: '' }];
+        updated.options = [{value: '', label: ''}];
       } else if (!newNeedsOptions) {
         updated.options = [];
       }
@@ -46,19 +46,19 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
 
   const handleOptionChange = (optionIndex: number, key: keyof FieldOption, value: string) => {
     const newOptions = [...(field.options || [])];
-    newOptions[optionIndex] = { ...newOptions[optionIndex], [key]: value };
-    onChange({ ...field, options: newOptions });
+    newOptions[optionIndex] = {...newOptions[optionIndex], [key]: value};
+    onChange({...field, options: newOptions});
   };
 
   const handleAddOption = () => {
-    const newOptions = [...(field.options || []), { value: '', label: '' }];
-    onChange({ ...field, options: newOptions });
+    const newOptions = [...(field.options || []), {value: '', label: ''}];
+    onChange({...field, options: newOptions});
   };
 
   const handleRemoveOption = (optionIndex: number) => {
     if (field.options && field.options.length > 1) {
       const newOptions = field.options.filter((_, i) => i !== optionIndex);
-      onChange({ ...field, options: newOptions });
+      onChange({...field, options: newOptions});
     }
   };
 

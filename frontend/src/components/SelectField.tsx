@@ -10,10 +10,10 @@ interface FieldProps {
   errorMessage?: string;
 }
 
-export const SelectField: React.FC<FieldProps> = ({ field, register, errorMessage }) => (
+export const SelectField: React.FC<FieldProps> = ({field, register, errorMessage}) => (
   <FieldWrapper label={field.label} required={field.required} controlId={field.name}>
     <Form.Select
-      {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
+      {...register(field.name, {required: field.required ? `${field.label} is required` : false})}
       isInvalid={!!errorMessage}
     >
       <option value="">Select an option...</option>

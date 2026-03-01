@@ -1,15 +1,15 @@
 import React from 'react';
-import { Alert, Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from 'react-oidc-context';
-import { formClient } from '../services/formClient';
-import { ReadOnlyDynamicForm } from '../components/ReadOnlyDynamicForm';
+import {Alert, Button, Card, Col, Container, Row, Spinner} from 'react-bootstrap';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
+import {useAuth} from 'react-oidc-context';
+import {formClient} from '../services/formClient';
+import {ReadOnlyDynamicForm} from '../components/ReadOnlyDynamicForm';
 
 export const SubmissionDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const {id} = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {user} = useAuth();
   const token = user?.access_token;
 
   const {
@@ -28,7 +28,7 @@ export const SubmissionDetail: React.FC = () => {
     error: formError,
   } = useQuery({
     queryKey: ['form', submission?.formKey],
-    queryFn: () => formClient.getForm(submission!.formKey,token!),
+    queryFn: () => formClient.getForm(submission!.formKey, token!),
     enabled: !!submission?.formKey,
   });
 
@@ -84,15 +84,15 @@ export const SubmissionDetail: React.FC = () => {
 
           <Alert variant="info" className="mb-4">
             <strong>Submission ID:</strong> {submission.id}
-            <br />
+            <br/>
             <strong>Form Key:</strong> {submission.formKey}
-            <br />
+            <br/>
             <strong>Submitted At:</strong> {new Date(submission.submittedAt).toLocaleString()}
-            <br />
+            <br/>
             <strong>Submitted By:</strong> {submission.submittedBy}
           </Alert>
 
-          <ReadOnlyDynamicForm fields={form.fields} data={submission.data} />
+          <ReadOnlyDynamicForm fields={form.fields} data={submission.data}/>
         </Card.Body>
       </Card>
     </Container>

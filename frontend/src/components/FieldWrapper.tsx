@@ -8,7 +8,12 @@ interface FieldWrapperProps {
   controlId?: string;
 }
 
-export const FieldWrapper: React.FC<FieldWrapperProps> = ({ label, required, children, controlId }) => (
+export const FieldWrapper: React.FC<FieldWrapperProps> = ({
+                                                            label,
+                                                            required,
+                                                            children,
+                                                            controlId
+                                                          }) => (
   <Form.Group className="mb-3" controlId={controlId}>
     <Form.Label>
       {label}

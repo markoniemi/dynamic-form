@@ -38,39 +38,46 @@ public class FormSubmissionPage extends BasePage {
   }
 
   public void fillTextField(String fieldName, String value) {
-    WebElement input = wait.until(
-        ExpectedConditions.visibilityOfElementLocated(
-            By.cssSelector("input[name='" + fieldName + "']")));
+    WebElement input =
+        wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("input[name='" + fieldName + "']")));
     input.clear();
     input.sendKeys(value);
   }
 
   public void fillTextArea(String fieldName, String value) {
-    WebElement area = wait.until(
-        ExpectedConditions.visibilityOfElementLocated(
-            By.cssSelector("textarea[name='" + fieldName + "']")));
+    WebElement area =
+        wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("textarea[name='" + fieldName + "']")));
     area.clear();
     area.sendKeys(value);
   }
 
   public void selectOption(String fieldName, String visibleText) {
-    WebElement selectEl = wait.until(
-        ExpectedConditions.visibilityOfElementLocated(
-            By.cssSelector("select[name='" + fieldName + "']")));
+    WebElement selectEl =
+        wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("select[name='" + fieldName + "']")));
     new Select(selectEl).selectByVisibleText(visibleText);
   }
 
   public void selectRadio(String fieldName, String value) {
-    WebElement radio = wait.until(
-        ExpectedConditions.elementToBeClickable(
-            By.cssSelector("input[type='radio'][name='" + fieldName + "'][value='" + value + "']")));
+    WebElement radio =
+        wait.until(
+            ExpectedConditions.elementToBeClickable(
+                By.cssSelector(
+                    "input[type='radio'][name='" + fieldName + "'][value='" + value + "']")));
     radio.click();
   }
 
   public void checkCheckbox(String fieldName, String value) {
-    WebElement checkbox = wait.until(
-        ExpectedConditions.elementToBeClickable(
-            By.cssSelector("input[type='checkbox'][name='" + fieldName + "'][value='" + value + "']")));
+    WebElement checkbox =
+        wait.until(
+            ExpectedConditions.elementToBeClickable(
+                By.cssSelector(
+                    "input[type='checkbox'][name='" + fieldName + "'][value='" + value + "']")));
     if (!checkbox.isSelected()) {
       checkbox.click();
     }
@@ -91,8 +98,7 @@ public class FormSubmissionPage extends BasePage {
   }
 
   public boolean isSubmitDisabled() {
-    return !submitButton.isEnabled()
-        || Boolean.parseBoolean(submitButton.getAttribute("disabled"));
+    return !submitButton.isEnabled() || Boolean.parseBoolean(submitButton.getAttribute("disabled"));
   }
 
   public void cancel() {

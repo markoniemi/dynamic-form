@@ -4,7 +4,7 @@ import {useAuth} from 'react-oidc-context';
 import {Link} from 'react-router-dom';
 
 export const Navigation: React.FC = () => {
-  const { isAuthenticated, signinRedirect, signoutRedirect } = useAuth();
+  const {isAuthenticated, signinRedirect, signoutRedirect} = useAuth();
 
   return (
     <Navbar bg="dark" data-bs-theme="dark" sticky="top" expand="lg">
@@ -12,7 +12,7 @@ export const Navigation: React.FC = () => {
         <Navbar.Brand as={Link} to="/">
           dynamic-form
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             {isAuthenticated && (

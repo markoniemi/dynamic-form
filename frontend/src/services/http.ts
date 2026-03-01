@@ -11,7 +11,7 @@ export interface ErrorDto {
 
 export const http = {
   async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const { token, ...fetchOptions } = options;
+    const {token, ...fetchOptions} = options;
 
     const headers = new Headers(fetchOptions.headers);
 

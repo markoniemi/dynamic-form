@@ -36,9 +36,7 @@ public class FormController {
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public List<FormDto> getAllForms() {
-    return formService.getAllForms().stream()
-        .map(formMapper::toDto)
-        .collect(Collectors.toList());
+    return formService.getAllForms().stream().map(formMapper::toDto).collect(Collectors.toList());
   }
 
   @GetMapping("/{key}")
@@ -54,7 +52,8 @@ public class FormController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto createForm(@Valid @RequestBody FormDto dto) {
     if (formService.existsByFormKey(dto.getFormKey())) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Form with key '" + dto.getFormKey() + "' already exists");
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "Form with key '" + dto.getFormKey() + "' already exists");
     }
     Form entity = formMapper.toEntity(dto);
     Form saved = formService.saveForm(entity);
@@ -64,9 +63,7 @@ public class FormController {
   @PutMapping("/{key}")
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  public FormDto updateForm(
-      @PathVariable String key,
-      @Valid @RequestBody FormDto dto) {
+  public FormDto updateForm(@PathVariable String key, @Valid @RequestBody FormDto dto) {
     Form entity = formMapper.toEntity(dto);
     Form updated = formService.updateForm(key, entity);
     return formMapper.toDto(updated);
@@ -79,5 +76,4 @@ public class FormController {
   public void deleteForm(@PathVariable String key) {
     formService.deleteForm(key);
   }
-
 }

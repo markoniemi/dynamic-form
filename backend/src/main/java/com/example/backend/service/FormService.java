@@ -31,14 +31,13 @@ public class FormService {
 
   @InterfaceLog
   public Set<String> getAvailableFormKeys() {
-    return formRepository.findAll().stream()
-        .map(Form::getFormKey)
-        .collect(Collectors.toSet());
+    return formRepository.findAll().stream().map(Form::getFormKey).collect(Collectors.toSet());
   }
 
   @InterfaceLog
   public Form getForm(String formKey) {
-    return formRepository.findByFormKey(formKey)
+    return formRepository
+        .findByFormKey(formKey)
         .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
   }
 
@@ -62,8 +61,10 @@ public class FormService {
   @InterfaceLog
   @Transactional
   public Form updateForm(String formKey, Form updatedDefinition) {
-    Form existing = formRepository.findByFormKey(formKey)
-        .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
+    Form existing =
+        formRepository
+            .findByFormKey(formKey)
+            .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
 
     existing.setTitle(updatedDefinition.getTitle());
     existing.setDescription(updatedDefinition.getDescription());
@@ -76,8 +77,10 @@ public class FormService {
   @InterfaceLog
   @Transactional
   public void deleteForm(String formKey) {
-    Form existing = formRepository.findByFormKey(formKey)
-        .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
+    Form existing =
+        formRepository
+            .findByFormKey(formKey)
+            .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
     formRepository.delete(existing);
     log.info("Deleted form definition: {}", formKey);
   }
@@ -86,5 +89,4 @@ public class FormService {
   public boolean existsByFormKey(String formKey) {
     return formRepository.existsByFormKey(formKey);
   }
-
 }

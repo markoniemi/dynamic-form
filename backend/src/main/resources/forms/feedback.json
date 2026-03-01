@@ -21,10 +21,22 @@
       "type": "select",
       "required": true,
       "options": [
-        {"value": "excellent", "label": "Excellent"},
-        {"value": "good", "label": "Good"},
-        {"value": "average", "label": "Average"},
-        {"value": "poor", "label": "Poor"}
+        {
+          "value": "excellent",
+          "label": "Excellent"
+        },
+        {
+          "value": "good",
+          "label": "Good"
+        },
+        {
+          "value": "average",
+          "label": "Average"
+        },
+        {
+          "value": "poor",
+          "label": "Poor"
+        }
       ]
     },
     {
@@ -33,10 +45,22 @@
       "type": "checkbox",
       "required": false,
       "options": [
-        {"value": "feature1", "label": "Feature 1"},
-        {"value": "feature2", "label": "Feature 2"},
-        {"value": "feature3", "label": "Feature 3"},
-        {"value": "feature4", "label": "Feature 4"}
+        {
+          "value": "feature1",
+          "label": "Feature 1"
+        },
+        {
+          "value": "feature2",
+          "label": "Feature 2"
+        },
+        {
+          "value": "feature3",
+          "label": "Feature 3"
+        },
+        {
+          "value": "feature4",
+          "label": "Feature 4"
+        }
       ]
     },
     {

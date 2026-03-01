@@ -3,8 +3,8 @@ package com.example.backend.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.example.backend.entity.Form;
 import com.example.backend.entity.Field;
+import com.example.backend.entity.Form;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,12 +37,13 @@ class FormServiceTest {
 
   @Test
   void getForm() {
-    Form mockForm = Form.builder()
-        .id(1L)
-        .formKey("form1")
-        .title("Test Form")
-        .fields(List.of(Field.builder().name("field1").type("text").build()))
-        .build();
+    Form mockForm =
+        Form.builder()
+            .id(1L)
+            .formKey("form1")
+            .title("Test Form")
+            .fields(List.of(Field.builder().name("field1").type("text").build()))
+            .build();
     when(formRepository.findByFormKey("form1")).thenReturn(Optional.of(mockForm));
 
     Form result = formService.getForm("form1");
@@ -60,11 +61,7 @@ class FormServiceTest {
 
   @Test
   void saveForm() {
-    Form newForm = Form.builder()
-        .formKey("new-form")
-        .title("New Form")
-        .fields(List.of())
-        .build();
+    Form newForm = Form.builder().formKey("new-form").title("New Form").fields(List.of()).build();
     when(formRepository.save(newForm)).thenReturn(newForm);
 
     Form result = formService.saveForm(newForm);

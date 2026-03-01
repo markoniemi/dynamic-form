@@ -29,10 +29,22 @@
       "type": "select",
       "required": true,
       "options": [
-        {"value": "general", "label": "General Inquiry"},
-        {"value": "support", "label": "Technical Support"},
-        {"value": "sales", "label": "Sales Question"},
-        {"value": "billing", "label": "Billing Issue"}
+        {
+          "value": "general",
+          "label": "General Inquiry"
+        },
+        {
+          "value": "support",
+          "label": "Technical Support"
+        },
+        {
+          "value": "sales",
+          "label": "Sales Question"
+        },
+        {
+          "value": "billing",
+          "label": "Billing Issue"
+        }
       ]
     },
     {
@@ -48,9 +60,18 @@
       "type": "radio",
       "required": true,
       "options": [
-        {"value": "low", "label": "Low"},
-        {"value": "medium", "label": "Medium"},
-        {"value": "high", "label": "High"}
+        {
+          "value": "low",
+          "label": "Low"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "high",
+          "label": "High"
+        }
       ]
     }
   ]

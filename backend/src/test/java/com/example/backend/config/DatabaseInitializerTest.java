@@ -17,8 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DatabaseInitializerTest {
 
-  @Mock
-  private FormRepository formRepository;
+  @Mock private FormRepository formRepository;
 
   private DatabaseInitializer databaseInitializer;
   private ObjectMapper objectMapper;
@@ -32,8 +31,7 @@ class DatabaseInitializerTest {
   @Test
   void runLoadsFormsFromResources() {
     when(formRepository.existsByFormKey(anyString())).thenReturn(false);
-    when(formRepository.save(any(Form.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
+    when(formRepository.save(any(Form.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(formRepository.count()).thenReturn(3L);
 
     databaseInitializer.run();
@@ -46,8 +44,7 @@ class DatabaseInitializerTest {
     when(formRepository.existsByFormKey("contact")).thenReturn(true);
     when(formRepository.existsByFormKey("feedback")).thenReturn(false);
     when(formRepository.existsByFormKey("survey")).thenReturn(false);
-    when(formRepository.save(any(Form.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
+    when(formRepository.save(any(Form.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(formRepository.count()).thenReturn(2L);
 
     databaseInitializer.run();
@@ -56,15 +53,13 @@ class DatabaseInitializerTest {
     verify(formRepository, atLeast(2)).save(captor.capture());
 
     // Verify "contact" was not saved since it already exists
-    assertTrue(captor.getAllValues().stream()
-        .noneMatch(fd -> "contact".equals(fd.getFormKey())));
+    assertTrue(captor.getAllValues().stream().noneMatch(fd -> "contact".equals(fd.getFormKey())));
   }
 
   @Test
   void runParsesFormCorrectly() {
     when(formRepository.existsByFormKey(anyString())).thenReturn(false);
-    when(formRepository.save(any(Form.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
+    when(formRepository.save(any(Form.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(formRepository.count()).thenReturn(3L);
 
     databaseInitializer.run();
@@ -72,10 +67,11 @@ class DatabaseInitializerTest {
     ArgumentCaptor<Form> captor = ArgumentCaptor.forClass(Form.class);
     verify(formRepository, atLeastOnce()).save(captor.capture());
 
-    Form contactForm = captor.getAllValues().stream()
-        .filter(fd -> "contact".equals(fd.getFormKey()))
-        .findFirst()
-        .orElse(null);
+    Form contactForm =
+        captor.getAllValues().stream()
+            .filter(fd -> "contact".equals(fd.getFormKey()))
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(contactForm);
     assertEquals("Contact Us", contactForm.getTitle());
@@ -83,4 +79,3 @@ class DatabaseInitializerTest {
     assertFalse(contactForm.getFields().isEmpty());
   }
 }
-

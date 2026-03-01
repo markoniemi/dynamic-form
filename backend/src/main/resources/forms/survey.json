@@ -22,11 +22,26 @@
       "type": "select",
       "required": true,
       "options": [
-        {"value": "5", "label": "Very Satisfied"},
-        {"value": "4", "label": "Satisfied"},
-        {"value": "3", "label": "Neutral"},
-        {"value": "2", "label": "Dissatisfied"},
-        {"value": "1", "label": "Very Dissatisfied"}
+        {
+          "value": "5",
+          "label": "Very Satisfied"
+        },
+        {
+          "value": "4",
+          "label": "Satisfied"
+        },
+        {
+          "value": "3",
+          "label": "Neutral"
+        },
+        {
+          "value": "2",
+          "label": "Dissatisfied"
+        },
+        {
+          "value": "1",
+          "label": "Very Dissatisfied"
+        }
       ]
     },
     {
@@ -42,8 +57,14 @@
       "type": "radio",
       "required": true,
       "options": [
-        {"value": "yes", "label": "Yes"},
-        {"value": "no", "label": "No"}
+        {
+          "value": "yes",
+          "label": "Yes"
+        },
+        {
+          "value": "no",
+          "label": "No"
+        }
       ]
     }
   ]

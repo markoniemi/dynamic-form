@@ -10,12 +10,12 @@ interface FieldProps {
   errorMessage?: string;
 }
 
-export const TextField: React.FC<FieldProps> = ({ field, register, errorMessage }) => (
+export const TextField: React.FC<FieldProps> = ({field, register, errorMessage}) => (
   <FieldWrapper label={field.label} required={field.required} controlId={field.name}>
     <Form.Control
       type={field.type}
       placeholder={field.placeholder}
-      {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
+      {...register(field.name, {required: field.required ? `${field.label} is required` : false})}
       isInvalid={!!errorMessage}
     />
     <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>

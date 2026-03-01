@@ -1,11 +1,11 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SubmissionDetail } from '../../src/pages/SubmissionDetail';
-import { useAuth } from 'react-oidc-context';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { formClient } from '../../src/services/formClient';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FormDataDto, Form } from '../../src/types/Form';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {SubmissionDetail} from '../../src/pages/SubmissionDetail';
+import {useAuth} from 'react-oidc-context';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {formClient} from '../../src/services/formClient';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {Form, FormDataDto} from '../../src/types/Form';
 
 vi.mock('react-oidc-context');
 vi.mock('../../src/services/formClient', () => ({
@@ -26,14 +26,14 @@ vi.mock('react-router-dom', async () => {
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: false },
+    queries: {retry: false},
   },
 });
 
 const mockSubmission: FormDataDto = {
   id: 1,
   formKey: 'contact',
-  data: { fullName: 'Jane Doe', email: 'jane@example.com', newsletter: true },
+  data: {fullName: 'Jane Doe', email: 'jane@example.com', newsletter: true},
   submittedAt: '2024-06-01T10:00:00.000Z',
   submittedBy: 'test-user',
 };
@@ -42,9 +42,9 @@ const mockForm: Form = {
   title: 'Contact Form',
   description: 'Please fill out your contact information',
   fields: [
-    { name: 'fullName', label: 'Full Name', type: 'text', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-    { name: 'newsletter', label: 'Subscribe to Newsletter', type: 'checkbox', required: false },
+    {name: 'fullName', label: 'Full Name', type: 'text', required: true},
+    {name: 'email', label: 'Email', type: 'email', required: true},
+    {name: 'newsletter', label: 'Subscribe to Newsletter', type: 'checkbox', required: false},
   ],
 };
 
@@ -53,7 +53,7 @@ function renderSubmissionDetail(submissionId: string = '1') {
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[`/forms/submissions/${submissionId}`]}>
         <Routes>
-          <Route path="/forms/submissions/:id" element={<SubmissionDetail />} />
+          <Route path="/forms/submissions/:id" element={<SubmissionDetail/>}/>
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>
@@ -63,7 +63,7 @@ function renderSubmissionDetail(submissionId: string = '1') {
 describe('SubmissionDetail Component', () => {
   const mockUser = {
     access_token: 'mock-token',
-    profile: { sub: 'test-user' },
+    profile: {sub: 'test-user'},
   };
 
   beforeEach(() => {
@@ -75,7 +75,8 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders loading spinner while fetching data', () => {
-    vi.mocked(formClient.getSubmissionById).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(formClient.getSubmissionById).mockImplementation(() => new Promise(() => {
+    }));
     renderSubmissionDetail();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
@@ -94,7 +95,7 @@ describe('SubmissionDetail Component', () => {
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /back to submissions/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: /back to submissions/i})).toBeInTheDocument();
     });
   });
 
@@ -150,9 +151,9 @@ describe('SubmissionDetail Component', () => {
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
-    await waitFor(() => screen.getByRole('button', { name: /back to submissions/i }));
+    await waitFor(() => screen.getByRole('button', {name: /back to submissions/i}));
 
-    const backButton = screen.getByRole('button', { name: /back to submissions/i });
+    const backButton = screen.getByRole('button', {name: /back to submissions/i});
     fireEvent.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/submissions');
   });
@@ -187,7 +188,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('does not call getSubmissionById when no token is present', () => {
-    vi.mocked(useAuth).mockReturnValue({ user: null } as ReturnType<typeof useAuth>);
+    vi.mocked(useAuth).mockReturnValue({user: null} as ReturnType<typeof useAuth>);
     vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
     renderSubmissionDetail();
 

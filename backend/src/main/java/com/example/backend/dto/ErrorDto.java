@@ -14,7 +14,8 @@ public class ErrorDto {
   Map<String, String> errors;
 
   public static ErrorDto of(Exception e) {
-    return new ErrorDto(e.getClass().getSimpleName(), Map.of(e.getClass().getSimpleName(), e.getMessage()));
+    return new ErrorDto(
+        e.getClass().getSimpleName(), Map.of(e.getClass().getSimpleName(), e.getMessage()));
   }
 
   public static ErrorDto of(MethodArgumentNotValidException ex) {
@@ -36,6 +37,7 @@ public class ErrorDto {
     return violations.stream()
         .collect(
             Collectors.toMap(
-                error -> error.getPropertyPath().toString(), ConstraintViolation::getMessageTemplate));
+                error -> error.getPropertyPath().toString(),
+                ConstraintViolation::getMessageTemplate));
   }
 }

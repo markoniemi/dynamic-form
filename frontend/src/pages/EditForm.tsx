@@ -8,15 +8,15 @@ import {CreateForm, FormField} from '../types/Form';
 import {FieldEditor} from '../components/FieldEditor';
 
 const FIELD_TYPES = [
-  { value: 'text', label: 'Text' },
-  { value: 'email', label: 'Email' },
-  { value: 'tel', label: 'Phone' },
-  { value: 'number', label: 'Number' },
-  { value: 'date', label: 'Date' },
-  { value: 'textarea', label: 'Text Area' },
-  { value: 'select', label: 'Dropdown' },
-  { value: 'radio', label: 'Radio Buttons' },
-  { value: 'checkbox', label: 'Checkbox' },
+  {value: 'text', label: 'Text'},
+  {value: 'email', label: 'Email'},
+  {value: 'tel', label: 'Phone'},
+  {value: 'number', label: 'Number'},
+  {value: 'date', label: 'Date'},
+  {value: 'textarea', label: 'Text Area'},
+  {value: 'select', label: 'Dropdown'},
+  {value: 'radio', label: 'Radio Buttons'},
+  {value: 'checkbox', label: 'Checkbox'},
 ] as const;
 
 const createEmptyField = (): FormField => ({
@@ -30,7 +30,7 @@ const createEmptyField = (): FormField => ({
 
 export const EditForm: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {user} = useAuth();
   const token = user?.access_token;
 
   const [formKey, setFormKey] = useState('');
@@ -194,7 +194,7 @@ export const EditForm: React.FC = () => {
               />
             </Form.Group>
 
-            <hr />
+            <hr/>
             <h4 className="mb-3">Fields</h4>
 
             {fields.map((field, index) => (
@@ -214,13 +214,13 @@ export const EditForm: React.FC = () => {
               + Add Field
             </Button>
 
-            <hr />
+            <hr/>
 
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? (
                   <>
-                    <Spinner animation="border" size="sm" className="me-2" />
+                    <Spinner animation="border" size="sm" className="me-2"/>
                     Creating...
                   </>
                 ) : (

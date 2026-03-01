@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.ErrorDto;
 import jakarta.validation.ConstraintViolationException;
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 @Slf4j
@@ -38,6 +37,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorDto> handleNoResourceFoundException(NoResourceFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDto.of(ex));
   }
+
   @ExceptionHandler(NoSuchElementException.class)
   public ResponseEntity<ErrorDto> handleNoSuchElementException(NoSuchElementException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDto.of(ex));

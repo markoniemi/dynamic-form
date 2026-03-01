@@ -70,7 +70,8 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        .perform(
+            get("/api/form-data").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }
@@ -86,7 +87,9 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data/form1").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        .perform(
+            get("/api/form-data/form1")
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }
@@ -101,7 +104,9 @@ class FormDataControllerTest {
     when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
 
     mockMvc
-        .perform(get("/api/form-data/submission/1").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        .perform(
+            get("/api/form-data/submission/1")
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L));
   }

@@ -1,14 +1,13 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "form")
@@ -28,8 +27,7 @@ public class Form {
   @Column(nullable = false)
   private String title;
 
-  @Column
-  private String description;
+  @Column private String description;
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(nullable = false)
@@ -42,7 +40,4 @@ public class Form {
   @UpdateTimestamp
   @Column(nullable = false)
   private LocalDateTime updatedAt;
-
 }
-
-

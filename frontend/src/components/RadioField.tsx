@@ -10,7 +10,7 @@ interface FieldProps {
   errorMessage?: string;
 }
 
-export const RadioField: React.FC<FieldProps> = ({ field, register, errorMessage }) => (
+export const RadioField: React.FC<FieldProps> = ({field, register, errorMessage}) => (
   <FieldWrapper label={field.label} required={field.required}>
     {field.options?.map((option) => (
       <Form.Check
@@ -19,7 +19,7 @@ export const RadioField: React.FC<FieldProps> = ({ field, register, errorMessage
         id={`${field.name}-${option.value}`}
         label={option.label}
         value={option.value}
-        {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
+        {...register(field.name, {required: field.required ? `${field.label} is required` : false})}
         isInvalid={!!errorMessage}
       />
     ))}

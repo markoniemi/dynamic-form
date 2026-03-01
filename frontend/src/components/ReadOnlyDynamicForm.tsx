@@ -8,7 +8,7 @@ interface ReadOnlyDynamicFormProps {
   data: Record<string, unknown>;
 }
 
-export const ReadOnlyDynamicForm: React.FC<ReadOnlyDynamicFormProps> = ({ fields, data }) => {
+export const ReadOnlyDynamicForm: React.FC<ReadOnlyDynamicFormProps> = ({fields, data}) => {
   const renderFieldValue = (field: FormField) => {
     const value = data[field.name];
 
@@ -35,7 +35,7 @@ export const ReadOnlyDynamicForm: React.FC<ReadOnlyDynamicFormProps> = ({ fields
 
     return (
       <FieldWrapper key={field.name} label={field.label} required={false} controlId={field.name}>
-        <Form.Control plaintext readOnly defaultValue={getDisplayValue()} />
+        <Form.Control plaintext readOnly defaultValue={getDisplayValue()}/>
       </FieldWrapper>
     );
   };

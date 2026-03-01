@@ -13,6 +13,4 @@ public class FieldOptionDto {
 
   @NotBlank(message = "Option label is required")
   String label;
-
 }
-

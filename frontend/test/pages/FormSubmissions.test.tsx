@@ -1,11 +1,11 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { FormSubmissions } from '../../src/pages/FormSubmissions';
-import { useAuth } from 'react-oidc-context';
-import { BrowserRouter } from 'react-router-dom';
-import { formClient } from '../../src/services/formClient';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FormDataDto } from '../../src/types/Form';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {FormSubmissions} from '../../src/pages/FormSubmissions';
+import {useAuth} from 'react-oidc-context';
+import {BrowserRouter} from 'react-router-dom';
+import {formClient} from '../../src/services/formClient';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {FormDataDto} from '../../src/types/Form';
 
 // Mock dependencies
 vi.mock('react-oidc-context');
@@ -26,7 +26,7 @@ vi.mock('react-router-dom', async () => {
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: false },
+    queries: {retry: false},
   },
 });
 
@@ -34,14 +34,14 @@ const mockSubmissions: FormDataDto[] = [
   {
     id: 1,
     formKey: 'contact',
-    data: { fullName: 'Jane Doe', email: 'jane@example.com' },
+    data: {fullName: 'Jane Doe', email: 'jane@example.com'},
     submittedAt: '2024-06-01T10:00:00.000Z',
     submittedBy: 'test-user',
   },
   {
     id: 2,
     formKey: 'feedback',
-    data: { message: 'Great service!' },
+    data: {message: 'Great service!'},
     submittedAt: '2024-06-02T14:30:00.000Z',
     submittedBy: 'test-user',
   },
@@ -51,7 +51,7 @@ function renderFormSubmissions() {
   render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <FormSubmissions />
+        <FormSubmissions/>
       </BrowserRouter>
     </QueryClientProvider>
   );
@@ -60,7 +60,7 @@ function renderFormSubmissions() {
 describe('FormSubmissions Component', () => {
   const mockUser = {
     access_token: 'mock-token',
-    profile: { sub: 'test-user' },
+    profile: {sub: 'test-user'},
   };
 
   beforeEach(() => {
@@ -72,7 +72,8 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders loading spinner while fetching submissions', () => {
-    vi.mocked(formClient.getAllSubmissions).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(formClient.getAllSubmissions).mockImplementation(() => new Promise(() => {
+    }));
     renderFormSubmissions();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
@@ -93,7 +94,7 @@ describe('FormSubmissions Component', () => {
     await waitFor(() => {
       expect(screen.getByText('contact')).toBeInTheDocument();
       expect(screen.getByText('feedback')).toBeInTheDocument();
-      expect(screen.getAllByRole('button', { name: /view details/i })).toHaveLength(2);
+      expect(screen.getAllByRole('button', {name: /view details/i})).toHaveLength(2);
     });
   });
 
@@ -105,18 +106,8 @@ describe('FormSubmissions Component', () => {
       expect(screen.getByText('ID')).toBeInTheDocument();
       expect(screen.getByText('Form Key')).toBeInTheDocument();
       expect(screen.getByText('Submitted At')).toBeInTheDocument();
-      expect(screen.getByText('Data')).toBeInTheDocument();
+      expect(screen.getByText('Submitted By')).toBeInTheDocument();
       expect(screen.getByText('Actions')).toBeInTheDocument();
-    });
-  });
-
-  it('renders submission data as formatted JSON', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
-    renderFormSubmissions();
-
-    await waitFor(() => {
-      expect(screen.getByText(/jane@example\.com/)).toBeInTheDocument();
-      expect(screen.getByText(/Great service!/)).toBeInTheDocument();
     });
   });
 
@@ -150,9 +141,9 @@ describe('FormSubmissions Component', () => {
     vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
-    await waitFor(() => screen.getAllByRole('button', { name: /view details/i }));
+    await waitFor(() => screen.getAllByRole('button', {name: /view details/i}));
 
-    const detailButtons = screen.getAllByRole('button', { name: /view details/i });
+    const detailButtons = screen.getAllByRole('button', {name: /view details/i});
     fireEvent.click(detailButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/1');
   });
@@ -161,9 +152,9 @@ describe('FormSubmissions Component', () => {
     vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
-    await waitFor(() => screen.getAllByRole('button', { name: /view details/i }));
+    await waitFor(() => screen.getAllByRole('button', {name: /view details/i}));
 
-    const detailButtons = screen.getAllByRole('button', { name: /view details/i });
+    const detailButtons = screen.getAllByRole('button', {name: /view details/i});
     fireEvent.click(detailButtons[1]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/2');
   });
@@ -178,7 +169,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('does not call getAllSubmissions when no token is present', () => {
-    (useAuth as any).mockReturnValue({ user: null });
+    (useAuth as any).mockReturnValue({user: null});
     vi.mocked(formClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 

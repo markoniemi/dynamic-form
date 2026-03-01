@@ -6,6 +6,9 @@ import com.example.backend.entity.Form;
 import com.example.backend.repository.FormRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -14,10 +17,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -56,8 +55,10 @@ public class DatabaseInitializer implements CommandLineRunner {
         }
       }
 
-      log.info("Database initialization complete. Loaded {} new form definition(s). Total forms: {}",
-          loadedCount, formRepository.count());
+      log.info(
+          "Database initialization complete. Loaded {} new form definition(s). Total forms: {}",
+          loadedCount,
+          formRepository.count());
     } catch (IOException e) {
       log.error("Failed to load form definitions from resources", e);
       throw new RuntimeException("Failed to load form definitions", e);
@@ -98,10 +99,11 @@ public class DatabaseInitializer implements CommandLineRunner {
     JsonNode optionsNode = fieldNode.path("options");
     if (optionsNode.isArray()) {
       for (JsonNode optionNode : optionsNode) {
-        FieldOption option = FieldOption.builder()
-            .value(optionNode.path("value").asText(""))
-            .label(optionNode.path("label").asText(""))
-            .build();
+        FieldOption option =
+            FieldOption.builder()
+                .value(optionNode.path("value").asText(""))
+                .label(optionNode.path("label").asText(""))
+                .build();
         options.add(option);
       }
     }
@@ -116,4 +118,3 @@ public class DatabaseInitializer implements CommandLineRunner {
         .build();
   }
 }
-

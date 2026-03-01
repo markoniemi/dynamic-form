@@ -1,17 +1,17 @@
-import { http } from './http';
-import { Form, FormDataDto, CreateForm, FormListItem } from '../types/Form';
+import {http} from './http';
+import {CreateForm, Form, FormDataDto, FormListItem} from '../types/Form';
 
 export const formClient = {
   async getAvailableForms(token: string): Promise<FormListItem[]> {
     return http.request<FormListItem[]>('/forms', {token});
   },
 
-  async getForm(formKey: string,token:string): Promise<Form> {
+  async getForm(formKey: string, token: string): Promise<Form> {
     return http.request<Form>(`/forms/${formKey}`, {token});
   },
 
   async getAllForms(token: string): Promise<Form[]> {
-    return http.request<Form[]>('/forms/all', { token });
+    return http.request<Form[]>('/forms/all', {token});
   },
 
   async saveForm(form: CreateForm, token: string): Promise<Form> {
@@ -46,15 +46,15 @@ export const formClient = {
   },
 
   async getFormSubmissions(formKey: string, token: string): Promise<FormDataDto[]> {
-    return http.request<FormDataDto[]>(`/form-data/${formKey}`, { token });
+    return http.request<FormDataDto[]>(`/form-data/${formKey}`, {token});
   },
 
   async getAllSubmissions(token: string): Promise<FormDataDto[]> {
-    return http.request<FormDataDto[]>('/form-data', { token });
+    return http.request<FormDataDto[]>('/form-data', {token});
   },
 
   async getSubmissionById(id: number, token: string): Promise<FormDataDto> {
-    return http.request<FormDataDto>(`/form-data/submission/${id}`, { token });
+    return http.request<FormDataDto>(`/form-data/submission/${id}`, {token});
   },
 
   async deleteSubmission(id: number, token: string): Promise<void> {

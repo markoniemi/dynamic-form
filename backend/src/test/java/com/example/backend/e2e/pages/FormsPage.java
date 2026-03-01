@@ -24,10 +24,12 @@ public class FormsPage extends BasePage {
     wait.until(ExpectedConditions.elementToBeClickable(loginButton));
     loginButton.click();
   }
+
   public void clickFormSubmissions() {
     wait.until(ExpectedConditions.elementToBeClickable(formSubmissionsLink));
     formSubmissionsLink.click();
   }
+
   public void waitForLoad() {
     wait.until(ExpectedConditions.visibilityOf(heading));
   }
@@ -35,16 +37,21 @@ public class FormsPage extends BasePage {
   public void openForm(String formKey) {
     waitForLoad();
     String formTitle = toTitleCase(formKey);
-    WebElement formRow = wait.until(ExpectedConditions.visibilityOfElementLocated(
-        By.xpath("//td[contains(text(), '" + formTitle + "')]/..")));
-    WebElement openButton = formRow.findElement(By.xpath(".//button[contains(text(), 'Open Form')]"));
+    WebElement formRow =
+        wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//td[contains(text(), '" + formTitle + "')]/..")));
+    WebElement openButton =
+        formRow.findElement(By.xpath(".//button[contains(text(), 'Open Form')]"));
     openButton.click();
   }
 
   public void openFirstForm() {
     waitForLoad();
-    WebElement firstButton = wait.until(ExpectedConditions.elementToBeClickable(
-        By.xpath("//tbody/tr[1]//button[contains(text(), 'Open Form')]")));
+    WebElement firstButton =
+        wait.until(
+            ExpectedConditions.elementToBeClickable(
+                By.xpath("//tbody/tr[1]//button[contains(text(), 'Open Form')]")));
     firstButton.click();
   }
 

@@ -13,6 +13,4 @@ public class FieldOption {
 
   private String value;
   private String label;
-
 }
-

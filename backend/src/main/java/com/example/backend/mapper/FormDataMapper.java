@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = SPRING)
 public interface FormDataMapper {
-    FormDataDto toDto(FormData formData);
+  FormDataDto toDto(FormData formData);
 
-    FormData toEntity(FormDataDto formDataDto);
+  FormData toEntity(FormDataDto formDataDto);
 }

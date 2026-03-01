@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Alert, Button, Card, Container, Form, Spinner } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAuth } from 'react-oidc-context';
-import { formClient } from '../services/formClient';
-import { DynamicForm } from '../components/DynamicForm.tsx';
+import React, {useState} from 'react';
+import {Alert, Button, Card, Container, Form, Spinner} from 'react-bootstrap';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useForm} from 'react-hook-form';
+import {useMutation, useQuery} from '@tanstack/react-query';
+import {useAuth} from 'react-oidc-context';
+import {formClient} from '../services/formClient';
+import {DynamicForm} from '../components/DynamicForm.tsx';
 
 export const FormSubmission: React.FC = () => {
-  const { formKey } = useParams<{ formKey: string }>();
+  const {formKey} = useParams<{ formKey: string }>();
   const navigate = useNavigate();
-  const { user, isAuthenticated, signinRedirect } = useAuth();
+  const {user, isAuthenticated, signinRedirect} = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
   const token = user?.access_token;
 
@@ -18,7 +18,7 @@ export const FormSubmission: React.FC = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: {errors},
   } = useForm();
 
   const {
@@ -27,7 +27,7 @@ export const FormSubmission: React.FC = () => {
     error: fetchError,
   } = useQuery({
     queryKey: ['form', formKey],
-    queryFn: () => formClient.getForm(formKey!,token!),
+    queryFn: () => formClient.getForm(formKey!, token!),
     enabled: !!formKey,
   });
 

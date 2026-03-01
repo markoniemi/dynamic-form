@@ -10,13 +10,13 @@ import {SubmissionDetail} from '../pages/SubmissionDetail';
 import {EditForm} from '../pages/EditForm.tsx';
 
 export const Content: React.FC = () => {
-  const { isAuthenticated, isLoading, error, signinRedirect } = useAuth();
+  const {isAuthenticated, isLoading, error, signinRedirect} = useAuth();
 
   if (isLoading) {
     return (
       <Container
         className="d-flex justify-content-center align-items-center"
-        style={{ height: '100vh' }}
+        style={{height: '100vh'}}
       >
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
@@ -47,19 +47,19 @@ export const Content: React.FC = () => {
 
   return (
     <>
-      <Navigation />
+      <Navigation/>
       <Routes>
         {/* Public routes - Forms can be viewed by anyone */}
 
         {/* Protected routes - Require authentication */}
         {isAuthenticated ? (
           <>
-            <Route path="/forms" element={<Forms />} />
-            <Route path="/forms/:formKey" element={<FormSubmission />} />
-            <Route path="/forms/submissions/:id" element={<SubmissionDetail />} />
-            <Route path="/create-form" element={<EditForm />} />
-            <Route path="/" element={<Forms />} />
-            <Route path="/submissions" element={<FormSubmissions />} />
+            <Route path="/forms" element={<Forms/>}/>
+            <Route path="/forms/:formKey" element={<FormSubmission/>}/>
+            <Route path="/forms/submissions/:id" element={<SubmissionDetail/>}/>
+            <Route path="/create-form" element={<EditForm/>}/>
+            <Route path="/" element={<Forms/>}/>
+            <Route path="/submissions" element={<FormSubmissions/>}/>
           </>
         ) : (
           <Route
@@ -85,7 +85,7 @@ export const Content: React.FC = () => {
         )}
 
         {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>
     </>
   );
