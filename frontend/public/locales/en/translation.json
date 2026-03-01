@@ -1,0 +1,65 @@
+{
+  "navigation": {
+    "brand": "Dynamic Form",
+    "home": "Home",
+    "forms": "Forms",
+    "submissions": "Submissions",
+    "login": "Login with OAuth2",
+    "logout": "Logout"
+  },
+  "home": {
+    "welcome": "Welcome to Dynamic Form",
+    "description": "This is a simple application to demonstrate dynamic form generation.",
+    "getStarted": "Get Started",
+    "viewForms": "View Forms"
+  },
+  "forms": {
+    "title": "Available Forms",
+    "subtitle": "Select a form to view or submit",
+    "noForms": "No forms available",
+    "table": {
+      "name": "Form Name",
+      "actions": "Actions",
+      "open": "Open Form"
+    }
+  },
+  "submissions": {
+    "title": "Form Submissions",
+    "subtitle": "View all submitted forms",
+    "noSubmissions": "No submissions found",
+    "table": {
+      "id": "ID",
+      "formKey": "Form Key",
+      "submittedAt": "Submitted At",
+      "submittedBy": "Submitted By",
+      "actions": "Actions",
+      "view": "View",
+      "delete": "Delete"
+    },
+    "confirmDelete": "Are you sure you want to delete this submission?"
+  },
+  "submissionDetail": {
+    "back": "Back to Submissions",
+    "notFound": "Submission not found.",
+    "id": "Submission ID",
+    "formKey": "Form Key",
+    "submittedAt": "Submitted At",
+    "submittedBy": "Submitted By"
+  },
+  "form": {
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "success": "Form submitted successfully!",
+    "error": "An error occurred while submitting the form.",
+    "required": "is required",
+    "selectOption": "Select an option..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "date": {
+      "short": "{{date, short}}",
+      "long": "{{date, long}}"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/react';
 import {DynamicForm} from '../../src/components/DynamicForm';
-import {FormField} from '../../src/types/Form';
+import {FormField, FormValues} from '../../src/types/Form';
 import {describe, expect, it, vi} from 'vitest';
 import {UseFormRegister} from 'react-hook-form';
 

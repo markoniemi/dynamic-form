@@ -4,11 +4,13 @@ import {useAuth} from 'react-oidc-context';
 import {useQuery} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import {formClient} from '../services/formClient';
+import {useTranslation} from 'react-i18next';
 
 export const FormSubmissions: React.FC = () => {
   const {user} = useAuth();
   const navigate = useNavigate();
   const token = user?.access_token;
+  const {t} = useTranslation();
 
   const {
     data: submissions = [],
@@ -24,7 +26,7 @@ export const FormSubmissions: React.FC = () => {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading')}</span>
         </Spinner>
       </Container>
     );
@@ -42,23 +44,23 @@ export const FormSubmissions: React.FC = () => {
     <Container className="mt-5">
       <Row className="mb-4">
         <Col>
-          <h2>Form Submissions</h2>
+          <h2>{t('submissions.title')}</h2>
         </Col>
       </Row>
 
       {submissions.length === 0 ? (
-        <Alert variant="info">No submissions found.</Alert>
+        <Alert variant="info">{t('submissions.noSubmissions')}</Alert>
       ) : (
         <Card className="shadow-sm">
           <Card.Body>
             <Table striped bordered hover responsive>
               <thead>
               <tr>
-                <th>ID</th>
-                <th>Form Key</th>
-                <th>Submitted At</th>
-                <th>Submitted By</th>
-                <th>Actions</th>
+                <th>{t('submissions.table.id')}</th>
+                <th>{t('submissions.table.formKey')}</th>
+                <th>{t('submissions.table.submittedAt')}</th>
+                <th>{t('submissions.table.submittedBy')}</th>
+                <th>{t('submissions.table.actions')}</th>
               </tr>
               </thead>
               <tbody>
@@ -66,7 +68,7 @@ export const FormSubmissions: React.FC = () => {
                 <tr key={submission.id}>
                   <td>{submission.id}</td>
                   <td>{submission.formKey}</td>
-                  <td>{new Date(submission.submittedAt).toLocaleString()}</td>
+                  <td>{t('common.date.long', {date: new Date(submission.submittedAt)})}</td>
                   <td>{submission.submittedBy}</td>
                   <td>
                     <Button
@@ -74,7 +76,7 @@ export const FormSubmissions: React.FC = () => {
                       size="sm"
                       onClick={() => navigate(`/forms/submissions/${submission.id}`)}
                     >
-                      View Details
+                      {t('submissions.table.view')}
                     </Button>
                   </td>
                 </tr>

@@ -83,7 +83,7 @@ describe('FormSubmissions Component', () => {
     renderFormSubmissions();
 
     await waitFor(() => {
-      expect(screen.getByText('Form Submissions')).toBeInTheDocument();
+      expect(screen.getByText('submissions.title')).toBeInTheDocument();
     });
   });
 
@@ -94,7 +94,7 @@ describe('FormSubmissions Component', () => {
     await waitFor(() => {
       expect(screen.getByText('contact')).toBeInTheDocument();
       expect(screen.getByText('feedback')).toBeInTheDocument();
-      expect(screen.getAllByRole('button', {name: /view details/i})).toHaveLength(2);
+      expect(screen.getAllByRole('button', {name: 'submissions.table.view'})).toHaveLength(2);
     });
   });
 
@@ -103,11 +103,11 @@ describe('FormSubmissions Component', () => {
     renderFormSubmissions();
 
     await waitFor(() => {
-      expect(screen.getByText('ID')).toBeInTheDocument();
-      expect(screen.getByText('Form Key')).toBeInTheDocument();
-      expect(screen.getByText('Submitted At')).toBeInTheDocument();
-      expect(screen.getByText('Submitted By')).toBeInTheDocument();
-      expect(screen.getByText('Actions')).toBeInTheDocument();
+      expect(screen.getByText('submissions.table.id')).toBeInTheDocument();
+      expect(screen.getByText('submissions.table.formKey')).toBeInTheDocument();
+      expect(screen.getByText('submissions.table.submittedAt')).toBeInTheDocument();
+      expect(screen.getByText('submissions.table.submittedBy')).toBeInTheDocument();
+      expect(screen.getByText('submissions.table.actions')).toBeInTheDocument();
     });
   });
 
@@ -116,7 +116,7 @@ describe('FormSubmissions Component', () => {
     renderFormSubmissions();
 
     await waitFor(() => {
-      expect(screen.getByText('No submissions found.')).toBeInTheDocument();
+      expect(screen.getByText('submissions.noSubmissions')).toBeInTheDocument();
     });
   });
 
@@ -141,9 +141,9 @@ describe('FormSubmissions Component', () => {
     vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
-    await waitFor(() => screen.getAllByRole('button', {name: /view details/i}));
+    await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
 
-    const detailButtons = screen.getAllByRole('button', {name: /view details/i});
+    const detailButtons = screen.getAllByRole('button', {name: 'submissions.table.view'});
     fireEvent.click(detailButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/1');
   });
@@ -152,9 +152,9 @@ describe('FormSubmissions Component', () => {
     vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
-    await waitFor(() => screen.getAllByRole('button', {name: /view details/i}));
+    await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
 
-    const detailButtons = screen.getAllByRole('button', {name: /view details/i});
+    const detailButtons = screen.getAllByRole('button', {name: 'submissions.table.view'});
     fireEvent.click(detailButtons[1]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/2');
   });

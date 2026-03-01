@@ -95,7 +95,7 @@ describe('SubmissionDetail Component', () => {
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: /back to submissions/i})).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: "submissionDetail.back"})).toBeInTheDocument();
     });
   });
 
@@ -116,9 +116,9 @@ describe('SubmissionDetail Component', () => {
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(screen.getByText(/Submission ID:/)).toBeInTheDocument();
-      expect(screen.getByText(/Form Key:/)).toBeInTheDocument();
-      expect(screen.getByText(/Submitted At:/)).toBeInTheDocument();
+      expect(screen.getByText("submissionDetail.id:")).toBeInTheDocument();
+      expect(screen.getByText("submissionDetail.formKey:")).toBeInTheDocument();
+      expect(screen.getByText("submissionDetail.submittedAt:")).toBeInTheDocument();
     });
   });
 
@@ -151,9 +151,9 @@ describe('SubmissionDetail Component', () => {
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
-    await waitFor(() => screen.getByRole('button', {name: /back to submissions/i}));
+    await waitFor(() => screen.getByRole('button', {name: '← submissionDetail.back'}));
 
-    const backButton = screen.getByRole('button', {name: /back to submissions/i});
+    const backButton = screen.getByRole('button', {name: '← submissionDetail.back'});
     fireEvent.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/submissions');
   });
@@ -183,7 +183,7 @@ describe('SubmissionDetail Component', () => {
     renderSubmissionDetail();
 
     await waitFor(() => {
-      expect(screen.getByText('Submission not found.')).toBeInTheDocument();
+      expect(screen.getByText('submissionDetail.notFound')).toBeInTheDocument();
     });
   });
 
@@ -195,4 +195,3 @@ describe('SubmissionDetail Component', () => {
     expect(formClient.getSubmissionById).not.toHaveBeenCalled();
   });
 });
-

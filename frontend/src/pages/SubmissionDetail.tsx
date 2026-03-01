@@ -5,12 +5,14 @@ import {useQuery} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {formClient} from '../services/formClient';
 import {ReadOnlyDynamicForm} from '../components/ReadOnlyDynamicForm';
+import {useTranslation} from 'react-i18next';
 
 export const SubmissionDetail: React.FC = () => {
   const {id} = useParams<{ id: string }>();
   const navigate = useNavigate();
   const {user} = useAuth();
   const token = user?.access_token;
+  const {t} = useTranslation();
 
   const {
     data: submission,
@@ -39,7 +41,7 @@ export const SubmissionDetail: React.FC = () => {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading')}</span>
         </Spinner>
       </Container>
     );
@@ -50,7 +52,7 @@ export const SubmissionDetail: React.FC = () => {
       <Container className="mt-5">
         <Alert variant="danger">{(error as Error).message}</Alert>
         <Button variant="secondary" onClick={() => navigate('/submissions')}>
-          Back to Submissions
+          {t('submissionDetail.back')}
         </Button>
       </Container>
     );
@@ -59,9 +61,9 @@ export const SubmissionDetail: React.FC = () => {
   if (!submission || !form) {
     return (
       <Container className="mt-5">
-        <Alert variant="warning">Submission not found.</Alert>
+        <Alert variant="warning">{t('submissionDetail.notFound')}</Alert>
         <Button variant="secondary" onClick={() => navigate('/submissions')}>
-          Back to Submissions
+          {t('submissionDetail.back')}
         </Button>
       </Container>
     );
@@ -72,7 +74,7 @@ export const SubmissionDetail: React.FC = () => {
       <Row className="mb-4">
         <Col>
           <Button variant="outline-secondary" onClick={() => navigate('/submissions')}>
-            ← Back to Submissions
+            ← {t('submissionDetail.back')}
           </Button>
         </Col>
       </Row>
@@ -83,13 +85,13 @@ export const SubmissionDetail: React.FC = () => {
           <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
           <Alert variant="info" className="mb-4">
-            <strong>Submission ID:</strong> {submission.id}
+            <strong>{t('submissionDetail.id')}:</strong> {submission.id}
             <br/>
-            <strong>Form Key:</strong> {submission.formKey}
+            <strong>{t('submissionDetail.formKey')}:</strong> {submission.formKey}
             <br/>
-            <strong>Submitted At:</strong> {new Date(submission.submittedAt).toLocaleString()}
+            <strong>{t('submissionDetail.submittedAt')}:</strong> {t('common.date.long', {date: new Date(submission.submittedAt)})}
             <br/>
-            <strong>Submitted By:</strong> {submission.submittedBy}
+            <strong>{t('submissionDetail.submittedBy')}:</strong> {submission.submittedBy}
           </Alert>
 
           <ReadOnlyDynamicForm fields={form.fields} data={submission.data}/>
@@ -98,4 +100,3 @@ export const SubmissionDetail: React.FC = () => {
     </Container>
   );
 };
-

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
 import {UseFormRegister} from 'react-hook-form';
-import {FormField} from '../types/Form';
+import {FormField, FormValues} from '../types/Form';
 import {FieldWrapper} from './FieldWrapper';
 
 interface FieldProps {
