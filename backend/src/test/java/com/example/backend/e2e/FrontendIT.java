@@ -68,4 +68,34 @@ public class FrontendIT extends IntegrationTestBase {
     assertTrue(submissionDetailPage.containsText("Low"));
     assertTrue(submissionDetailPage.containsText("admin"));
   }
+
+  @Test
+  void editSubmission() {
+    // 1. Navigate to Submissions page
+    driver.get("http://localhost:8080");
+    // 2. Login if not already
+    if (!driver.getCurrentUrl().contains("submissions")) {
+      formsPage.clickLogin();
+      loginPage.login("admin", "admin");
+    }
+    formsPage.clickFormSubmissions();
+    formSubmissionsPage.waitForLoad();
+    // 3. Click edit on the first submission
+    formSubmissionsPage.editFirstSubmission();
+    // 4. Verify the form page loaded in edit mode
+    formSubmissionPage.waitForLoad();
+    assertTrue(formSubmissionPage.getFormTitle().contains("Edit:"));
+    // 5. Modify a field
+    formSubmissionPage.fillTextField("name", "Test User Updated");
+    // 6. Submit the form
+    formSubmissionPage.submit();
+    // 7. Verify success message is shown and redirected
+    assertTrue(formSubmissionPage.isSuccessMessageDisplayed());
+    formSubmissionsPage.waitForLoad();
+    // 8. View the submission details
+    formSubmissionsPage.viewFirstSubmission();
+    submissionDetailPage.waitForLoad();
+    // 9. Verify the change was saved
+    assertTrue(submissionDetailPage.containsText("Test User Updated"));
+  }
 }

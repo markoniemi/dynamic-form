@@ -1,29 +1,34 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Button, Card, Container, Form, Spinner} from 'react-bootstrap';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
-import {useMutation, useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {formClient} from '../services/formClient';
 import {DynamicForm} from '../components/DynamicForm.tsx';
+import {useTranslation} from 'react-i18next';
 
 export const FormSubmission: React.FC = () => {
-  const {formKey} = useParams<{ formKey: string }>();
+  const {formKey, id} = useParams<{ formKey: string; id?: string }>();
   const navigate = useNavigate();
   const {user, isAuthenticated, signinRedirect} = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
   const token = user?.access_token;
+  const {t} = useTranslation();
+  const isEditMode = !!id;
+  const queryClient = useQueryClient();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: {errors},
   } = useForm();
 
   const {
     data: form,
-    isLoading,
+    isLoading: isLoadingForm,
     error: fetchError,
   } = useQuery({
     queryKey: ['form', formKey],
@@ -31,23 +36,53 @@ export const FormSubmission: React.FC = () => {
     enabled: !!formKey,
   });
 
+  const {
+    data: submission,
+    isLoading: isLoadingSubmission,
+    error: submissionError,
+  } = useQuery({
+    queryKey: ['submission', id],
+    queryFn: () => formClient.getSubmissionById(Number(id), token!),
+    enabled: !!id && !!token,
+  });
+
+  useEffect(() => {
+    if (submission && submission.data) {
+      Object.entries(submission.data).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+    }
+  }, [submission, setValue]);
+
   const mutation = useMutation({
-    mutationFn: (data: Record<string, any>) => {
+    mutationFn: (data: Record<string, unknown>) => {
       if (!isAuthenticated || !token) {
         return Promise.reject(new Error('You must be logged in to submit a form'));
+      }
+      if (isEditMode) {
+        return formClient.updateSubmission(Number(id), data, token);
       }
       return formClient.submitForm(formKey!, data, token);
     },
     onSuccess: () => {
       setShowSuccess(true);
-      reset();
+      if (!isEditMode) {
+        reset();
+      }
+
+      // Invalidate queries to ensure fresh data is fetched
+      queryClient.invalidateQueries({ queryKey: ['form-submissions'] });
+      if (isEditMode) {
+        queryClient.invalidateQueries({ queryKey: ['submission', id] });
+      }
+
       setTimeout(() => {
-        navigate('/forms');
-      }, 3000);
+        navigate('/submissions');
+      }, 2000);
     },
   });
 
-  const onSubmit = (data: Record<string, any>) => {
+  const onSubmit = (data: Record<string, unknown>) => {
     if (!isAuthenticated) {
       signinRedirect();
       return;
@@ -55,22 +90,25 @@ export const FormSubmission: React.FC = () => {
     mutation.mutate(data);
   };
 
+  const isLoading = isLoadingForm || (isEditMode && isLoadingSubmission);
+  const error = fetchError || (isEditMode && submissionError);
+
   if (isLoading) {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading')}</span>
         </Spinner>
       </Container>
     );
   }
 
-  if (fetchError) {
+  if (error) {
     return (
       <Container className="mt-5">
-        <Alert variant="danger">{(fetchError as Error).message}</Alert>
+        <Alert variant="danger">{(error as Error).message}</Alert>
         <Button variant="secondary" onClick={() => navigate('/forms')}>
-          Back to Forms
+          {t('submissionDetail.back')}
         </Button>
       </Container>
     );
@@ -84,12 +122,12 @@ export const FormSubmission: React.FC = () => {
     <Container className="mt-5">
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title as="h2">{form.title}</Card.Title>
+          <Card.Title as="h2">{isEditMode ? t('form.editTitle', {title: form.title}) : form.title}</Card.Title>
           <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
           {showSuccess && (
             <Alert variant="success" onClose={() => setShowSuccess(false)} dismissible>
-              Form submitted successfully! Redirecting to forms list...
+              {isEditMode ? t('form.updateSuccess') : t('form.success')}
             </Alert>
           )}
 
@@ -99,8 +137,8 @@ export const FormSubmission: React.FC = () => {
 
           {!isAuthenticated && (
             <Alert variant="warning">
-              You must be logged in to submit this form.{' '}
-              <Alert.Link onClick={() => signinRedirect()}>Click here to log in</Alert.Link>
+              {t('form.loginRequired')}{' '}
+              <Alert.Link onClick={() => signinRedirect()}>{t('navigation.login')}</Alert.Link>
             </Alert>
           )}
 
@@ -117,10 +155,10 @@ export const FormSubmission: React.FC = () => {
                 type="submit"
                 disabled={mutation.isPending || !isAuthenticated}
               >
-                {mutation.isPending ? 'Submitting...' : 'Submit'}
+                {mutation.isPending ? t('form.submitting') : t('form.submit')}
               </Button>
               <Button variant="secondary" onClick={() => navigate('/submissions')}>
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </Form>

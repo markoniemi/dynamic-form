@@ -34,6 +34,7 @@
       "submittedBy": "Submitted By",
       "actions": "Actions",
       "view": "View",
+      "edit": "Edit",
       "delete": "Delete"
     },
     "confirmDelete": "Are you sure you want to delete this submission?"
@@ -48,15 +49,20 @@
   },
   "form": {
     "submit": "Submit",
+    "update": "Update",
     "submitting": "Submitting...",
     "success": "Form submitted successfully!",
+    "updateSuccess": "Form updated successfully!",
     "error": "An error occurred while submitting the form.",
     "required": "is required",
-    "selectOption": "Select an option..."
+    "selectOption": "Select an option...",
+    "editTitle": "Edit: {{title}}",
+    "loginRequired": "You must be logged in to submit this form."
   },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
+    "cancel": "Cancel",
     "date": {
       "short": "{{date, short}}",
       "long": "{{date, long}}"

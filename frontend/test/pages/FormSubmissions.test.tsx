@@ -95,6 +95,7 @@ describe('FormSubmissions Component', () => {
       expect(screen.getByText('contact')).toBeInTheDocument();
       expect(screen.getByText('feedback')).toBeInTheDocument();
       expect(screen.getAllByRole('button', {name: 'submissions.table.view'})).toHaveLength(2);
+      expect(screen.getAllByRole('button', {name: 'submissions.table.edit'})).toHaveLength(2);
     });
   });
 
@@ -157,6 +158,17 @@ describe('FormSubmissions Component', () => {
     const detailButtons = screen.getAllByRole('button', {name: 'submissions.table.view'});
     fireEvent.click(detailButtons[1]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/2');
+  });
+
+  it('navigates to the submission edit page when "Edit" is clicked', async () => {
+    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    renderFormSubmissions();
+
+    await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.edit'}));
+
+    const editButtons = screen.getAllByRole('button', {name: 'submissions.table.edit'});
+    fireEvent.click(editButtons[0]);
+    expect(mockNavigate).toHaveBeenCalledWith('/forms/contact/submissions/1/edit');
   });
 
   it('calls getAllSubmissions with the user token', async () => {

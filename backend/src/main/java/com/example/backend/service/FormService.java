@@ -5,7 +5,6 @@ import com.example.backend.entity.Form;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +38,6 @@ public class FormService {
     return formRepository
         .findByFormKey(formKey)
         .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
-  }
-
-  @InterfaceLog
-  public Optional<Form> findByFormKey(String formKey) {
-    return formRepository.findByFormKey(formKey);
   }
 
   @InterfaceLog

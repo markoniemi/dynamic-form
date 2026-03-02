@@ -56,6 +56,7 @@ export const Content: React.FC = () => {
           <>
             <Route path="/forms" element={<Forms/>}/>
             <Route path="/forms/:formKey" element={<FormSubmission/>}/>
+            <Route path="/forms/:formKey/submissions/:id/edit" element={<FormSubmission/>}/>
             <Route path="/forms/submissions/:id" element={<SubmissionDetail/>}/>
             <Route path="/create-form" element={<EditForm/>}/>
             <Route path="/" element={<Forms/>}/>

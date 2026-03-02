@@ -74,9 +74,17 @@ export const FormSubmissions: React.FC = () => {
                     <Button
                       variant="outline-primary"
                       size="sm"
+                      className="me-2"
                       onClick={() => navigate(`/forms/submissions/${submission.id}`)}
                     >
                       {t('submissions.table.view')}
+                    </Button>
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => navigate(`/forms/${submission.formKey}/submissions/${submission.id}/edit`)}
+                    >
+                      {t('submissions.table.edit')}
                     </Button>
                   </td>
                 </tr>

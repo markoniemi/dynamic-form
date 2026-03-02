@@ -45,6 +45,14 @@ export const formClient = {
     });
   },
 
+  async updateSubmission(id: number, data: Record<string, unknown>, token: string): Promise<FormDataDto> {
+    return http.request<FormDataDto>(`/form-data/submission/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      token,
+    });
+  },
+
   async getFormSubmissions(formKey: string, token: string): Promise<FormDataDto[]> {
     return http.request<FormDataDto[]>(`/form-data/${formKey}`, {token});
   },

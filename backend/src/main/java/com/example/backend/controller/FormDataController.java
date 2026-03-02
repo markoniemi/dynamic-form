@@ -38,9 +38,20 @@ public class FormDataController {
     return formDataMapper.toDto(savedFormData);
   }
 
+  @PutMapping("/submission/{id}")
+  @InterfaceLog
+  @PreAuthorize("isAuthenticated()")
+  public FormDataDto updateSubmission(
+      @PathVariable Long id,
+      @RequestBody Map<String, Object> data) {
+    FormData updatedFormData = formDataService.updateFormSubmission(id, data);
+    return formDataMapper.toDto(updatedFormData);
+  }
+
   @GetMapping
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
+  // TODO: User can get only their own submissions.
   public List<FormDataDto> getAllSubmissions() {
     return formDataService.getAllFormSubmissions().stream()
         .map(formDataMapper::toDto)

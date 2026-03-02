@@ -33,13 +33,14 @@ public class FormController {
 
   @GetMapping("/all")
   @InterfaceLog
-  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @PreAuthorize("isAuthenticated()")
   public List<FormDto> getAllForms() {
     return formService.getAllForms().stream().map(formMapper::toDto).toList();
   }
 
   @GetMapping("/{key}")
   @InterfaceLog
+  @PreAuthorize("isAuthenticated()")
   public FormDto getForm(@PathVariable String key) {
     Form definition = formService.getForm(key);
     return formMapper.toDto(definition);
