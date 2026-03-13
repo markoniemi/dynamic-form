@@ -16,6 +16,9 @@ public class FormsPage extends BasePage {
   @FindBy(xpath = "//a[contains(text(), 'Submissions')]")
   private WebElement formSubmissionsLink;
 
+  @FindBy(xpath = "//button[contains(text(), 'Logout')]")
+  private WebElement logoutButton;
+
   public FormsPage(WebDriver driver) {
     super(driver);
   }
@@ -23,6 +26,11 @@ public class FormsPage extends BasePage {
   public void clickLogin() {
     wait.until(ExpectedConditions.elementToBeClickable(loginButton));
     loginButton.click();
+  }
+
+  public void clickLogout() {
+    wait.until(ExpectedConditions.elementToBeClickable(logoutButton));
+    logoutButton.click();
   }
 
   public void clickFormSubmissions() {

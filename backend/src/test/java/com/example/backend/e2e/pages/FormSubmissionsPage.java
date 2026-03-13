@@ -26,14 +26,23 @@ public class FormSubmissionsPage extends BasePage {
     wait.until(ExpectedConditions.visibilityOf(heading));
   }
 
-  public boolean isSubmissionPresent(String formKey) {
+  public boolean isSubmissionPresent(String text) {
     waitForLoad();
     try {
       wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table tbody tr")));
-      return submissionRows.stream().anyMatch(row -> row.getText().contains(formKey));
+      return submissionRows.stream().anyMatch(row -> row.getText().contains(text));
     } catch (Exception e) {
       return false;
     }
+  }
+
+  public String getFirstSubmissionId() {
+    waitForLoad();
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table tbody tr")));
+    if (!submissionRows.isEmpty()) {
+      return submissionRows.getFirst().findElement(By.xpath("./td[1]")).getText();
+    }
+    return null;
   }
 
   public void viewFirstSubmission() {
@@ -63,6 +72,7 @@ public class FormSubmissionsPage extends BasePage {
 
   public boolean isEmpty() {
     try {
+      wait.until(ExpectedConditions.visibilityOf(emptyAlert));
       return emptyAlert.isDisplayed();
     } catch (Exception e) {
       return false;

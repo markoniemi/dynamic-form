@@ -1,5 +1,6 @@
 package com.example.backend.e2e;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.backend.IntegrationTestBase;
@@ -97,5 +98,38 @@ public class FrontendIT extends IntegrationTestBase {
     submissionDetailPage.waitForLoad();
     // 9. Verify the change was saved
     assertTrue(submissionDetailPage.containsText("Test User Updated"));
+  }
+
+  @Test
+  void userAccessControlTest() {
+    // 1. Admin creates a submission
+    driver.get("http://localhost:8080");
+    formsPage.clickLogin();
+    loginPage.login("admin", "admin");
+    formsPage.openForm("contact");
+    formSubmissionPage.fillTextField("name", "Admin's Submission");
+    formSubmissionPage.submit();
+    formsPage.clickFormSubmissions();
+    String submissionId = formSubmissionsPage.getFirstSubmissionId();
+    formsPage.clickLogout();
+
+    // 2. User logs in and tries to access admin's submission
+    formsPage.clickLogin();
+    loginPage.login("user", "user");
+    formsPage.clickFormSubmissions();
+    formSubmissionsPage.waitForLoad();
+
+    // 3. Verify user cannot see admin's submission in the list
+    assertFalse(formSubmissionsPage.isSubmissionPresent("Admin's Submission"));
+    assertTrue(formSubmissionsPage.isEmpty());
+
+    // 4. Verify user cannot access detail page directly
+    driver.get("http://localhost:8080/forms/submissions/" + submissionId);
+    // Assuming a 403/404 would not render the details card
+    assertFalse(submissionDetailPage.containsText("Admin's Submission"));
+
+    // 5. Verify user cannot access edit page directly
+    driver.get("http://localhost:8080/forms/contact/submissions/" + submissionId + "/edit");
+    assertFalse(formSubmissionPage.getFormTitle().contains("Edit:"));
   }
 }

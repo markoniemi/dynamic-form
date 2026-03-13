@@ -37,9 +37,13 @@ public class FormDataService {
 
   @InterfaceLog
   @Transactional
-  public FormData updateFormSubmission(@NotNull Long id, @NotNull Map<String, Object> data) {
+  public FormData updateFormSubmission(@NotNull Long id, @NotNull Map<String, Object> data, String username) {
     FormData existing = formDataRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Submission not found: " + id));
+
+    if (!existing.getSubmittedBy().equals(username)) {
+      throw new SecurityException("You are not authorized to update this submission");
+    }
 
     existing.setData(data);
     log.info("Updating submission: {}", id);
@@ -57,8 +61,18 @@ public class FormDataService {
   }
 
   @InterfaceLog
+  public List<FormData> getFormSubmissionsByOwner(@NotNull String username) {
+    return formDataRepository.findBySubmittedByOrderBySubmittedAtDesc(username);
+  }
+
+  @InterfaceLog
   public List<FormData> getFormSubmissionsByKey(@NotNull String formKey) {
     return formDataRepository.findByFormKeyOrderBySubmittedAtDesc(formKey);
+  }
+
+  @InterfaceLog
+  public List<FormData> getFormSubmissionsByKeyAndOwner(@NotNull String formKey, @NotNull String username) {
+    return formDataRepository.findByFormKeyAndSubmittedByOrderBySubmittedAtDesc(formKey, username);
   }
 
   @InterfaceLog

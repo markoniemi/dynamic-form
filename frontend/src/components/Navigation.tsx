@@ -3,10 +3,17 @@ import {Button, Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
 import {useAuth} from 'react-oidc-context';
 import {Link} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
+import {useQueryClient} from '@tanstack/react-query';
 
 export const Navigation: React.FC = () => {
   const {isAuthenticated, signinRedirect, signoutRedirect} = useAuth();
   const {t, i18n} = useTranslation();
+  const queryClient = useQueryClient();
+
+  const handleLogout = () => {
+    queryClient.clear(); // Clear the cache
+    signoutRedirect();
+  };
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -42,7 +49,7 @@ export const Navigation: React.FC = () => {
             </NavDropdown>
             <div className="d-flex align-items-center ms-2">
             {isAuthenticated ? (
-              <Button variant="danger" size="sm" onClick={() => signoutRedirect()}>
+              <Button variant="danger" size="sm" onClick={handleLogout}>
                 {t('navigation.logout')}
               </Button>
             ) : (

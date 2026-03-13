@@ -4,16 +4,23 @@ import com.example.backend.dto.FormDataDto;
 import com.example.backend.entity.FormData;
 import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;
+import com.example.backend.util.SecurityUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import static com.example.backend.util.SecurityUtils.getUsername;
+import static com.example.backend.util.SecurityUtils.isAdmin;
 
 @RestController
 @RequestMapping("/api/form-data")
@@ -32,7 +39,7 @@ public class FormDataController {
       @PathVariable String key,
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
-    String username = jwt.getClaimAsString("sub");
+    String username = getUsername(jwt);
     FormData formData = new FormData(key, data, username);
     FormData savedFormData = formDataService.createFormSubmission(key, formData);
     return formDataMapper.toDto(savedFormData);
@@ -43,37 +50,65 @@ public class FormDataController {
   @PreAuthorize("isAuthenticated()")
   public FormDataDto updateSubmission(
       @PathVariable Long id,
-      @RequestBody Map<String, Object> data) {
-    FormData updatedFormData = formDataService.updateFormSubmission(id, data);
-    return formDataMapper.toDto(updatedFormData);
+      @RequestBody Map<String, Object> data,
+      @AuthenticationPrincipal Jwt jwt) {
+    String username = getUsername(jwt);
+    try {
+      FormData updatedFormData = formDataService.updateFormSubmission(id, data, username);
+      return formDataMapper.toDto(updatedFormData);
+    } catch (SecurityException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
   }
 
   @GetMapping
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
-  // TODO: User can get only their own submissions.
-  public List<FormDataDto> getAllSubmissions() {
-    return formDataService.getAllFormSubmissions().stream()
-        .map(formDataMapper::toDto)
-        .toList();
+  public List<FormDataDto> getAllSubmissions(
+      @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
+    String username = getUsername(jwt);
+    if (isAdmin(authentication)) {
+      return formDataService.getAllFormSubmissions().stream().map(formDataMapper::toDto).toList();
+    } else {
+      return formDataService.getFormSubmissionsByOwner(username).stream().map(formDataMapper::toDto).toList();
+    }
   }
 
   @GetMapping("/{key}")
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
-  public List<FormDataDto> getSubmissionsByFormKey(@PathVariable String key) {
-    return formDataService.getFormSubmissionsByKey(key).stream()
-        .map(formDataMapper::toDto)
-        .toList();
+  public List<FormDataDto> getSubmissionsByFormKey(
+      @PathVariable String key,
+      @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
+    String username = getUsername(jwt);
+    if (isAdmin(authentication)) {
+      return formDataService.getFormSubmissionsByKey(key).stream().map(formDataMapper::toDto).toList();
+    } else {
+      return formDataService.getFormSubmissionsByKeyAndOwner(key, username).stream()
+          .map(formDataMapper::toDto)
+          .toList();
+    }
   }
 
   @GetMapping("/submission/{id}")
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
-  public FormDataDto getSubmissionById(@PathVariable Long id) {
+  public FormDataDto getSubmissionById(
+      @PathVariable Long id,
+      @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
+    String username = getUsername(jwt);
     return formDataService
         .getFormSubmissionById(id)
-        .map(formDataMapper::toDto)
+        .map(submission -> {
+          boolean isAdmin = isAdmin(authentication);
+
+          if (!submission.getSubmittedBy().equals(username) && !isAdmin) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "You are not authorized to view this submission");
+          }
+          return formDataMapper.toDto(submission);
+        })
         .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
   }
 
