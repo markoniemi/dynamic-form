@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
       @org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
     registry
         .addResourceHandler("/**")
-        .addResourceLocations("classpath:/META-INF/resources/webjars/frontend/1.0.0/");
+        .addResourceLocations("classpath:/META-INF/resources/webjars/frontend/1.0.0-SNAPSHOT/");
   }
 
   @Override
