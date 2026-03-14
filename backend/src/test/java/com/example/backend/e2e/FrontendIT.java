@@ -109,7 +109,8 @@ public class FrontendIT extends IntegrationTestBase {
     formsPage.openForm("contact");
     formSubmissionPage.fillTextField("name", "Admin's Submission");
     formSubmissionPage.submit();
-    formsPage.clickFormSubmissions();
+    assertTrue(formSubmissionPage.isSuccessMessageDisplayed());
+    formSubmissionsPage.waitForLoad();
     String submissionId = formSubmissionsPage.getFirstSubmissionId();
     formsPage.clickLogout();
 
