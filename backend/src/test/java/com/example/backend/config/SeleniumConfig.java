@@ -12,7 +12,7 @@ public class SeleniumConfig {
   public WebDriver getWebDriver() {
     WebDriverManager.chromedriver().setup();
     ChromeOptions options = new ChromeOptions();
-//    options.addArguments("headless=new");
+    options.addArguments("headless=new");
     options.addArguments("window-size=1920,1080");
     options.addArguments("no-sandbox");
     options.addArguments("proxy-server='direct://'");
