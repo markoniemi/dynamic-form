@@ -43,6 +43,18 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDto.of(ex));
   }
 
+  @ExceptionHandler(SecurityException.class)
+  public ResponseEntity<ErrorDto> handleSecurityException(SecurityException ex) {
+    log.warn("SecurityException: {}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorDto.of(ex));
+  }
+
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ErrorDto> handleIllegalStateException(IllegalStateException ex) {
+    log.warn("IllegalStateException: {}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorDto.of(ex));
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorDto> handleGenericException(Exception ex) {
     log.error("Unhandled exception: ", ex);

@@ -13,7 +13,6 @@ import org.example.log.InterfaceLog;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/forms")
@@ -52,8 +51,7 @@ public class FormController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto createForm(@Valid @RequestBody FormDto dto) {
     if (formService.existsByFormKey(dto.getFormKey())) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "Form with key '" + dto.getFormKey() + "' already exists");
+      throw new IllegalStateException("Form with key '" + dto.getFormKey() + "' already exists");
     }
     Form entity = formMapper.toEntity(dto);
     Form saved = formService.saveForm(entity);

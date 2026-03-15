@@ -13,13 +13,11 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/form-data")
@@ -52,12 +50,8 @@ public class FormDataController {
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
     String username = getUsername(jwt);
-    try {
-      FormData updatedFormData = formDataService.updateFormSubmission(id, data, username);
-      return formDataMapper.toDto(updatedFormData);
-    } catch (SecurityException e) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
-    }
+    FormData updatedFormData = formDataService.updateFormSubmission(id, data, username);
+    return formDataMapper.toDto(updatedFormData);
   }
 
   @GetMapping
@@ -102,9 +96,7 @@ public class FormDataController {
           boolean isAdmin = isAdmin(authentication);
 
           if (!submission.getSubmittedBy().equals(username) && !isAdmin) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
-                "You are not authorized to view this submission");
+            throw new SecurityException("You are not authorized to view this submission");
           }
           return formDataMapper.toDto(submission);
         })

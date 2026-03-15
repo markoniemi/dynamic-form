@@ -20,11 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class FormService {
 
   private final FormRepository formRepository;
+  private final com.example.backend.mapper.FormMapper formMapper;
 
   @InterfaceLog
   public List<FormListItemDto> getAvailableForms() {
     return formRepository.findAll().stream()
-        .map(form -> new FormListItemDto(form.getFormKey(), form.getTitle()))
+        .map(formMapper::toListItemDto)
         .collect(Collectors.toList());
   }
 
