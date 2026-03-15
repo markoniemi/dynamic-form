@@ -78,7 +78,9 @@ class FormDataServiceTest {
   @Test
   void deleteFormSubmission() {
     Long id = 1L;
-    formDataService.deleteFormSubmission(id);
+    FormData formData = new FormData("form1", Map.of(), "username");
+    when(formDataRepository.findById(id)).thenReturn(Optional.of(formData));
+    formDataService.deleteFormSubmission(id, "username");
     verify(formDataRepository).deleteById(id);
   }
 }

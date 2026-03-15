@@ -120,6 +120,6 @@ class FormDataControllerTest {
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk());
 
-    verify(formDataService).deleteFormSubmission(1L);
+    verify(formDataService).deleteFormSubmission(1L, "user");
   }
 }

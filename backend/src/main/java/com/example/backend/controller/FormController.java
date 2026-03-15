@@ -51,7 +51,7 @@ public class FormController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto createForm(@Valid @RequestBody FormDto dto) {
     if (formService.existsByFormKey(dto.getFormKey())) {
-      throw new IllegalStateException("Form with key '" + dto.getFormKey() + "' already exists");
+      throw new IllegalArgumentException("Form with key '" + dto.getFormKey() + "' already exists");
     }
     Form entity = formMapper.toEntity(dto);
     Form saved = formService.saveForm(entity);

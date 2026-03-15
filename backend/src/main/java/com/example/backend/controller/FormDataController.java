@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -63,7 +64,9 @@ public class FormDataController {
     if (isAdmin(authentication)) {
       return formDataService.getAllFormSubmissions().stream().map(formDataMapper::toDto).toList();
     } else {
-      return formDataService.getFormSubmissionsByOwner(username).stream().map(formDataMapper::toDto).toList();
+      return formDataService.getFormSubmissionsByOwner(username).stream()
+          .map(formDataMapper::toDto)
+          .toList();
     }
   }
 
@@ -71,11 +74,12 @@ public class FormDataController {
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
   public List<FormDataDto> getSubmissionsByFormKey(
-      @PathVariable String key,
-      @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
+      @PathVariable String key, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
     if (isAdmin(authentication)) {
-      return formDataService.getFormSubmissionsByKey(key).stream().map(formDataMapper::toDto).toList();
+      return formDataService.getFormSubmissionsByKey(key).stream()
+          .map(formDataMapper::toDto)
+          .toList();
     } else {
       return formDataService.getFormSubmissionsByKeyAndOwner(key, username).stream()
           .map(formDataMapper::toDto)
@@ -87,26 +91,26 @@ public class FormDataController {
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
   public FormDataDto getSubmissionById(
-      @PathVariable Long id,
-      @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
+      @PathVariable Long id, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
     return formDataService
         .getFormSubmissionById(id)
-        .map(submission -> {
-          boolean isAdmin = isAdmin(authentication);
+        .map(
+            submission -> {
+              boolean isAdmin = isAdmin(authentication);
 
-          if (!submission.getSubmittedBy().equals(username) && !isAdmin) {
-            throw new SecurityException("You are not authorized to view this submission");
-          }
-          return formDataMapper.toDto(submission);
-        })
+              if (!submission.getSubmittedBy().equals(username) && !isAdmin) {
+                throw new AccessDeniedException("You are not authorized to view this submission");
+              }
+              return formDataMapper.toDto(submission);
+            })
         .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
   }
 
   @DeleteMapping("/submission/{id}")
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  public void deleteSubmission(@PathVariable Long id) {
-    formDataService.deleteFormSubmission(id);
+  public void deleteSubmission(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+    formDataService.deleteFormSubmission(id, getUsername(jwt));
   }
 }
