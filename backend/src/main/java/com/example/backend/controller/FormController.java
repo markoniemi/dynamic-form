@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.FormDto;
 import com.example.backend.dto.FormListItemDto;
-import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import jakarta.validation.Valid;
@@ -41,8 +40,7 @@ public class FormController {
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
   public FormDto getForm(@PathVariable String key) {
-    Form definition = formService.getForm(key);
-    return formMapper.toDto(definition);
+    return formMapper.toDto(formService.getForm(key));
   }
 
   @PostMapping
@@ -53,18 +51,14 @@ public class FormController {
     if (formService.existsByFormKey(dto.getFormKey())) {
       throw new IllegalArgumentException("Form with key '" + dto.getFormKey() + "' already exists");
     }
-    Form entity = formMapper.toEntity(dto);
-    Form saved = formService.saveForm(entity);
-    return formMapper.toDto(saved);
+    return formMapper.toDto(formService.saveForm(formMapper.toEntity(dto)));
   }
 
   @PutMapping("/{key}")
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto updateForm(@PathVariable String key, @Valid @RequestBody FormDto dto) {
-    Form entity = formMapper.toEntity(dto);
-    Form updated = formService.updateForm(key, entity);
-    return formMapper.toDto(updated);
+    return formMapper.toDto(formService.updateForm(key, formMapper.toEntity(dto)));
   }
 
   @DeleteMapping("/{key}")

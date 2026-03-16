@@ -19,6 +19,7 @@ import com.example.backend.service.FormDataService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ class FormDataControllerTest {
         new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
 
     when(formDataService.getAllFormSubmissions()).thenReturn(Collections.singletonList(formData));
-    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
+    when(formDataMapper.mapList(any(List.class))).thenReturn(Collections.singletonList(formDataDto));
 
     mockMvc
         .perform(
@@ -84,7 +85,7 @@ class FormDataControllerTest {
 
     when(formDataService.getFormSubmissionsByKey("form1"))
         .thenReturn(Collections.singletonList(formData));
-    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
+    when(formDataMapper.mapList(any(List.class))).thenReturn(Collections.singletonList(formDataDto));
 
     mockMvc
         .perform(

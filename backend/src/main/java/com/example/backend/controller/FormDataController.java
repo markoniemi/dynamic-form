@@ -37,10 +37,8 @@ public class FormDataController {
       @PathVariable String key,
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
-    String username = getUsername(jwt);
-    FormData formData = new FormData(key, data, username);
-    FormData savedFormData = formDataService.createFormSubmission(key, formData);
-    return formDataMapper.toDto(savedFormData);
+    FormData formData = new FormData(key, data, getUsername(jwt));
+    return formDataMapper.toDto(formDataService.createFormSubmission(key, formData));
   }
 
   @PutMapping("/submission/{id}")
@@ -51,8 +49,7 @@ public class FormDataController {
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
     String username = getUsername(jwt);
-    FormData updatedFormData = formDataService.updateFormSubmission(id, data, username);
-    return formDataMapper.toDto(updatedFormData);
+    return formDataMapper.toDto(formDataService.updateFormSubmission(id, data, username));
   }
 
   @GetMapping
@@ -60,13 +57,10 @@ public class FormDataController {
   @PreAuthorize("isAuthenticated()")
   public List<FormDataDto> getAllSubmissions(
       @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
-    String username = getUsername(jwt);
     if (isAdmin(authentication)) {
-      return formDataService.getAllFormSubmissions().stream().map(formDataMapper::toDto).toList();
+      return formDataMapper.mapList(formDataService.getAllFormSubmissions());
     } else {
-      return formDataService.getFormSubmissionsByOwner(username).stream()
-          .map(formDataMapper::toDto)
-          .toList();
+      return formDataMapper.mapList(formDataService.getFormSubmissionsByOwner(getUsername(jwt)));
     }
   }
 
@@ -77,13 +71,9 @@ public class FormDataController {
       @PathVariable String key, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
     if (isAdmin(authentication)) {
-      return formDataService.getFormSubmissionsByKey(key).stream()
-          .map(formDataMapper::toDto)
-          .toList();
+      return formDataMapper.mapList(formDataService.getFormSubmissionsByKey(key));
     } else {
-      return formDataService.getFormSubmissionsByKeyAndOwner(key, username).stream()
-          .map(formDataMapper::toDto)
-          .toList();
+      return formDataMapper.mapList(formDataService.getFormSubmissionsByKeyAndOwner(key, username));
     }
   }
 
@@ -93,18 +83,14 @@ public class FormDataController {
   public FormDataDto getSubmissionById(
       @PathVariable Long id, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
-    return formDataService
-        .getFormSubmissionById(id)
-        .map(
-            submission -> {
-              boolean isAdmin = isAdmin(authentication);
-
-              if (!submission.getSubmittedBy().equals(username) && !isAdmin) {
-                throw new AccessDeniedException("You are not authorized to view this submission");
-              }
-              return formDataMapper.toDto(submission);
-            })
-        .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
+    FormData submission =
+        formDataService
+            .getFormSubmissionById(id)
+            .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
+    if (!submission.getSubmittedBy().equals(username) && !isAdmin(authentication)) {
+      throw new AccessDeniedException("You are not authorized to view this submission");
+    }
+    return formDataMapper.toDto(submission);
   }
 
   @DeleteMapping("/submission/{id}")

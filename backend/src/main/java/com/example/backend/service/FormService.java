@@ -2,6 +2,8 @@ package com.example.backend.service;
 
 import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Form;
+import com.example.backend.mapper.FormListItemMapper;
+import com.example.backend.mapper.FormMapper;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class FormService {
 
   private final FormRepository formRepository;
-  private final com.example.backend.mapper.FormMapper formMapper;
+  private final FormListItemMapper formListItemMapper;
 
   @InterfaceLog
   public List<FormListItemDto> getAvailableForms() {
     return formRepository.findAll().stream()
-        .map(formMapper::toListItemDto)
-        .collect(Collectors.toList());
+        .map(formListItemMapper::toListItemDto)
+        .toList();
   }
 
   @InterfaceLog
