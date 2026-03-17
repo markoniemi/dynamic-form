@@ -5,6 +5,7 @@ import {useForm} from 'react-hook-form';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {formClient} from '../services/formClient';
+import {formDataClient} from '../services/formDataClient';
 import {DynamicForm} from '../components/DynamicForm.tsx';
 import {useTranslation} from 'react-i18next';
 
@@ -42,7 +43,7 @@ export const FormSubmission: React.FC = () => {
     error: submissionError,
   } = useQuery({
     queryKey: ['submission', id],
-    queryFn: () => formClient.getSubmissionById(Number(id), token!),
+    queryFn: () => formDataClient.getSubmissionById(Number(id), token!),
     enabled: !!id && !!token,
   });
 
@@ -60,9 +61,9 @@ export const FormSubmission: React.FC = () => {
         return Promise.reject(new Error('You must be logged in to submit a form'));
       }
       if (isEditMode) {
-        return formClient.updateSubmission(Number(id), data, token);
+        return formDataClient.updateSubmission(Number(id), data, token);
       }
-      return formClient.submitForm(formKey!, data, token);
+      return formDataClient.submitForm(formKey!, data, token);
     },
     onSuccess: () => {
       setShowSuccess(true);

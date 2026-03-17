@@ -3,7 +3,6 @@ package com.example.backend.service;
 import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormListItemMapper;
-import com.example.backend.mapper.FormMapper;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -41,11 +40,6 @@ public class FormService {
     return formRepository
         .findByFormKey(formKey)
         .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
-  }
-
-  @InterfaceLog
-  public List<Form> getAllForms() {
-    return formRepository.findAll();
   }
 
   @InterfaceLog

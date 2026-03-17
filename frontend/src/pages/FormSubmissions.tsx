@@ -3,7 +3,7 @@ import {Alert, Button, Card, Col, Container, Row, Spinner, Table} from 'react-bo
 import {useAuth} from 'react-oidc-context';
 import {useQuery} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
-import {formClient} from '../services/formClient';
+import {formDataClient} from '../services/formDataClient';
 import {useTranslation} from 'react-i18next';
 
 export const FormSubmissions: React.FC = () => {
@@ -18,7 +18,7 @@ export const FormSubmissions: React.FC = () => {
     error,
   } = useQuery({
     queryKey: ['form-submissions'],
-    queryFn: () => formClient.getAllSubmissions(token!),
+    queryFn: () => formDataClient.getAllSubmissions(token!),
     enabled: !!token,
   });
 

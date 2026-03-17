@@ -4,6 +4,7 @@ import {FormSubmission} from '../../src/pages/FormSubmission';
 import {useAuth} from 'react-oidc-context';
 import {BrowserRouter, useParams} from 'react-router-dom';
 import {formClient} from '../../src/services/formClient';
+import {formDataClient} from '../../src/services/formDataClient';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {Form, FormDataDto} from '../../src/types/Form';
 
@@ -12,6 +13,10 @@ vi.mock('react-oidc-context');
 vi.mock('../../src/services/formClient', () => ({
   formClient: {
     getForm: vi.fn(),
+  },
+}));
+vi.mock('../../src/services/formDataClient', () => ({
+  formDataClient: {
     submitForm: vi.fn(),
     getSubmissionById: vi.fn(),
     updateSubmission: vi.fn(),
@@ -109,7 +114,7 @@ describe('FormSubmission Component', () => {
 
     it('submits form successfully and shows success alert', async () => {
       vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
-      vi.mocked(formClient.submitForm).mockResolvedValue(mockSubmission);
+      vi.mocked(formDataClient.submitForm).mockResolvedValue(mockSubmission);
       renderFormSubmission();
 
       await waitFor(() => screen.getByPlaceholderText('Enter your name'));
@@ -123,7 +128,7 @@ describe('FormSubmission Component', () => {
       fireEvent.click(screen.getByRole('button', {name: 'form.submit'}));
 
       await waitFor(() => {
-        expect(formClient.submitForm).toHaveBeenCalledWith(
+        expect(formDataClient.submitForm).toHaveBeenCalledWith(
           'contact',
           {fullName: 'Jane Doe', email: 'jane@example.com'},
           'mock-token'
@@ -140,7 +145,7 @@ describe('FormSubmission Component', () => {
 
     it('fetches submission data and populates the form', async () => {
       vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
-      vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+      vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
       renderFormSubmission();
 
       await waitFor(() => {
@@ -151,8 +156,8 @@ describe('FormSubmission Component', () => {
 
     it('updates form successfully and shows success alert', async () => {
       vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
-      vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-      vi.mocked(formClient.updateSubmission).mockResolvedValue(mockSubmission);
+      vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
+      vi.mocked(formDataClient.updateSubmission).mockResolvedValue(mockSubmission);
       renderFormSubmission();
 
       await waitFor(() => screen.getByDisplayValue('Jane Doe'));
@@ -163,7 +168,7 @@ describe('FormSubmission Component', () => {
       fireEvent.click(screen.getByRole('button', {name: 'form.submit'}));
 
       await waitFor(() => {
-        expect(formClient.updateSubmission).toHaveBeenCalledWith(
+        expect(formDataClient.updateSubmission).toHaveBeenCalledWith(
           1,
           {fullName: 'Jane Doe Updated', email: 'jane@example.com'},
           'mock-token'
@@ -174,8 +179,8 @@ describe('FormSubmission Component', () => {
 
     it('shows "Updating..." text on the button while mutation is pending', async () => {
       vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
-      vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
-      vi.mocked(formClient.updateSubmission).mockImplementation(() => new Promise(() => {
+      vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
+      vi.mocked(formDataClient.updateSubmission).mockImplementation(() => new Promise(() => {
       }));
       renderFormSubmission();
 

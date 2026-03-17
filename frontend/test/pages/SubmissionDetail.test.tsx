@@ -4,14 +4,19 @@ import {SubmissionDetail} from '../../src/pages/SubmissionDetail';
 import {useAuth} from 'react-oidc-context';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {formClient} from '../../src/services/formClient';
+import {formDataClient} from '../../src/services/formDataClient';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {Form, FormDataDto} from '../../src/types/Form';
 
 vi.mock('react-oidc-context');
 vi.mock('../../src/services/formClient', () => ({
   formClient: {
-    getSubmissionById: vi.fn(),
     getForm: vi.fn(),
+  },
+}));
+vi.mock('../../src/services/formDataClient', () => ({
+  formDataClient: {
+    getSubmissionById: vi.fn(),
   },
 }));
 
@@ -75,14 +80,14 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders loading spinner while fetching data', () => {
-    vi.mocked(formClient.getSubmissionById).mockImplementation(() => new Promise(() => {
+    vi.mocked(formDataClient.getSubmissionById).mockImplementation(() => new Promise(() => {
     }));
     renderSubmissionDetail();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('renders error alert when fetching submission fails', async () => {
-    vi.mocked(formClient.getSubmissionById).mockRejectedValue(new Error('Failed to load submission'));
+    vi.mocked(formDataClient.getSubmissionById).mockRejectedValue(new Error('Failed to load submission'));
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -91,7 +96,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders back button when error occurs', async () => {
-    vi.mocked(formClient.getSubmissionById).mockRejectedValue(new Error('Error'));
+    vi.mocked(formDataClient.getSubmissionById).mockRejectedValue(new Error('Error'));
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -100,7 +105,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders submission details when data is loaded', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -111,7 +116,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders submission metadata', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -123,7 +128,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders field labels from form definition', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -135,7 +140,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders submitted field values', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -147,7 +152,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('navigates back to submissions when back button is clicked', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -159,17 +164,17 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('calls getSubmissionById with correct parameters', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail('42');
 
     await waitFor(() => {
-      expect(formClient.getSubmissionById).toHaveBeenCalledWith(42, 'mock-token');
+      expect(formDataClient.getSubmissionById).toHaveBeenCalledWith(42, 'mock-token');
     });
   });
 
   it('calls getForm with the form key from submission', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
@@ -179,7 +184,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('renders "Submission not found" when submission is null', async () => {
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(null as unknown as FormDataDto);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(null as unknown as FormDataDto);
     renderSubmissionDetail();
 
     await waitFor(() => {
@@ -189,9 +194,9 @@ describe('SubmissionDetail Component', () => {
 
   it('does not call getSubmissionById when no token is present', () => {
     vi.mocked(useAuth).mockReturnValue({user: null} as ReturnType<typeof useAuth>);
-    vi.mocked(formClient.getSubmissionById).mockResolvedValue(mockSubmission);
+    vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     renderSubmissionDetail();
 
-    expect(formClient.getSubmissionById).not.toHaveBeenCalled();
+    expect(formDataClient.getSubmissionById).not.toHaveBeenCalled();
   });
 });

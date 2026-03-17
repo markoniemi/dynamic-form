@@ -4,6 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {formClient} from '../services/formClient';
+import {formDataClient} from '../services/formDataClient';
 import {ReadOnlyDynamicForm} from '../components/ReadOnlyDynamicForm';
 import {useTranslation} from 'react-i18next';
 
@@ -20,7 +21,7 @@ export const SubmissionDetail: React.FC = () => {
     error: submissionError,
   } = useQuery({
     queryKey: ['submission', id],
-    queryFn: () => formClient.getSubmissionById(Number(id), token!),
+    queryFn: () => formDataClient.getSubmissionById(Number(id), token!),
     enabled: !!token && !!id,
   });
 

@@ -25,15 +25,9 @@ public class FormController {
 
   @GetMapping
   @InterfaceLog
+  @PreAuthorize("isAuthenticated()")
   public List<FormListItemDto> getAvailableForms() {
     return formService.getAvailableForms();
-  }
-
-  @GetMapping("/all")
-  @InterfaceLog
-  @PreAuthorize("isAuthenticated()")
-  public List<FormDto> getAllForms() {
-    return formService.getAllForms().stream().map(formMapper::toDto).toList();
   }
 
   @GetMapping("/{key}")

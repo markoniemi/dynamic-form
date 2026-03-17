@@ -3,14 +3,14 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {FormSubmissions} from '../../src/pages/FormSubmissions';
 import {useAuth} from 'react-oidc-context';
 import {BrowserRouter} from 'react-router-dom';
-import {formClient} from '../../src/services/formClient';
+import {formDataClient} from '../../src/services/formDataClient';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {FormDataDto} from '../../src/types/Form';
 
 // Mock dependencies
 vi.mock('react-oidc-context');
-vi.mock('../../src/services/formClient', () => ({
-  formClient: {
+vi.mock('../../src/services/formDataClient', () => ({
+  formDataClient: {
     getAllSubmissions: vi.fn(),
   },
 }));
@@ -72,14 +72,14 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders loading spinner while fetching submissions', () => {
-    vi.mocked(formClient.getAllSubmissions).mockImplementation(() => new Promise(() => {
+    vi.mocked(formDataClient.getAllSubmissions).mockImplementation(() => new Promise(() => {
     }));
     renderFormSubmissions();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('renders the page heading', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => {
@@ -88,7 +88,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders table with all submissions when data is loaded', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => {
@@ -100,7 +100,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders table headers correctly', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => {
@@ -113,7 +113,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders "No submissions found" alert when the list is empty', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue([]);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 
     await waitFor(() => {
@@ -122,7 +122,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('renders error alert when fetching fails', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockRejectedValue(new Error('Failed to load submissions'));
+    vi.mocked(formDataClient.getAllSubmissions).mockRejectedValue(new Error('Failed to load submissions'));
     renderFormSubmissions();
 
     await waitFor(() => {
@@ -131,7 +131,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('does not render the table when an error occurs', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockRejectedValue(new Error('Server error'));
+    vi.mocked(formDataClient.getAllSubmissions).mockRejectedValue(new Error('Server error'));
     renderFormSubmissions();
 
     await waitFor(() => screen.getByText('Server error'));
@@ -139,7 +139,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('navigates to the submission detail page when "View Details" is clicked', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
@@ -150,7 +150,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('navigates to the correct submission when second "View Details" is clicked', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
@@ -161,7 +161,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('navigates to the submission edit page when "Edit" is clicked', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.edit'}));
@@ -172,19 +172,19 @@ describe('FormSubmissions Component', () => {
   });
 
   it('calls getAllSubmissions with the user token', async () => {
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue([]);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 
     await waitFor(() => {
-      expect(formClient.getAllSubmissions).toHaveBeenCalledWith('mock-token');
+      expect(formDataClient.getAllSubmissions).toHaveBeenCalledWith('mock-token');
     });
   });
 
   it('does not call getAllSubmissions when no token is present', () => {
     (useAuth as any).mockReturnValue({user: null});
-    vi.mocked(formClient.getAllSubmissions).mockResolvedValue([]);
+    vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 
-    expect(formClient.getAllSubmissions).not.toHaveBeenCalled();
+    expect(formDataClient.getAllSubmissions).not.toHaveBeenCalled();
   });
 });
