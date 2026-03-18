@@ -55,25 +55,12 @@ public class FormDataController {
   @GetMapping
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
-  public List<FormDataDto> getAllSubmissions(
+  public List<FormDataDto> getSubmissions(
       @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     if (isAdmin(authentication)) {
-      return formDataMapper.mapList(formDataService.getAllFormSubmissions());
+      return formDataMapper.mapList(formDataService.getFormSubmissions());
     } else {
       return formDataMapper.mapList(formDataService.getFormSubmissionsByOwner(getUsername(jwt)));
-    }
-  }
-
-  @GetMapping("/{key}")
-  @InterfaceLog
-  @PreAuthorize("isAuthenticated()")
-  public List<FormDataDto> getSubmissionsByFormKey(
-      @PathVariable String key, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
-    String username = getUsername(jwt);
-    if (isAdmin(authentication)) {
-      return formDataMapper.mapList(formDataService.getFormSubmissionsByKey(key));
-    } else {
-      return formDataMapper.mapList(formDataService.getFormSubmissionsByKeyAndOwner(key, username));
     }
   }
 

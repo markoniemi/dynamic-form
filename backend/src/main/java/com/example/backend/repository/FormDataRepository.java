@@ -7,10 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FormDataRepository extends JpaRepository<FormData, Long> {
-
-  List<FormData> findByFormKeyOrderBySubmittedAtDesc(String formKey);
-
   List<FormData> findBySubmittedByOrderBySubmittedAtDesc(String submittedBy);
-
-  List<FormData> findByFormKeyAndSubmittedByOrderBySubmittedAtDesc(String formKey, String submittedBy);
 }

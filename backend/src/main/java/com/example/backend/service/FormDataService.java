@@ -57,23 +57,13 @@ public class FormDataService {
   }
 
   @InterfaceLog
-  public List<FormData> getAllFormSubmissions() {
+  public List<FormData> getFormSubmissions() {
     return formDataRepository.findAll();
   }
 
   @InterfaceLog
   public List<FormData> getFormSubmissionsByOwner(@NotNull String username) {
     return formDataRepository.findBySubmittedByOrderBySubmittedAtDesc(username);
-  }
-
-  @InterfaceLog
-  public List<FormData> getFormSubmissionsByKey(@NotNull String formKey) {
-    return formDataRepository.findByFormKeyOrderBySubmittedAtDesc(formKey);
-  }
-
-  @InterfaceLog
-  public List<FormData> getFormSubmissionsByKeyAndOwner(@NotNull String formKey, @NotNull String username) {
-    return formDataRepository.findByFormKeyAndSubmittedByOrderBySubmittedAtDesc(formKey, username);
   }
 
   @InterfaceLog

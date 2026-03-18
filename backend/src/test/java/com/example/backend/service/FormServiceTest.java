@@ -9,7 +9,6 @@ import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,19 +20,6 @@ class FormServiceTest {
 
   @Mock private FormRepository formRepository;
   @InjectMocks private FormService formService;
-
-  @Test
-  void getAvailableFormKeys() {
-    Form form1 = Form.builder().formKey("form1").build();
-    Form form2 = Form.builder().formKey("form2").build();
-    when(formRepository.findAll()).thenReturn(List.of(form1, form2));
-
-    Set<String> keys = formService.getAvailableFormKeys();
-
-    assertEquals(2, keys.size());
-    assertTrue(keys.contains("form1"));
-    assertTrue(keys.contains("form2"));
-  }
 
   @Test
   void getForm() {

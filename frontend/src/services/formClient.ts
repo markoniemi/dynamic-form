@@ -2,7 +2,7 @@ import {http} from './http';
 import {CreateForm, Form, FormListItem} from '../types/Form';
 
 export const formClient = {
-  async getAvailableForms(token: string): Promise<FormListItem[]> {
+  async getForms(token: string): Promise<FormListItem[]> {
     return http.request<FormListItem[]>('/forms', {token});
   },
 

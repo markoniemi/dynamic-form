@@ -52,24 +52,11 @@ class FormDataServiceTest {
   }
 
   @Test
-  void getAllFormSubmissions() {
+  void getFormSubmissions() {
     FormData formData = new FormData("form1", Map.of(), "username");
     when(formDataRepository.findAll()).thenReturn(Collections.singletonList(formData));
 
-    List<FormData> result = formDataService.getAllFormSubmissions();
-
-    assertEquals(1, result.size());
-    assertEquals(formData, result.getFirst());
-  }
-
-  @Test
-  void getFormSubmissionsByKey() {
-    String formKey = "form1";
-    FormData formData = new FormData(formKey, Map.of(), "username");
-    when(formDataRepository.findByFormKeyOrderBySubmittedAtDesc(formKey))
-        .thenReturn(Collections.singletonList(formData));
-
-    List<FormData> result = formDataService.getFormSubmissionsByKey(formKey);
+    List<FormData> result = formDataService.getFormSubmissions();
 
     assertEquals(1, result.size());
     assertEquals(formData, result.getFirst());

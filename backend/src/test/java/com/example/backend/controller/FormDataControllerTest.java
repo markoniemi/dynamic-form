@@ -62,35 +62,17 @@ class FormDataControllerTest {
   }
 
   @Test
-  void getAllSubmissions() throws Exception {
+  void getSubmissions() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
         new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
 
-    when(formDataService.getAllFormSubmissions()).thenReturn(Collections.singletonList(formData));
+    when(formDataService.getFormSubmissions()).thenReturn(Collections.singletonList(formData));
     when(formDataMapper.mapList(any(List.class))).thenReturn(Collections.singletonList(formDataDto));
 
     mockMvc
         .perform(
             get("/api/form-data").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].id").value(1L));
-  }
-
-  @Test
-  void getSubmissionsByFormKey() throws Exception {
-    FormData formData = new FormData("form1", Map.of(), "username");
-    FormDataDto formDataDto =
-        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
-
-    when(formDataService.getFormSubmissionsByKey("form1"))
-        .thenReturn(Collections.singletonList(formData));
-    when(formDataMapper.mapList(any(List.class))).thenReturn(Collections.singletonList(formDataDto));
-
-    mockMvc
-        .perform(
-            get("/api/form-data/form1")
-                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }

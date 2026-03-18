@@ -19,7 +19,7 @@ export const Forms: React.FC = () => {
     error,
   } = useQuery({
     queryKey: ['forms'],
-    queryFn: () => formClient.getAvailableForms(token!),
+    queryFn: () => formClient.getForms(token!),
   });
 
   return (

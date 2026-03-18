@@ -26,8 +26,8 @@ public class FormController {
   @GetMapping
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
-  public List<FormListItemDto> getAvailableForms() {
-    return formService.getAvailableForms();
+  public List<FormListItemDto> getForms() {
+    return formService.getForms();
   }
 
   @GetMapping("/{key}")

@@ -18,10 +18,6 @@ export const formDataClient = {
     });
   },
 
-  async getFormSubmissions(formKey: string, token: string): Promise<FormDataDto[]> {
-    return http.request<FormDataDto[]>(`/form-data/${formKey}`, {token});
-  },
-
   async getAllSubmissions(token: string): Promise<FormDataDto[]> {
     return http.request<FormDataDto[]>('/form-data', {token});
   },

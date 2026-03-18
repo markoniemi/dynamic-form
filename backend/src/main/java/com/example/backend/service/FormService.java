@@ -6,8 +6,6 @@ import com.example.backend.mapper.FormListItemMapper;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -24,15 +22,10 @@ public class FormService {
   private final FormListItemMapper formListItemMapper;
 
   @InterfaceLog
-  public List<FormListItemDto> getAvailableForms() {
+  public List<FormListItemDto> getForms() {
     return formRepository.findAll().stream()
         .map(formListItemMapper::toListItemDto)
         .toList();
-  }
-
-  @InterfaceLog
-  public Set<String> getAvailableFormKeys() {
-    return formRepository.findAll().stream().map(Form::getFormKey).collect(Collectors.toSet());
   }
 
   @InterfaceLog

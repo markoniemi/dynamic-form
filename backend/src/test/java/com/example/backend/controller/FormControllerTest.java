@@ -10,7 +10,6 @@ import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,25 +24,6 @@ class FormControllerTest {
   @Autowired private WebTestClient webTestClient;
   @MockitoBean private FormService formService;
   @MockitoBean private FormMapper formMapper;
-
-  @Test
-  @WithMockUser
-  void getAvailableForms() {
-    when(formService.getAvailableFormKeys()).thenReturn(Set.of("form1", "form2"));
-
-    webTestClient
-        .get()
-        .uri("/api/forms")
-        .accept(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .returnResult(String.class)
-        .getResponseBody()
-        .toStream()
-        .toList()
-        .containsAll(List.of("form1", "form2"));
-  }
 
   @Test
   @WithMockUser
