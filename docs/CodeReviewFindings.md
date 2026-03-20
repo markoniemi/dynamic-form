@@ -1,8 +1,9 @@
 # Code Review Findings
 
-Generated: 2026-03-20. Based on project standards defined in `.github/copilot-instructions.md`.
+Generated: 2026-03-20. Updated: 2026-03-20 (re-reviewed against Clean Code + Effective Java rules).
+Based on project standards defined in `.github/copilot-instructions.md` and `skills/dynamic-form-backend/SKILL.md`.
 
-Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
+Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded in re-review · `🆕` new finding
 
 ---
 
@@ -15,7 +16,7 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
   **Fix:** Remove `@Data`, keep `@Value` (adds `@AllArgsConstructor` + makes fields final).
 
 - [ ] **B2** — `service/FormDataService.java:46,76`
-  Service throws `AccessDeniedException` (a Spring Security exception). Services must only throw standard Java exceptions.
+  Service throws `AccessDeniedException` (a Spring Security exception). Services must only throw standard Java exceptions (Effective Java Item 72).
   **Fix:** Replace with `IllegalArgumentException` or `IllegalStateException`; let `GlobalExceptionHandler` map it to 403.
 
 - [ ] **B3** — `controller/FormDataController.java:78`
@@ -25,6 +26,14 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
 - [ ] **B4** — `util/SecurityUtils.java`
   File uses 4-space indentation. Project requires 2-space (Google Java Style).
   **Fix:** Reformat to 2-space indentation throughout the file.
+
+- [ ] **B8** ⬆ — `config/WebConfig.java:16`
+  WebJar path contains hardcoded version `1.0.0-SNAPSHOT`. Hardcoded config values violate the externalization rule (Effective Java Item 5 spirit — don't hardwire resources).
+  **Fix:** Externalize to `application.yaml` and inject with `@Value("${frontend.webjar.version}")`.
+
+- [ ] **B9** ⬆ — `config/SecurityConfig.java:47-48`
+  CORS allowed origins (`http://localhost:8080`, `http://localhost:5173`, `http://localhost:9000`) are hardcoded in source — must differ per environment.
+  **Fix:** Move to `application.yaml` as `cors.allowed-origins` list; inject with `@ConfigurationProperties`.
 
 ### Should Fix
 
@@ -40,23 +49,23 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
   Handler catches `SecurityException` but the service throws `AccessDeniedException` — the handler misses the actual exception being thrown.
   **Fix:** After fixing B2/B3, add or replace handler to cover the correct exception type.
 
-### Consider
-
-- [ ] **B8** — `config/WebConfig.java:16`
-  WebJar path contains hardcoded version `1.0.0-SNAPSHOT`.
-  **Fix:** Externalize to `application.yaml` and inject with `@Value("${frontend.webjar.version}")`.
-
-- [ ] **B9** — `config/SecurityConfig.java:47-48`
-  CORS allowed origins are hardcoded in source.
-  **Fix:** Move to `application.yaml` under a `cors.allowed-origins` key and inject with `@Value`.
-
 - [ ] **B10** — `e2e/pages/BasePage.java:20-26`
-  Uses `Thread.sleep()` for waits in Selenium tests.
-  **Fix:** Replace with explicit `WebDriverWait` + `ExpectedConditions` for reliability.
+  Uses `Thread.sleep()` for waits in Selenium tests, and swallows `InterruptedException` silently (Effective Java Item 77 — never swallow exceptions).
+  **Fix:** Replace with `WebDriverWait` + `ExpectedConditions`; if sleep must stay, call `Thread.currentThread().interrupt()` in the catch block.
 
 - [ ] **B11** — `service/FormDataService.java:41`
   `@NotNull` on service method parameters is redundant — Jakarta Validation only runs via the bean validation framework on controller inputs.
-  **Fix:** Remove `@NotNull` from service method signatures; rely on DTO-level validation in the controller.
+  **Fix:** Remove `@NotNull` from service method signatures; use `Objects.requireNonNull()` if null-guarding is genuinely needed (Effective Java Item 49).
+
+### Consider
+
+- [ ] **B12** 🆕 — `controller/FormController.java`, `controller/FormDataController.java`
+  Controllers don't document which exceptions propagate from the service layer.
+  **Fix:** Add Javadoc `@throws` clauses on controller methods documenting expected service exceptions.
+
+- [ ] **B13** 🆕 — `mapper/FormListItemMapper.java`
+  Single-method mapper interface is separate from `FormMapper` with no clear boundary reason.
+  **Fix:** Consider consolidating into `FormMapper` if the mapping is related, or leave as-is if the separation is intentional.
 
 ---
 
@@ -104,6 +113,18 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
   `"Cancel"` is a hardcoded string.
   **Fix:** `{t('common.cancel')}` (or existing common key if one exists).
 
+- [ ] **F18** 🆕 — `components/Content.tsx:22,35,38,75,77`
+  `"Loading..."`, `"Authentication Error"`, `"Try Again"`, `"Welcome"`, `"Please log in."`, `"Login with OAuth2"` are all hardcoded.
+  **Fix:** Replace each with `t('content.<key>')` and add keys to translation files.
+
+- [ ] **F19** 🆕 — `components/ReadOnlyDynamicForm.tsx:17,21`
+  `"—"`, `"Yes"`, and `"No"` are hardcoded display strings.
+  **Fix:** `{t('readOnlyForm.empty')}`, `{t('readOnlyForm.yes')}`, `{t('readOnlyForm.no')}`.
+
+- [ ] **F20** 🆕 — `components/SelectField.tsx:19`
+  `"Select an option..."` placeholder is hardcoded.
+  **Fix:** `{t('common.selectOption')}`.
+
 ### Must Fix — Type Safety
 
 - [ ] **F11** — `services/http.ts:45`
@@ -132,8 +153,22 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix
   `as unknown as UseFormRegister<FormValues>` double-cast in test mock.
   **Fix:** Use `vi.fn() as unknown as UseFormRegister<FormValues>` or define a properly typed stub.
 
+### Should Fix — Safety & Style
+
+- [ ] **F21** 🆕 — `pages/EditForm.tsx:44`
+  `token!` non-null assertion used before calling `formClient.saveForm()` without an earlier guard.
+  **Fix:** Add `if (!token) { setError('Not authenticated'); return; }` before the mutation call.
+
+- [ ] **F22** 🆕 — `components/FieldEditor.tsx:5-8`
+  `FieldTypeOption` interface is defined inside the component file instead of in `src/types/`.
+  **Fix:** Move to `frontend/src/types/Form.ts` and import it in `FieldEditor.tsx`.
+
 ### Consider
 
 - [ ] **F17** — `pages/EditForm.tsx:10-20`
   `FIELD_TYPES` constant defined locally in the page component.
-  **Fix:** Move to `types/Form.ts` so it can be reused alongside the type definitions.
+  **Fix:** Move to `types/Form.ts` or a dedicated `constants/` file so it can be shared.
+
+- [ ] **F23** 🆕 — `pages/SubmissionDetail.tsx:78`
+  Back link uses a raw `←` arrow character with no ARIA label, which screen readers may announce awkwardly.
+  **Fix:** Add `aria-label="Back"` to the link element, or use a visually hidden span for the arrow.
