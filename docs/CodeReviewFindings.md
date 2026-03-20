@@ -125,6 +125,18 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   `"Select an option..."` placeholder is hardcoded.
   **Fix:** `{t('common.selectOption')}`.
 
+- [ ] **F24** 🆕 — `pages/EditForm.tsx:164`
+  `"e.g., contact-form"` placeholder is hardcoded.
+  **Fix:** `{t('editForm.formKeyPlaceholder')}`.
+
+- [ ] **F25** 🆕 — `pages/EditForm.tsx:178`
+  `"e.g., Contact Form"` placeholder is hardcoded.
+  **Fix:** `{t('editForm.titlePlaceholder')}`.
+
+- [ ] **F26** 🆕 — `pages/EditForm.tsx:191`
+  `"Brief description of the form"` placeholder is hardcoded.
+  **Fix:** `{t('editForm.descriptionPlaceholder')}`.
+
 ### Must Fix — Type Safety
 
 - [ ] **F11** — `services/http.ts:45`
