@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'cd frontend && npx tsc --noEmit --pretty false 2>&1; cd ../backend && mvn compile -q 2>&1'",
+            "timeout": 120,
+            "statusMessage": "Checking compilation..."
+          }
+        ]
+      }
+    ]
+  }
+}
