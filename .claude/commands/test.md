@@ -1,7 +1,7 @@
 Run frontend unit tests (Vitest) and backend unit tests (JUnit, no integration tests), then report a summary of results.
 
 ```bash
-cd frontend && npx vitest run --reporter=verbose 2>&1; cd ../backend && mvn test -DskipITs 2>&1
+cd frontend && npx vitest run 2>&1; cd ../backend && mvn test -DskipITs -q 2>&1
 ```
 
 After running, summarize:
