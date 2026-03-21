@@ -1,4 +1,18 @@
 {
+  "enabledMcpjsonServers": ["playwright"],
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(mvn:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(git:*)",
+      "Bash(tsc:*)",
+      "Bash(java:*)",
+      "Bash(bash -c*)",
+      "mcp__playwright__*"
+    ]
+  },
   "hooks": {
     "Stop": [
       {
