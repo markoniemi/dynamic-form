@@ -11,7 +11,7 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 
 ### Must Fix
 
-- [ ] **B1** — `dto/FormDataDto.java:11-13`
+- [x] **B1** — `dto/FormDataDto.java:11-13`
   Both `@Data` and `@Value` used together — contradictory annotations. `@Data` generates mutable setters while `@Value` enforces immutability.
   **Fix:** Remove `@Data`, keep `@Value` (adds `@AllArgsConstructor` + makes fields final).
 
