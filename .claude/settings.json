@@ -19,8 +19,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'cd frontend && npx tsc --noEmit --pretty false 2>&1; cd ../backend && mvn compile -q 2>&1'",
-            "timeout": 120,
+            "command": "bash -c 'cd frontend && npm run lint:fix 2>/dev/null; npx tsc --noEmit --pretty false 2>&1; cd ../backend && mvn compile -q 2>&1'",
+            "timeout": 150,
             "statusMessage": "Checking compilation..."
           }
         ]

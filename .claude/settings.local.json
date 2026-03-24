@@ -8,5 +8,9 @@
       "mcp__playwright__browser_type",
       "mcp__playwright__browser_select_option"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "enableAllProjectMcpServers": true
 }

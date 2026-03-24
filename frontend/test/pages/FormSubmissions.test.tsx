@@ -19,7 +19,7 @@ const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
-    ...(actual as any),
+    ...(actual as Record<string, unknown>),
     useNavigate: () => mockNavigate,
   };
 });
@@ -66,7 +66,7 @@ describe('FormSubmissions Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient.clear();
-    (useAuth as any).mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       user: mockUser,
     });
   });
@@ -181,7 +181,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('does not call getAllSubmissions when no token is present', () => {
-    (useAuth as any).mockReturnValue({user: null});
+    vi.mocked(useAuth).mockReturnValue({user: null});
     vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 

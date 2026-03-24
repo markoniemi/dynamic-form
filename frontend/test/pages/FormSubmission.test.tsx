@@ -84,8 +84,8 @@ describe('FormSubmission Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient.clear();
-    (useParams as any).mockReturnValue({formKey: 'contact'});
-    (useAuth as any).mockReturnValue({
+    vi.mocked(useParams).mockReturnValue({formKey: 'contact'});
+    vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       user: mockUser,
       signinRedirect: mockSigninRedirect,
@@ -140,7 +140,7 @@ describe('FormSubmission Component', () => {
 
   describe('Edit Mode', () => {
     beforeEach(() => {
-      (useParams as any).mockReturnValue({formKey: 'contact', id: '1'});
+      vi.mocked(useParams).mockReturnValue({formKey: 'contact', id: '1'});
     });
 
     it('fetches submission data and populates the form', async () => {
