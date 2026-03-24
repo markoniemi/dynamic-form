@@ -21,7 +21,7 @@ export const SubmissionDetail: React.FC = () => {
     error: submissionError,
   } = useQuery({
     queryKey: ['submission', id],
-    queryFn: () => formDataClient.getSubmissionById(Number(id), token!),
+    queryFn: () => formDataClient.getSubmissionById(Number(id), token ?? ''),
     enabled: !!token && !!id,
   });
 
@@ -31,7 +31,7 @@ export const SubmissionDetail: React.FC = () => {
     error: formError,
   } = useQuery({
     queryKey: ['form', submission?.formKey],
-    queryFn: () => formClient.getForm(submission!.formKey, token!),
+    queryFn: () => formClient.getForm(submission?.formKey ?? '', token ?? ''),
     enabled: !!submission?.formKey,
   });
 

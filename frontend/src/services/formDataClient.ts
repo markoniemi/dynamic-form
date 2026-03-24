@@ -27,7 +27,7 @@ export const formDataClient = {
   },
 
   async deleteSubmission(id: number, token: string): Promise<void> {
-    await http.request<void>(`/form-data/submission/${id}`, {
+    await http.request<undefined>(`/form-data/submission/${id}`, {
       method: 'DELETE',
       token,
     });

@@ -18,7 +18,7 @@ export const FormSubmissions: React.FC = () => {
     error,
   } = useQuery({
     queryKey: ['form-submissions'],
-    queryFn: () => formDataClient.getAllSubmissions(token!),
+    queryFn: () => formDataClient.getAllSubmissions(token ?? ''),
     enabled: !!token,
   });
 

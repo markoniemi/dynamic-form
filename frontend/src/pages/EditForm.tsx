@@ -40,8 +40,10 @@ export const EditForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
-    mutationFn: (form: CreateForm) =>
-      formClient.saveForm(form, token!),
+    mutationFn: (form: CreateForm) => {
+      if (!token) return Promise.reject(new Error('Not authenticated'));
+      return formClient.saveForm(form, token);
+    },
     onSuccess: () => {
       navigate('/forms');
     },

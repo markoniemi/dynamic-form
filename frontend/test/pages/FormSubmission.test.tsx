@@ -2,6 +2,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {FormSubmission} from '../../src/pages/FormSubmission';
 import {useAuth} from 'react-oidc-context';
+import type {AuthContextProps, User} from 'react-oidc-context';
 import {BrowserRouter, useParams} from 'react-router-dom';
 import {formClient} from '../../src/services/formClient';
 import {formDataClient} from '../../src/services/formDataClient';
@@ -79,7 +80,7 @@ describe('FormSubmission Component', () => {
   const mockUser = {
     access_token: 'mock-token',
     profile: {sub: 'test-user'},
-  };
+  } as unknown as User;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -89,7 +90,7 @@ describe('FormSubmission Component', () => {
       isAuthenticated: true,
       user: mockUser,
       signinRedirect: mockSigninRedirect,
-    });
+    } as unknown as AuthContextProps);
   });
 
   describe('Create Mode', () => {

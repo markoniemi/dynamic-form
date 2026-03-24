@@ -33,8 +33,8 @@ export const FormSubmission: React.FC = () => {
     error: fetchError,
   } = useQuery({
     queryKey: ['form', formKey],
-    queryFn: () => formClient.getForm(formKey!, token!),
-    enabled: !!formKey,
+    queryFn: () => formClient.getForm(formKey ?? '', token ?? ''),
+    enabled: !!formKey && !!token,
   });
 
   const {
@@ -43,7 +43,7 @@ export const FormSubmission: React.FC = () => {
     error: submissionError,
   } = useQuery({
     queryKey: ['submission', id],
-    queryFn: () => formDataClient.getSubmissionById(Number(id), token!),
+    queryFn: () => formDataClient.getSubmissionById(Number(id), token ?? ''),
     enabled: !!id && !!token,
   });
 
@@ -63,7 +63,7 @@ export const FormSubmission: React.FC = () => {
       if (isEditMode) {
         return formDataClient.updateSubmission(Number(id), data, token);
       }
-      return formDataClient.submitForm(formKey!, data, token);
+      return formDataClient.submitForm(formKey ?? '', data, token);
     },
     onSuccess: () => {
       setShowSuccess(true);

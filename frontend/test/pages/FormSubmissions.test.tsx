@@ -2,6 +2,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {FormSubmissions} from '../../src/pages/FormSubmissions';
 import {useAuth} from 'react-oidc-context';
+import type {AuthContextProps, User} from 'react-oidc-context';
 import {BrowserRouter} from 'react-router-dom';
 import {formDataClient} from '../../src/services/formDataClient';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -61,14 +62,14 @@ describe('FormSubmissions Component', () => {
   const mockUser = {
     access_token: 'mock-token',
     profile: {sub: 'test-user'},
-  };
+  } as unknown as User;
 
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient.clear();
     vi.mocked(useAuth).mockReturnValue({
       user: mockUser,
-    });
+    } as unknown as AuthContextProps);
   });
 
   it('renders loading spinner while fetching submissions', () => {
@@ -181,7 +182,7 @@ describe('FormSubmissions Component', () => {
   });
 
   it('does not call getAllSubmissions when no token is present', () => {
-    vi.mocked(useAuth).mockReturnValue({user: null});
+    vi.mocked(useAuth).mockReturnValue({user: null} as unknown as AuthContextProps);
     vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue([]);
     renderFormSubmissions();
 
