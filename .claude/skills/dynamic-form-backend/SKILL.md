@@ -76,7 +76,14 @@ mvn verify
 - **Mappers:** Use MapStruct interfaces for converting between Entities and DTOs.
 - **Dependency Injection:** Use constructor injection (Lombok `@RequiredArgsConstructor`).
 - **Validation:** Use Jakarta Validation annotations (`@NotNull`, `@Size`, etc.) on DTOs.
-- **Error Handling:** Use `@ControllerAdvice` / `@ExceptionHandler` for consistent error responses.
+- **Error Handling:** Throw standard Java exceptions from the service layer — never HTTP-specific exceptions like `ResponseStatusException`. Map all exceptions to HTTP responses once, centrally, in a `@RestControllerAdvice`:
+
+  | Exception | HTTP status |
+  |---|---|
+  | `NoSuchElementException` | 404 Not Found |
+  | `IllegalArgumentException` | 400 Bad Request |
+  | `IllegalStateException` | 409 Conflict |
+  | `SecurityException` | 403 Forbidden |
 
 ## Clean Code Principles (Uncle Bob)
 

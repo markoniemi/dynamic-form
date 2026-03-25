@@ -27,6 +27,7 @@ Before writing code, agree on:
   - `NoSuchElementException` → 404
   - `IllegalArgumentException` → 400
   - `IllegalStateException` → 409
+  - `SecurityException` → 403
 
 ---
 
