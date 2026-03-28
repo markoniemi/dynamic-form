@@ -17,11 +17,11 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 
 - [ ] **B2** — `service/FormDataService.java:46,76`
   Service throws `AccessDeniedException` (a Spring Security exception). Services must only throw standard Java exceptions (Effective Java Item 72).
-  **Fix:** Replace with `IllegalArgumentException` or `IllegalStateException`; let `GlobalExceptionHandler` map it to 403.
+  **Fix:** Replace with `java.lang.SecurityException`; `GlobalExceptionHandler` already maps it to 403. Also fixes B7.
 
 - [ ] **B3** — `controller/FormDataController.java:78`
   `AccessDeniedException` thrown directly from a controller method instead of being handled centrally.
-  **Fix:** Move the authorization check to a `@PreAuthorize` annotation or throw a standard exception from the service and map it in `GlobalExceptionHandler`.
+  **Fix:** Move the authorization check to a `@PreAuthorize` annotation or throw `SecurityException` from the service and let `GlobalExceptionHandler` map it to 403.
 
 - [ ] **B4** — `util/SecurityUtils.java`
   File uses 4-space indentation. Project requires 2-space (Google Java Style).
@@ -47,7 +47,7 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 
 - [ ] **B7** — `controller/GlobalExceptionHandler.java:46-50`
   Handler catches `SecurityException` but the service throws `AccessDeniedException` — the handler misses the actual exception being thrown.
-  **Fix:** After fixing B2/B3, add or replace handler to cover the correct exception type.
+  **Fix:** Resolved automatically when B2/B3 are fixed by switching to `SecurityException`; no separate handler change needed.
 
 - [ ] **B10** — `e2e/pages/BasePage.java:20-26`
   Uses `Thread.sleep()` for waits in Selenium tests, and swallows `InterruptedException` silently (Effective Java Item 77 — never swallow exceptions).
