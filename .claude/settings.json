@@ -1,4 +1,5 @@
 {
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["playwright"],
   "permissions": {
     "defaultMode": "acceptEdits",
@@ -10,7 +11,13 @@
       "Bash(tsc:*)",
       "Bash(java:*)",
       "Bash(bash -c*)",
-      "mcp__playwright__*"
+      "mcp__playwright__*",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_select_option"
     ]
   },
   "hooks": {
