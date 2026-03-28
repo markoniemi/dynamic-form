@@ -161,25 +161,25 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Uses `fireEvent.click()`.
   **Fix:** Replace with `await userEvent.click()`.
 
-- [ ] **F16** — `test/components/DynamicForm.test.tsx:12`
-  `as unknown as UseFormRegister<FormValues>` double-cast in test mock.
-  **Fix:** Use `vi.fn() as unknown as UseFormRegister<FormValues>` or define a properly typed stub.
-
 ### Should Fix — Safety & Style
 
 - [ ] **F21** 🆕 — `pages/EditForm.tsx:44`
   `token!` non-null assertion used before calling `formClient.saveForm()` without an earlier guard.
   **Fix:** Add `if (!token) { setError('Not authenticated'); return; }` before the mutation call.
 
-- [ ] **F22** 🆕 — `components/FieldEditor.tsx:5-8`
-  `FieldTypeOption` interface is defined inside the component file instead of in `src/types/`.
-  **Fix:** Move to `frontend/src/types/Form.ts` and import it in `FieldEditor.tsx`.
-
 ### Consider
 
 - [ ] **F17** — `pages/EditForm.tsx:10-20`
   `FIELD_TYPES` constant defined locally in the page component.
   **Fix:** Move to `types/Form.ts` or a dedicated `constants/` file so it can be shared.
+
+- [ ] **F16** — `test/components/DynamicForm.test.tsx:12`
+  `as unknown as UseFormRegister<FormValues>` cast in test mock with no explanation. The `as unknown as T` pattern is permitted by the skill at well-understood boundaries, but must be documented.
+  **Fix:** Add an inline comment explaining why the cast is safe (e.g. `// mock; only subset of register API exercised in this test`).
+
+- [ ] **F22** 🆕 — `components/FieldEditor.tsx:5-8`
+  `FieldTypeOption` interface is defined inside the component file. The skill permits component-specific types to live near the component; only move if the type is reused elsewhere.
+  **Fix:** If used in more than one component, move to `frontend/src/types/Form.ts` and import it in `FieldEditor.tsx`.
 
 - [ ] **F23** 🆕 — `pages/SubmissionDetail.tsx:78`
   Back link uses a raw `←` arrow character with no ARIA label, which screen readers may announce awkwardly.
