@@ -46,7 +46,8 @@ description: "Work on the dynamic-form React/Vite frontend (React 19 + TypeScrip
 
 ## i18n
 
-- Use useTranslation and t('key.path') for user-visible strings.
+- No hardcoded user-visible strings in JSX or component logic — wrap every UI string with `t('key.path')`.
+- Translation keys must be hardcoded string literals (e.g. `t('navigation.createForm')`). Dynamic key construction (e.g. `t(\`section.${var}\``) breaks static extraction tools like i18next-parser and typed-i18n plugins.
 - Keep date formatting in i18n (see common.date.long usage).
 
 ## Testing

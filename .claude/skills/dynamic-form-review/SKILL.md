@@ -98,7 +98,8 @@ Do NOT rewrite the whole file unless the user asks. Propose targeted edits only.
 
 ### i18n
 - [ ] All user-visible strings go through `useTranslation` + `t('key.path')`
-- [ ] No hardcoded UI strings
+- [ ] No hardcoded user-visible strings in JSX (labels, placeholders, button text, error messages)
+- [ ] Translation keys are hardcoded string literals — dynamic key construction (e.g. `` t(`section.${var}`) ``) is a violation
 - [ ] Date formatting handled via i18n helpers (not inline `toLocaleDateString`)
 
 ### Style & accessibility

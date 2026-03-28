@@ -74,67 +74,67 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 ### Must Fix — i18n
 
 - [ ] **F1** — `components/Navigation.tsx:37`
-  `"Create Form"` is a hardcoded string.
+  `"Create Form"` is a hardcoded user-visible string.
   **Fix:** `{t('navigation.createForm')}` and add key to translation files.
 
 - [ ] **F2** — `components/Navigation.tsx:46`
-  `"Language"` is a hardcoded string.
+  `"Language"` is a hardcoded user-visible string.
   **Fix:** `{t('navigation.language')}`.
 
 - [ ] **F3** — `components/Navigation.tsx:47`
-  `"English"` is a hardcoded string.
+  `"English"` is a hardcoded user-visible string.
   **Fix:** `{t('navigation.english')}`.
 
 - [ ] **F4** — `pages/EditForm.tsx:146`
-  `"← Back to Forms"` is a hardcoded string.
+  `"← Back to Forms"` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.backToForms')}`.
 
 - [ ] **F5** — `pages/EditForm.tsx:153`
-  `"Create New Form"` is a hardcoded string.
+  `"Create New Form"` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.title')}`.
 
 - [ ] **F6** — `pages/EditForm.tsx:198`
-  `"Fields"` is a hardcoded string.
+  `"Fields"` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.fields')}`.
 
 - [ ] **F7** — `pages/EditForm.tsx:214`
-  `"+ Add Field"` is a hardcoded string.
+  `"+ Add Field"` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.addField')}`.
 
 - [ ] **F8** — `pages/EditForm.tsx:224`
-  `"Creating..."` is a hardcoded string.
+  `"Creating..."` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.creating')}`.
 
 - [ ] **F9** — `pages/EditForm.tsx:227`
-  `"Create Form"` is a hardcoded string.
+  `"Create Form"` is a hardcoded user-visible string.
   **Fix:** `{t('editForm.submit')}`.
 
 - [ ] **F10** — `pages/EditForm.tsx:231`
-  `"Cancel"` is a hardcoded string.
+  `"Cancel"` is a hardcoded user-visible string.
   **Fix:** `{t('common.cancel')}` (or existing common key if one exists).
 
 - [ ] **F18** 🆕 — `components/Content.tsx:22,35,38,75,77`
-  `"Loading..."`, `"Authentication Error"`, `"Try Again"`, `"Welcome"`, `"Please log in."`, `"Login with OAuth2"` are all hardcoded.
+  `"Loading..."`, `"Authentication Error"`, `"Try Again"`, `"Welcome"`, `"Please log in."`, `"Login with OAuth2"` are all hardcoded user-visible strings.
   **Fix:** Replace each with `t('content.<key>')` and add keys to translation files.
 
 - [ ] **F19** 🆕 — `components/ReadOnlyDynamicForm.tsx:17,21`
-  `"—"`, `"Yes"`, and `"No"` are hardcoded display strings.
+  `"—"`, `"Yes"`, and `"No"` are hardcoded user-visible strings.
   **Fix:** `{t('readOnlyForm.empty')}`, `{t('readOnlyForm.yes')}`, `{t('readOnlyForm.no')}`.
 
 - [ ] **F20** 🆕 — `components/SelectField.tsx:19`
-  `"Select an option..."` placeholder is hardcoded.
+  `"Select an option..."` placeholder is a hardcoded user-visible string.
   **Fix:** `{t('common.selectOption')}`.
 
 - [ ] **F24** 🆕 — `pages/EditForm.tsx:164`
-  `"e.g., contact-form"` placeholder is hardcoded.
+  `"e.g., contact-form"` placeholder is a hardcoded user-visible string.
   **Fix:** `{t('editForm.formKeyPlaceholder')}`.
 
 - [ ] **F25** 🆕 — `pages/EditForm.tsx:178`
-  `"e.g., Contact Form"` placeholder is hardcoded.
+  `"e.g., Contact Form"` placeholder is a hardcoded user-visible string.
   **Fix:** `{t('editForm.titlePlaceholder')}`.
 
 - [ ] **F26** 🆕 — `pages/EditForm.tsx:191`
-  `"Brief description of the form"` placeholder is hardcoded.
+  `"Brief description of the form"` placeholder is a hardcoded user-visible string.
   **Fix:** `{t('editForm.descriptionPlaceholder')}`.
 
 ### Must Fix — Type Safety
