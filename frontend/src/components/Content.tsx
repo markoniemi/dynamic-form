@@ -1,6 +1,7 @@
 import React from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {useAuth} from 'react-oidc-context';
+import {useTranslation} from 'react-i18next';
 import {Button, Card, Col, Container, Row, Spinner} from 'react-bootstrap';
 import {Navigation} from './Navigation';
 import {Forms} from '../pages/Forms';
@@ -11,6 +12,7 @@ import {EditForm} from '../pages/EditForm.tsx';
 
 export const Content: React.FC = () => {
   const {isAuthenticated, isLoading, error, signinRedirect} = useAuth();
+  const {t} = useTranslation();
 
   if (isLoading) {
     return (
@@ -19,7 +21,7 @@ export const Content: React.FC = () => {
         style={{height: '100vh'}}
       >
         <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading')}</span>
         </Spinner>
       </Container>
     );
@@ -32,10 +34,10 @@ export const Content: React.FC = () => {
           <Col md={6} className="mx-auto text-center">
             <Card border="danger">
               <Card.Body>
-                <Card.Title className="text-danger">Authentication Error</Card.Title>
+                <Card.Title className="text-danger">{t('content.authError')}</Card.Title>
                 <Card.Text>{error.message}</Card.Text>
                 <Button variant="primary" onClick={() => signinRedirect()}>
-                  Try Again
+                  {t('content.tryAgain')}
                 </Button>
               </Card.Body>
             </Card>
@@ -71,10 +73,10 @@ export const Content: React.FC = () => {
                   <Col md={6} className="mx-auto text-center">
                     <Card>
                       <Card.Body>
-                        <Card.Title>Welcome</Card.Title>
-                        <Card.Text>Please log in.</Card.Text>
+                        <Card.Title>{t('content.welcome')}</Card.Title>
+                        <Card.Text>{t('content.pleaseLogIn')}</Card.Text>
                         <Button variant="primary" onClick={() => signinRedirect()}>
-                          Login with OAuth2
+                          {t('navigation.login')}
                         </Button>
                       </Card.Body>
                     </Card>

@@ -5,7 +5,10 @@
     "forms": "Forms",
     "submissions": "Submissions",
     "login": "Login with OAuth2",
-    "logout": "Logout"
+    "logout": "Logout",
+    "createForm": "Create Form",
+    "language": "Language",
+    "english": "English"
   },
   "home": {
     "welcome": "Welcome to Dynamic Form",
@@ -59,10 +62,30 @@
     "editTitle": "Edit: {{title}}",
     "loginRequired": "You must be logged in to submit this form."
   },
+  "editForm": {
+    "backToForms": "← Back to Forms",
+    "title": "Create New Form",
+    "fields": "Fields",
+    "addField": "+ Add Field",
+    "creating": "Creating...",
+    "submit": "Create Form",
+    "formKeyPlaceholder": "e.g., contact-form",
+    "titlePlaceholder": "e.g., Contact Form",
+    "descriptionPlaceholder": "Brief description of the form"
+  },
+  "content": {
+    "authError": "Authentication Error",
+    "tryAgain": "Try Again",
+    "welcome": "Welcome",
+    "pleaseLogIn": "Please log in."
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
     "cancel": "Cancel",
+    "empty": "—",
+    "yes": "Yes",
+    "no": "No",
     "date": {
       "short": "{{date, short}}",
       "long": "{{date, long}}"

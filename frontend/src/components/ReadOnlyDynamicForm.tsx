@@ -1,5 +1,6 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
+import {useTranslation} from 'react-i18next';
 import {FormField} from '../types/Form';
 import {FieldWrapper} from './FieldWrapper';
 
@@ -9,16 +10,18 @@ interface ReadOnlyDynamicFormProps {
 }
 
 export const ReadOnlyDynamicForm: React.FC<ReadOnlyDynamicFormProps> = ({fields, data}) => {
+  const {t} = useTranslation();
+
   const renderFieldValue = (field: FormField) => {
     const value = data[field.name];
 
     const getDisplayValue = (): string => {
       if (value === undefined || value === null || value === '') {
-        return '—';
+        return t('common.empty');
       }
 
       if (field.type === 'checkbox') {
-        return value ? 'Yes' : 'No';
+        return value ? t('common.yes') : t('common.no');
       }
 
       if (field.type === 'select' || field.type === 'radio') {

@@ -34,7 +34,7 @@ export const Navigation: React.FC = () => {
                   {t('navigation.submissions')}
                 </Nav.Link>
                 <Nav.Link as={Link} to="/create-form">
-                  Create Form
+                  {t('navigation.createForm')}
                 </Nav.Link>
               </>
             )}
@@ -43,8 +43,8 @@ export const Navigation: React.FC = () => {
             </Nav.Link>
           </Nav>
           <Nav>
-            <NavDropdown title="Language" id="language-switcher">
-              <NavDropdown.Item onClick={() => changeLanguage('en')}>English</NavDropdown.Item>
+            <NavDropdown title={t('navigation.language')} id="language-switcher">
+              <NavDropdown.Item onClick={() => changeLanguage('en')}>{t('navigation.english')}</NavDropdown.Item>
               {/* Add more languages here */}
             </NavDropdown>
             <div className="d-flex align-items-center ms-2">

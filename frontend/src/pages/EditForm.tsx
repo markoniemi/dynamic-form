@@ -3,6 +3,7 @@ import {Alert, Button, Card, Col, Container, Form, Row, Spinner,} from 'react-bo
 import {useNavigate} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
+import {useTranslation} from 'react-i18next';
 import {formClient} from '../services/formClient';
 import {CreateForm, FormField} from '../types/Form';
 import {FieldEditor} from '../components/FieldEditor';
@@ -32,6 +33,7 @@ export const EditForm: React.FC = () => {
   const navigate = useNavigate();
   const {user} = useAuth();
   const token = user?.access_token;
+  const {t} = useTranslation();
 
   const [formKey, setFormKey] = useState('');
   const [title, setTitle] = useState('');
@@ -145,14 +147,14 @@ export const EditForm: React.FC = () => {
       <Row className="mb-4">
         <Col>
           <Button variant="outline-secondary" onClick={() => navigate('/forms')}>
-            ← Back to Forms
+            {t('editForm.backToForms')}
           </Button>
         </Col>
       </Row>
 
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title as="h2">Create New Form</Card.Title>
+          <Card.Title as="h2">{t('editForm.title')}</Card.Title>
 
           {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
 
@@ -163,7 +165,7 @@ export const EditForm: React.FC = () => {
                   <Form.Label>Form Key <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="e.g., contact-form"
+                    placeholder={t('editForm.formKeyPlaceholder')}
                     value={formKey}
                     onChange={(e) => setFormKey(e.target.value.toLowerCase())}
                   />
@@ -177,7 +179,7 @@ export const EditForm: React.FC = () => {
                   <Form.Label>Title <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="e.g., Contact Form"
+                    placeholder={t('editForm.titlePlaceholder')}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -190,14 +192,14 @@ export const EditForm: React.FC = () => {
               <Form.Control
                 as="textarea"
                 rows={2}
-                placeholder="Brief description of the form"
+                placeholder={t('editForm.descriptionPlaceholder')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Form.Group>
 
             <hr/>
-            <h4 className="mb-3">Fields</h4>
+            <h4 className="mb-3">{t('editForm.fields')}</h4>
 
             {fields.map((field, index) => (
               <FieldEditor
@@ -213,7 +215,7 @@ export const EditForm: React.FC = () => {
             ))}
 
             <Button variant="outline-primary" onClick={handleAddField} className="mb-4">
-              + Add Field
+              {t('editForm.addField')}
             </Button>
 
             <hr/>
@@ -223,14 +225,14 @@ export const EditForm: React.FC = () => {
                 {mutation.isPending ? (
                   <>
                     <Spinner animation="border" size="sm" className="me-2"/>
-                    Creating...
+                    {t('editForm.creating')}
                   </>
                 ) : (
-                  'Create Form'
+                  t('editForm.submit')
                 )}
               </Button>
               <Button variant="secondary" onClick={() => navigate('/forms')}>
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </Form>
