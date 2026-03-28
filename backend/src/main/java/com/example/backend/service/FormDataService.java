@@ -10,7 +10,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,7 @@ public class FormDataService {
         .orElseThrow(() -> new IllegalArgumentException("Submission not found: " + id));
 
     if (!existing.getSubmittedBy().equals(username)) {
-      throw new AccessDeniedException("You are not authorized to update this submission");
+      throw new SecurityException("You are not authorized to update this submission");
     }
 
     existing.setData(data);
@@ -73,7 +72,7 @@ public class FormDataService {
         .orElseThrow(() -> new IllegalArgumentException("Submission not found: " + id));
 
     if (!existing.getSubmittedBy().equals(username)) {
-      throw new AccessDeniedException("You are not authorized to delete this submission");
+      throw new SecurityException("You are not authorized to delete this submission");
     }
 
     formDataRepository.deleteById(id);

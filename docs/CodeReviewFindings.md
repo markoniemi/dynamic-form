@@ -15,15 +15,15 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Both `@Data` and `@Value` used together — contradictory annotations. `@Data` generates mutable setters while `@Value` enforces immutability.
   **Fix:** Remove `@Data`, keep `@Value` (adds `@AllArgsConstructor` + makes fields final).
 
-- [ ] **B2** — `service/FormDataService.java:46,76`
+- [x] **B2** — `service/FormDataService.java:46,76`
   Service throws `AccessDeniedException` (a Spring Security exception). Services must only throw standard Java exceptions (Effective Java Item 72).
   **Fix:** Replace with `java.lang.SecurityException`; `GlobalExceptionHandler` already maps it to 403. Also fixes B7.
 
-- [ ] **B3** — `controller/FormDataController.java:78`
+- [x] **B3** — `controller/FormDataController.java:78`
   `AccessDeniedException` thrown directly from a controller method instead of being handled centrally.
   **Fix:** Move the authorization check to a `@PreAuthorize` annotation or throw `SecurityException` from the service and let `GlobalExceptionHandler` map it to 403.
 
-- [ ] **B4** — `util/SecurityUtils.java`
+- [x] **B4** — `util/SecurityUtils.java`
   File uses 4-space indentation. Project requires 2-space (Google Java Style).
   **Fix:** Reformat to 2-space indentation throughout the file.
 

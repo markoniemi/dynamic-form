@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,7 +74,7 @@ public class FormDataController {
             .getFormSubmissionById(id)
             .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
     if (!submission.getSubmittedBy().equals(username) && !isAdmin(authentication)) {
-      throw new AccessDeniedException("You are not authorized to view this submission");
+      throw new SecurityException("You are not authorized to view this submission");
     }
     return formDataMapper.toDto(submission);
   }
