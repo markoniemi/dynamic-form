@@ -147,7 +147,7 @@ describe('SubmissionDetail Component', () => {
     await waitFor(() => {
       expect(screen.getByDisplayValue('Jane Doe')).toBeInTheDocument();
       expect(screen.getByDisplayValue('jane@example.com')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('Yes')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('common.yes')).toBeInTheDocument();
     });
   });
 

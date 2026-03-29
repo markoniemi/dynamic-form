@@ -57,7 +57,7 @@ describe('ReadOnlyDynamicForm Component', () => {
   it('renders dash for empty values', () => {
     render(<ReadOnlyDynamicForm fields={[textField]} data={{}}/>);
 
-    expect(screen.getByDisplayValue('—')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('common.empty')).toBeInTheDocument();
   });
 
   it('renders select field with label instead of value', () => {
@@ -77,13 +77,13 @@ describe('ReadOnlyDynamicForm Component', () => {
   it('renders checkbox field as "Yes" when true', () => {
     render(<ReadOnlyDynamicForm fields={[checkboxField]} data={{newsletter: true}}/>);
 
-    expect(screen.getByDisplayValue('Yes')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('common.yes')).toBeInTheDocument();
   });
 
   it('renders checkbox field as "No" when false', () => {
     render(<ReadOnlyDynamicForm fields={[checkboxField]} data={{newsletter: false}}/>);
 
-    expect(screen.getByDisplayValue('No')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('common.no')).toBeInTheDocument();
   });
 
   it('renders date field formatted', () => {
@@ -106,7 +106,7 @@ describe('ReadOnlyDynamicForm Component', () => {
 
     expect(screen.getByDisplayValue('Jane')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Canada')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Yes')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('common.yes')).toBeInTheDocument();
   });
 
   it('falls back to raw value when option not found', () => {
