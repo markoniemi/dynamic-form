@@ -1,0 +1,76 @@
+@startuml aws-architecture
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #666666
+skinparam ArrowThickness 1.2
+skinparam RoundCorner 8
+
+skinparam rectangle {
+  BorderColor #888888
+  BorderThickness 0.8
+}
+
+skinparam node {
+  BorderColor #888888
+}
+
+' ── GitHub ──────────────────────────────────────────
+rectangle "GitHub" as GH #E8E6F0 {
+  rectangle "deploy.yml\n<size:10>push to main</size>" as DEPLOY #D3D1C7
+  rectangle "destroy.yml\n<size:10>manual trigger</size>" as DESTROY #D3D1C7
+  rectangle "Secrets\n<size:10>AWS keys, region, account ID</size>" as SECRETS #CECBF6
+}
+
+' ── AWS ─────────────────────────────────────────────
+rectangle "AWS" as AWS #E6F1FB {
+
+  rectangle "ECR\n<size:10>Docker image registry</size>" as ECR #9FE1CB
+
+  rectangle "CloudFront\n<size:10>/* → S3   /api/* → ALB</size>" as CF #9FE1CB
+  rectangle "S3\n<size:10>Frontend static files</size>" as FRONTEND #9FE1CB
+
+  rectangle "Application Load Balancer\n<size:10>Routes /api/* to ECS</size>" as ALB #D3D1C7
+
+  rectangle "ECS Fargate\n<size:10>No servers to manage</size>" as ECS #CECBF6 {
+    rectangle "Spring Boot task\n<size:10>Docker container — replaced on deploy</size>" as SPRING #F5C4B3
+  }
+
+  ALB -down-> SPRING
+
+  rectangle "Networking (Terraform-managed)" as NET #D3D1C7 {
+    rectangle "VPC + Subnets\n<size:10>public subnet</size>" as VPC #D3D1C7
+    rectangle "Security Groups\n<size:10>80/443 open</size>" as SG #D3D1C7
+  }
+
+  rectangle "IAM (least-privilege)\n<size:10>GitHub Actions role + ECS task role</size>" as IAM #FAC775
+
+  ECR -down-> ECS
+  ECS -down-> NET
+  NET -down-> IAM
+}
+
+' ── Connections ─────────────────────────────────────
+DEPLOY -right-> ECR : build & push image
+DEPLOY -right-> FRONTEND : s3 sync + invalidate
+DEPLOY -right-> CF : cache invalidation
+DESTROY ..> ECS : terraform destroy\n(ECS + ALB only)
+
+actor User
+User -down-> CF : all requests
+CF -down-> FRONTEND : /* static files
+CF -down-> ALB : /api/* forwarded
+
+note bottom of SECRETS
+  Never stored in files.
+  Injected at workflow runtime.
+end note
+
+note bottom of DESTROY
+  ECR images and S3 files
+  are kept on destroy.
+  Cost drops to ~$0.
+end note
+
+@enduml
