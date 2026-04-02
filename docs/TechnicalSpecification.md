@@ -15,18 +15,18 @@ The **Dynamic Form Application** is a full-stack monolithic Spring Boot applicat
 
 ### 2.1 Backend Stack
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Language | Java | 21 |
-| Framework | Spring Boot | 3.5.6 |
-| Build Tool | Maven | 3.9+ |
-| Database (Production) | PostgreSQL | 42.7.2 driver |
-| Database (Dev/Test) | H2 | In-memory |
-| ORM | Spring Data JPA | via Spring Boot |
-| Security | Spring Security OAuth2 | via Spring Boot |
-| DTO Mapping | MapStruct | 1.5.5 |
-| Code Generation | Lombok | via Spring Boot |
-| Logging | SLF4J + Logback | via Spring Boot |
+| Component | Technology |
+|-----------|-----------|
+| Language | Java 21 |
+| Framework | Spring Boot |
+| Build Tool | Maven |
+| Database (Production) | PostgreSQL |
+| Database (Dev/Test) | H2 |
+| ORM | Spring Data JPA |
+| Security | Spring Security OAuth2 |
+| DTO Mapping | MapStruct |
+| Code Generation | Lombok |
+| Logging | SLF4J + Logback |
 
 **Spring Boot Dependencies**:
 - `spring-boot-starter-web` - REST API
@@ -45,35 +45,35 @@ The **Dynamic Form Application** is a full-stack monolithic Spring Boot applicat
 
 ### 2.2 Frontend Stack
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Language | TypeScript | 5.9.3 |
-| Framework | React | 19.2.4 |
-| Build Tool | Vite | 7.3.1 |
-| Package Manager | npm | via Node.js |
-| Node.js | Node.js | 24.13.0 |
-| UI Framework | Bootstrap | 5.3.8 |
-| UI Components | react-bootstrap | 2.10.10 |
+| Component | Technology |
+|-----------|-----------|
+| Language | TypeScript |
+| Framework | React |
+| Build Tool | Vite |
+| Package Manager | npm |
+| Node.js | Node.js |
+| UI Framework | Bootstrap |
+| UI Components | react-bootstrap |
 
 **Core Libraries**:
-- `react-router-dom` 7.13.0 - Routing
-- `react-hook-form` 7.71.1 - Form management
-- `zod` 4.3.6 - Schema validation
-- `@tanstack/react-query` 5.90.20 - Server state management
-- `react-oidc-context` 3.3.0 - OAuth authentication
-- `react-i18next` 15.4.0 - Internationalization
-- `i18next` 25.5.0 - i18n core
-- `lucide-react` 0.563.0 - Icons
+- `react-router-dom` - Routing
+- `react-hook-form` - Form management
+- `zod` - Schema validation
+- `@tanstack/react-query` - Server state management
+- `react-oidc-context` - OAuth authentication
+- `react-i18next` - Internationalization
+- `i18next` - i18n core
+- `lucide-react` - Icons
 
 **Testing Libraries**:
-- `vitest` 4.0.18 - Test runner
-- `@testing-library/react` 16.3.2 - React testing utilities
+- `vitest` - Test runner
+- `@testing-library/react` - React testing utilities
 - `@vitest/coverage-v8` - Code coverage
 
 **Build Configuration**:
 - `@vitejs/plugin-react` - React plugin for Vite
-- `typescript-eslint` 9.8.0 - TypeScript linting
-- `prettier` 4.0.1 - Code formatting
+- `typescript-eslint` - TypeScript linting
+- `prettier` - Code formatting
 
 ### 2.3 Build and Packaging
 
@@ -637,79 +637,7 @@ Credentials: Allowed
 
 ## 7. Configuration
 
-### 7.1 Backend Configuration
-
-**application.yaml** (Production):
-```yaml
-spring:
-  application:
-    name: backend
-  datasource:
-    url: jdbc:postgresql://localhost:5432/template
-    username: postgres
-    password: postgres
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9000
-
-server:
-  port: 8080
-```
-
-**application-dev.yaml** (Development):
-```yaml
-spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-```
-
-**application-test.yaml** (Testing):
-- Similar to dev profile
-- H2 in-memory database
-- Auto-schema creation
-
-### 7.2 Frontend Configuration
-
-**vite.config.ts**:
-```typescript
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': 'http://localhost:8080'
-    }
-  }
-});
-```
-
-**OAuth Configuration** (`src/context/oidcConfig.tsx`):
-```typescript
-{
-  authority: 'http://localhost:9000',
-  client_id: 'frontend-client',
-  redirect_uri: window.location.origin,
-  response_type: 'code',
-  scope: 'openid profile'
-}
-```
-
-### 7.3 Logging Configuration
+### 7.1 Logging Configuration
 
 **logback-spring.xml**:
 - Console appender with pattern
@@ -850,7 +778,6 @@ function Component() {
 **API**:
 - Stateless authentication (no session overhead)
 - DTO projection to avoid over-fetching
-- Pagination support (can be added to list endpoints)
 
 ### 10.2 Frontend
 
@@ -904,21 +831,6 @@ function Component() {
 - Extend Zod schema with custom validators
 - Apply in form schema generation
 
-### 11.4 Multi-Tenancy
-
-The architecture supports multi-tenancy with these approaches:
-
-**Database per Tenant**:
-- Configure multiple data sources
-- Route based on tenant identifier
-
-**Schema per Tenant**:
-- Use Hibernate multi-tenancy with schema resolution
-
-**Shared Schema**:
-- Add `tenantId` column to entities
-- Filter queries with `@Where` annotation or JPA criteria
-
 ## 12. Monitoring and Observability
 
 ### 12.1 Logging
@@ -943,7 +855,6 @@ Spring Boot Actuator endpoints:
 ## 13. Known Limitations
 
 1. **Form-FormData Relationship**: Soft reference via `formKey` string, not foreign key constraint
-2. **No Pagination**: List endpoints return all records
 3. **No File Upload**: Field types limited to text-based inputs
 4. **Single Language Backend**: Error messages not internationalized
 5. **No Audit Trail**: No history of form/submission changes
