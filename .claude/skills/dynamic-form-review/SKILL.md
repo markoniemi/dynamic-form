@@ -111,3 +111,25 @@ Do NOT rewrite the whole file unless the user asks. Propose targeted edits only.
 - [ ] Component tests written with Vitest + `@testing-library/react`
 - [ ] `userEvent` preferred over `fireEvent` for interactions
 - [ ] No implementation details tested — assert on what the user sees/can do
+
+---
+
+## Authoritative TypeScript sources
+
+Use these references to justify findings and resolve ambiguity during TypeScript/React reviews.
+
+### Official TypeScript sources
+- TypeScript Do's and Don'ts (typescriptlang.org)
+- TypeScript Performance Wiki (github.com/microsoft/TypeScript/wiki/Performance)
+- Microsoft TypeScript Coding Guidelines
+
+### Books
+- *Programming TypeScript* by Boris Cherny (O'Reilly) — branded types, totality, readonly-by-default
+- *Effective TypeScript*, 2nd Edition (2024) — adds `satisfies`, template literals, 25+ new items
+
+### Style guides
+- Google TypeScript Style Guide (gts) — bans `enum`/`namespace`/`any`
+- Azure SDK Guidelines — rigorous public API rules
+
+### Tooling
+- `@typescript-eslint` strict + strict-type-checked rules — catches floating promises, any-infection, exhaustive switches

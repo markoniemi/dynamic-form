@@ -1,7 +1,7 @@
 # Code Review Findings
 
-Generated: 2026-03-20. Updated: 2026-03-20 (re-reviewed against Clean Code + Effective Java rules).
-Based on project standards defined in `.github/copilot-instructions.md` and `skills/dynamic-form-backend/SKILL.md`.
+Generated: 2026-03-20. Updated: 2026-04-04 (re-reviewed frontend against authoritative TypeScript sources).
+Based on project standards defined in `.github/copilot-instructions.md` and `skills/dynamic-form-review/SKILL.md`.
 
 Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded in re-review · `🆕` new finding
 
@@ -184,3 +184,88 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 - [ ] **F23** 🆕 — `pages/SubmissionDetail.tsx:78`
   Back link uses a raw `←` arrow character with no ARIA label, which screen readers may announce awkwardly.
   **Fix:** Add `aria-label="Back"` to the link element, or use a visually hidden span for the arrow.
+
+---
+
+## Frontend — Authoritative TypeScript Sources Review (2026-04-04)
+
+Sources: Effective TypeScript 2nd Ed, Programming TypeScript (O'Reilly), Google TypeScript Style Guide (gts), TypeScript Do's and Don'ts, @typescript-eslint strict-type-checked, Microsoft TypeScript Coding Guidelines.
+
+### Must Fix — Type Safety
+
+- [ ] **F27** 🆕 — `components/DynamicForm.tsx:49`
+  Non-exhaustive switch: `default: return null` silently drops unknown `FormField.type` values. If a new type is added to the union, the compiler will not flag the missing branch.
+  **Source:** Effective TypeScript Item 36; @typescript-eslint `switch-exhaustiveness-check`.
+  **Fix:** Replace `default: return null` with an exhaustive check:
+  ```ts
+  default: {
+    const _exhaustive: never = field.type;
+    return null;
+  }
+  ```
+
+- [ ] **F28** 🆕 — `pages/FormSubmission.tsx:28`
+  `useForm()` called without a type parameter. Defaults to `FieldValues` which is `Record<string, any>`, infecting `onSubmit(data)` at line 86 and `setValue(key, value)` at line 53 with `any`.
+  **Source:** Effective TypeScript Item 5 ("avoid `any` types"); @typescript-eslint `no-unsafe-argument`.
+  **Fix:** Supply the generic: `useForm<FormValues>()` (import `FormValues` from `types/Form.ts`).
+
+- [ ] **F29** 🆕 — `FormSubmission.tsx:110,136` · `FormSubmissions.tsx:36` · `Forms.tsx:35` · `SubmissionDetail.tsx:54`
+  `(error as Error).message` — type assertion used instead of type narrowing. While react-query types `error` as `Error | null` and the surrounding `if` narrows out `null`, the `as Error` cast is still a code smell that bypasses the type system unnecessarily.
+  **Source:** TypeScript Do's and Don'ts ("don't use type assertions when a type guard is possible"); Google TS Style Guide.
+  **Fix:** Remove the cast — after the `if (error)` guard, TypeScript already narrows to `Error`: use `error.message` directly. If the type is `unknown`, narrow with `error instanceof Error ? error.message : String(error)`.
+
+### Must Fix — i18n (missed in original review)
+
+- [ ] **F30** 🆕 — `pages/EditForm.tsx:84,88,92,96,103,107,111,117,122`
+  8 `setError()` calls use hardcoded English strings (`'Form key is required'`, `'Title is required'`, etc.) that are displayed in the UI via the `<Alert>` at line 159.
+  **Fix:** Replace with `setError(t('editForm.validation.formKeyRequired'))` etc. and add keys to translation files.
+
+- [ ] **F31** 🆕 — `pages/EditForm.tsx:165,173,179,191`
+  Form labels `"Form Key"`, `"Title"`, `"Description"` and help text `"Unique identifier (lowercase letters, numbers, hyphens only)"` are hardcoded English strings.
+  **Fix:** Replace with `t('editForm.label.formKey')`, `t('editForm.label.title')`, `t('editForm.label.description')`, `t('editForm.help.formKey')`.
+
+- [ ] **F32** 🆕 — `components/FieldEditor.tsx:68,103,106,113,125,143,148,155,165,196`
+  10+ hardcoded user-visible strings: `"Field {n}"`, `"Field Name"`, `"Label"`, `"Type"`, `"Placeholder"`, `"Optional placeholder text"`, `"Required"`, `"Options"`, `"Value"`, `"Label"` (option), `"+ Add Option"`, and button titles `"Move up"`, `"Move down"`, `"Remove field"`.
+  **Fix:** Replace each with `t('fieldEditor.<key>')` and add keys to translation files.
+
+### Should Fix — Tooling
+
+- [ ] **F33** 🆕 — `eslint.config.js:11`
+  Uses `tseslint.configs.strict` but not `strictTypeChecked`. Without type-aware linting, floating promises (`no-floating-promises`), `any` infection (`no-unsafe-*`), and unsafe returns go undetected.
+  **Source:** @typescript-eslint strict-type-checked documentation.
+  **Fix:** Replace `...tseslint.configs.strict` with `...tseslint.configs.strictTypeChecked` and add `languageOptions.parserOptions.project: true` to enable type information.
+
+### Should Fix — Type Safety
+
+- [ ] **F34** 🆕 — `types/Form.ts:1-43`
+  All interfaces (`FormField`, `FieldOption`, `Form`, `FormDataDto`, `FormListItem`) use mutable properties. Types representing API responses should be `readonly` by default to prevent accidental mutation.
+  **Source:** Programming TypeScript (readonly-by-default); Effective TypeScript Item 17.
+  **Fix:** Add `readonly` to all property definitions on API response types. For types also used in form editing (e.g. `FormField` in `EditForm.tsx`), consider splitting into `ReadonlyFormField` (for display) and mutable `EditableFormField` (for editing), or use `Readonly<FormField>` at consumption sites.
+
+- [ ] **F35** 🆕 — `i18n.ts:15-30`
+  `format` callback returns raw `value` at line 30 without narrowing. The i18next callback expects `string` returns, but when `value` is not a `Date`, the function returns whatever was passed in (typed `any` by i18next).
+  **Source:** TypeScript Do's and Don'ts; Effective TypeScript Item 5.
+  **Fix:** Replace `return value;` with `return String(value);` to guarantee a string return.
+
+### Consider
+
+- [ ] **F36** 🆕 — `pages/EditForm.tsx:11-21`
+  `FIELD_TYPES` uses `as const` but doesn't validate that `value` properties match `FormField['type']`. If the union changes, the constant won't cause a compile error.
+  **Source:** Effective TypeScript 2nd Ed (`satisfies` operator).
+  **Fix:** Add type validation:
+  ```ts
+  const FIELD_TYPES = [
+    {value: 'text', label: 'Text'},
+    // ...
+  ] as const satisfies ReadonlyArray<{readonly value: FormField['type']; readonly label: string}>;
+  ```
+
+- [ ] **F37** 🆕 — `context/oidcConfig.tsx:1-9`
+  `oidcConfig` is an untyped object literal. No compile-time validation that its shape matches what `AuthProvider` expects.
+  **Source:** Effective TypeScript 2nd Ed (`satisfies` operator).
+  **Fix:** `const oidcConfig = { ... } satisfies AuthProviderProps;` (import from `react-oidc-context`).
+
+- [ ] **F38** 🆕 — `tsconfig.app.json`
+  `exactOptionalPropertyTypes` is not enabled. Without it, TypeScript allows assigning `undefined` to optional properties (e.g. `placeholder: undefined` on `FormField`) even when the intent is "property not present".
+  **Source:** TypeScript Performance Wiki; Microsoft TypeScript Coding Guidelines.
+  **Fix:** Add `"exactOptionalPropertyTypes": true` to `compilerOptions`. Requires fixing any existing `prop: undefined` assignments.
