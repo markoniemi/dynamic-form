@@ -101,9 +101,170 @@ Push to `main` or re-run `deploy.yml`.
 
 ### Phase 1 — One-time AWS setup (~30 min)
 
-1. Create an IAM user for GitHub Actions with a policy covering ECS, ECR, S3, CloudFront, and IAM
-2. Generate access key → add to GitHub Secrets
-3. Create ECR repository (can be Terraform-managed after this)
+**Prerequisites:** Install the AWS CLI (`winget install Amazon.AWSCLI`) and configure it with your admin credentials (`aws configure`).
+
+#### Step 1 — Create IAM user for GitHub Actions
+
+```bash
+aws iam create-user --user-name github-actions-deploy
+```
+
+#### Step 2 — Create and attach a least-privilege policy
+
+Save the following as `deploy-policy.json`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ECRAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:PutImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:CreateRepository",
+        "ecr:DescribeRepositories"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECSAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:UpdateService",
+        "ecs:DescribeServices",
+        "ecs:DescribeClusters",
+        "ecs:RegisterTaskDefinition",
+        "ecs:DeregisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
+        "ecs:CreateCluster",
+        "ecs:CreateService",
+        "ecs:DeleteService"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "S3Access",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:ListBucket",
+        "s3:CreateBucket",
+        "s3:PutBucketPolicy",
+        "s3:PutBucketWebsite"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudFrontAccess",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:CreateInvalidation",
+        "cloudfront:GetDistribution",
+        "cloudfront:CreateDistribution",
+        "cloudfront:UpdateDistribution"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "IAMPassRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole",
+        "iam:GetRole",
+        "iam:CreateRole",
+        "iam:AttachRolePolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EC2Networking",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateVpc",
+        "ec2:CreateSubnet",
+        "ec2:CreateSecurityGroup",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CreateInternetGateway",
+        "ec2:AttachInternetGateway",
+        "ec2:CreateRouteTable",
+        "ec2:CreateRoute",
+        "ec2:AssociateRouteTable",
+        "ec2:ModifyVpcAttribute"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ALBAccess",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LogsAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+Then attach it:
+
+```bash
+aws iam put-user-policy \
+  --user-name github-actions-deploy \
+  --policy-name dynamic-form-deploy-policy \
+  --policy-document file://deploy-policy.json
+```
+
+#### Step 3 — Generate access keys
+
+```bash
+aws iam create-access-key --user-name github-actions-deploy
+```
+
+This outputs `AccessKeyId` and `SecretAccessKey` — save them immediately, the secret is only shown once.
+
+#### Step 4 — Create the ECR repository
+
+```bash
+aws ecr create-repository \
+  --repository-name dynamic-form \
+  --region eu-north-1
+```
+
+#### Step 5 — Add secrets to GitHub
+
+```bash
+gh secret set AWS_ACCESS_KEY_ID --body "<your-access-key-id>"
+gh secret set AWS_SECRET_ACCESS_KEY --body "<your-secret-access-key>"
+gh secret set AWS_REGION --body "eu-north-1"
+gh secret set AWS_ACCOUNT_ID --body "<your-12-digit-account-id>"
+gh secret set ECR_REPOSITORY --body "dynamic-form"
+```
+
+> **Note:** Replace placeholder values with the actual values from the previous steps. You can find your account ID with `aws sts get-caller-identity --query Account --output text`.
 
 ### Phase 2 — Terraform files
 
