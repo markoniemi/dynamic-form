@@ -103,13 +103,32 @@ Push to `main` or re-run `deploy.yml`.
 
 **Prerequisites:** Install the AWS CLI (`winget install Amazon.AWSCLI`) and configure it with your admin credentials (`aws configure`).
 
-#### Step 1 — Create IAM user for GitHub Actions
+#### Step 1 — Get AWS access keys for the CLI
+
+You need an IAM user with admin permissions to run `aws configure`. If you already have access keys, skip to Step 2.
+
+1. Sign in to the [AWS Console](https://console.aws.amazon.com/) with your root or admin account
+2. Go to **IAM → Users → Create user**
+3. Give the user a name (e.g. `admin-cli`) and attach the **AdministratorAccess** managed policy
+4. Select the user → **Security credentials** tab → **Create access key**
+5. Choose **Command Line Interface (CLI)** as the use case
+6. Copy the **Access key ID** and **Secret access key** — the secret is only shown once
+
+Now configure the CLI:
+
+```bash
+aws configure
+```
+
+When prompted, enter the access key ID, secret access key, default region (`eu-north-1`), and output format (`json`).
+
+#### Step 2 — Create IAM user for GitHub Actions
 
 ```bash
 aws iam create-user --user-name github-actions-deploy
 ```
 
-#### Step 2 — Create and attach a least-privilege policy
+#### Step 3 — Create and attach a least-privilege policy
 
 Save the following as `deploy-policy.json`:
 
@@ -232,13 +251,10 @@ Save the following as `deploy-policy.json`:
 Then attach it:
 
 ```bash
-aws iam put-user-policy \
-  --user-name github-actions-deploy \
-  --policy-name dynamic-form-deploy-policy \
-  --policy-document file://deploy-policy.json
+aws iam put-user-policy --user-name github-actions-deploy --policy-name dynamic-form-deploy-policy --policy-document file://deploy-policy.json
 ```
 
-#### Step 3 — Generate access keys
+#### Step 4 — Generate access keys
 
 ```bash
 aws iam create-access-key --user-name github-actions-deploy
@@ -246,7 +262,7 @@ aws iam create-access-key --user-name github-actions-deploy
 
 This outputs `AccessKeyId` and `SecretAccessKey` — save them immediately, the secret is only shown once.
 
-#### Step 4 — Create the ECR repository
+#### Step 5 — Create the ECR repository
 
 ```bash
 aws ecr create-repository \
@@ -254,7 +270,7 @@ aws ecr create-repository \
   --region eu-north-1
 ```
 
-#### Step 5 — Add secrets to GitHub
+#### Step 6 — Add secrets to GitHub
 
 ```bash
 gh secret set AWS_ACCESS_KEY_ID --body "<your-access-key-id>"
