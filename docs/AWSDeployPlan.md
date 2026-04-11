@@ -458,96 +458,266 @@ gh secret set OAUTH2_ISSUER_URI --body "<your-production-oauth2-issuer>"
 
 > **Note:** Replace placeholder values with the actual values from the previous steps. You can find your account ID with `aws sts get-caller-identity --query Account --output text`. The RDS endpoint is available after `terraform apply` via `terraform output rds_endpoint`.
 
-### Phase 2 — Terraform files
+### Phase 2 — Dockerfile + local container validation
 
-Write the following Terraform files:
+Write the Dockerfile and verify the image works locally before touching AWS.
 
-**`terraform/main.tf`** — VPC + subnets + security groups:
-- VPC with public subnets (ALB, ECS) and **private subnets** (RDS)
-- Security group: ALB accepts 80/443 from internet
-- Security group: ECS accepts 8080 only from ALB security group
-- Security group: RDS accepts 5432 only from ECS security group
-
-**`terraform/ecr.tf`** — ECR repository
-
-**`terraform/rds.tf`** — RDS PostgreSQL:
-- `aws_db_instance` with `engine = "postgres"`, `engine_version = "16"`
-- Instance class `db.t3.micro` (free tier eligible)
-- `db_subnet_group` using the private subnets
-- `skip_final_snapshot = true` for dev/demo teardown convenience
-- Store credentials via `aws_ssm_parameter` and inject into ECS task as environment variables
-
-**`terraform/ecs.tf`** — ECS cluster + Fargate service + task definition:
-- Task definition passes `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `OAUTH2_ISSUER_URI`, `SPRING_PROFILES_ACTIVE=prod` as environment variables (sourced from Terraform outputs / SSM)
-- Health check: `GET /actuator/health` with 30s interval, 3 retries, 60s start period
-
-**`terraform/alb.tf`** — ALB + target group + listener (port 80 → ECS port 8080)
-
-**`terraform/frontend.tf`** — S3 bucket + CloudFront distribution with **two origins**:
-- S3 bucket: static website hosting, not public — access granted only via CloudFront OAC (Origin Access Control)
-- CloudFront default origin: S3 (serves `/*` — the React SPA)
-- CloudFront ordered cache behaviour: `/api/*` → ALB, with TTL = 0, caching disabled, all headers forwarded
-- S3 origin caches aggressively (Vite outputs content-hashed filenames); `index.html` gets a short TTL so new deploys are picked up quickly
-
-**`terraform/iam.tf`** — IAM execution role for ECS + GitHub Actions user policy
-
-### Phase 3 — Dockerfile
-
-Multi-stage build to keep image small:
+**`Dockerfile`** — multi-stage build at the repo root:
 
 ```dockerfile
 # Stage 1: build
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
-COPY src ./src
+COPY frontend/pom.xml frontend/pom.xml
+COPY backend/pom.xml backend/pom.xml
+RUN mvn dependency:go-offline -q
+COPY . .
 RUN mvn package -DskipTests
 
 # Stage 2: run
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/backend/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
-### Phase 4 — GitHub Actions workflows
+**`docker-compose.yml`** — spin up the full stack locally against a real PostgreSQL:
 
-**deploy.yml** (on push to main):
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dynamicform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"   # 5433 to avoid clashing with a locally running postgres
 
-1. Checkout code
-2. Set up Java 21 (Temurin)
-3. Configure AWS credentials from Secrets
-4. Authenticate Docker to ECR: `aws ecr get-login-password | docker login`
-5. Build full project: `mvn install -DskipTests` (builds backend JAR + frontend `dist/`)
-6. Build and push backend image via Jib (no Docker daemon needed):
-   ```bash
-   mvn -pl backend jib:build \
-     -DAWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
-     -DAWS_REGION=${{ secrets.AWS_REGION }} \
-     -DECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
-   ```
-7. `aws ecs update-service --force-new-deployment` to pick up the new image
-8. Sync frontend static files to S3:
-   ```bash
-   aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET }} --delete
-   ```
-9. Invalidate CloudFront cache so users get the new `index.html` immediately:
-   ```bash
-   aws cloudfront create-invalidation \
-     --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-     --paths "/index.html"
-   ```
-   Content-hashed assets (`/assets/*`) do not need invalidation — their filenames change on each build.
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/dynamicform
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      OAUTH2_ISSUER_URI: http://localhost:9000   # placeholder for local smoke test
+    depends_on:
+      - db
+```
 
-**destroy.yml** (manual trigger, `workflow_dispatch`):
+**Checkpoint:** `docker compose up --build` → `curl http://localhost:8080/actuator/health` returns `{"status":"UP"}`.
 
-1. Configure AWS credentials from Secrets
-2. `terraform destroy` targeting ECS service, Fargate tasks, and ALB
+---
 
-### Phase 5 — First deploy
+### Phase 3 — Terraform: networking
 
-Run `terraform apply` once (locally or in Actions) to bootstrap all infrastructure. All subsequent updates flow through GitHub Actions.
+Write `terraform/main.tf`, `terraform/variables.tf`, and `terraform/outputs.tf` covering only networking:
+
+- Provider block (`aws`, region from variable)
+- VPC (`10.0.0.0/16`)
+- Two public subnets in different AZs (for ALB requirement)
+- Two private subnets in different AZs (for RDS)
+- Internet Gateway + route table for public subnets
+- Security group: `alb-sg` — ingress 80/443 from `0.0.0.0/0`
+- Security group: `ecs-sg` — ingress 8080 from `alb-sg` only
+- Security group: `rds-sg` — ingress 5432 from `ecs-sg` only
+
+**Checkpoint:** `terraform init && terraform apply` — resources appear in the AWS console with no errors.
+
+---
+
+### Phase 4 — Terraform: database
+
+Write `terraform/rds.tf`:
+
+- `aws_db_subnet_group` using the private subnets from Phase 3
+- `aws_db_instance`:
+  - `engine = "postgres"`, `engine_version = "16"`
+  - `instance_class = "db.t3.micro"` (free tier eligible)
+  - `db_name`, `username`, `password` from Terraform variables (fed from `terraform.tfvars`, never committed)
+  - `vpc_security_group_ids = [aws_security_group.rds-sg.id]`
+  - `skip_final_snapshot = true`
+  - `publicly_accessible = false`
+- Output `rds_endpoint` for use in GitHub Secrets
+
+**Checkpoint:** `terraform apply` → `terraform output rds_endpoint` returns a hostname. Add `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` to GitHub Secrets now (Step 6 in Phase 1).
+
+---
+
+### Phase 5 — Terraform: compute + first manual deploy
+
+Write `terraform/ecr.tf`, `terraform/ecs.tf`, and `terraform/alb.tf`:
+
+**`terraform/ecr.tf`:**
+- `aws_ecr_repository` named `dynamic-form`
+
+**`terraform/alb.tf`:**
+- `aws_lb` (type `application`) in the public subnets, attached to `alb-sg`
+- `aws_lb_target_group` for port 8080, protocol HTTP, with health check on `/actuator/health`
+- `aws_lb_listener` on port 80 forwarding to the target group
+
+**`terraform/ecs.tf`:**
+- `aws_ecs_cluster`
+- `aws_ecs_task_definition` — Fargate, 512 CPU / 1024 MB memory, container image from ECR `latest`, environment variables: `SPRING_PROFILES_ACTIVE=prod`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `OAUTH2_ISSUER_URI`; health check: `CMD-SHELL curl -f http://localhost:8080/actuator/health`; log driver `awslogs`
+- `aws_ecs_service` — desired count 1, launch type FARGATE, network config in public subnets with `ecs-sg`, load balancer attached to the target group
+
+**`terraform/iam.tf`:**
+- `aws_iam_role` for ECS task execution with `AmazonECSTaskExecutionRolePolicy`
+
+After `terraform apply`, do a **manual first push** to confirm the pipeline before automating it:
+
+```bash
+aws ecr get-login-password --region eu-north-1 | \
+  docker login --username AWS --password-stdin \
+  <account-id>.dkr.ecr.eu-north-1.amazonaws.com
+
+mvn -pl backend jib:build -DskipTests \
+  -DAWS_ACCOUNT_ID=<account-id> \
+  -DAWS_REGION=eu-north-1 \
+  -DECR_REPOSITORY=dynamic-form
+
+aws ecs update-service \
+  --cluster dynamic-form-cluster \
+  --service dynamic-form-service \
+  --force-new-deployment \
+  --region eu-north-1
+```
+
+**Checkpoint:** ALB DNS name (from `terraform output alb_dns`) responds to `GET /actuator/health` with `{"status":"UP"}`.
+
+---
+
+### Phase 6 — Terraform: frontend + first S3 sync
+
+Write `terraform/frontend.tf`:
+
+- `aws_s3_bucket` — block all public access; do NOT enable static website hosting (use OAC instead)
+- `aws_cloudfront_origin_access_control` (OAC) for the S3 origin
+- `aws_s3_bucket_policy` — grants CloudFront OAC read access
+- `aws_cloudfront_distribution` with two origins:
+  - **Default origin (S3):** serves `/*`; cache policy `CachingOptimized`; `index.html` TTL overridden to 60s
+  - **Ordered cache behaviour `/api/*` (ALB):** TTL = 0, forward all headers and query strings, no caching
+- Output `cloudfront_domain` and `cloudfront_distribution_id`
+
+After `terraform apply`, do a **manual first sync**:
+
+```bash
+# Build the frontend
+mvn -pl frontend generate-resources   # runs npm install + vite build
+
+aws s3 sync frontend/dist/ s3://<bucket-name> --delete
+
+aws cloudfront create-invalidation \
+  --distribution-id <distribution-id> \
+  --paths "/index.html"
+```
+
+Add `S3_BUCKET` and `CLOUDFRONT_DISTRIBUTION_ID` to GitHub Secrets.
+
+**Checkpoint:** CloudFront domain loads the React SPA and API calls via `/api/*` reach the Spring Boot container.
+
+---
+
+### Phase 7 — GitHub Actions CI/CD
+
+Now that everything works manually, automate it.
+
+**`.github/workflows/deploy.yml`** (on push to `master`):
+
+```yaml
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { java-version: '21', distribution: temurin }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS \
+            --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      - name: Build
+        run: mvn install -DskipTests
+      - name: Push backend image
+        run: |
+          mvn -pl backend jib:build \
+            -DAWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
+            -DAWS_REGION=${{ secrets.AWS_REGION }} \
+            -DECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
+      - name: Deploy ECS
+        run: |
+          aws ecs update-service \
+            --cluster dynamic-form-cluster \
+            --service dynamic-form-service \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
+      - name: Sync frontend to S3
+        run: aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET }} --delete
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/index.html"
+```
+
+**`.github/workflows/destroy.yml`** (manual trigger only):
+
+```yaml
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=terraform init
+      - run: |
+          terraform -chdir=terraform destroy -auto-approve \
+            -target=aws_ecs_service.app \
+            -target=aws_lb.main
+```
+
+**Checkpoint:** Push a trivial change to `master` → Actions workflow goes green → CloudFront domain reflects the change.
+
+---
+
+### Phase 8 — Smoke test and tear-down drill
+
+Verify the full lifecycle before treating the setup as production-ready.
+
+**Smoke test checklist:**
+- [ ] `GET <cloudfront-domain>/` — returns the React SPA (`200 OK`)
+- [ ] `GET <cloudfront-domain>/api/actuator/health` — returns `{"status":"UP"}`
+- [ ] Log in via OAuth2 — token accepted by the Spring Boot resource server
+- [ ] Submit a form — data persists in RDS across ECS task restarts
+- [ ] `docker compose up` still works locally with `SPRING_PROFILES_ACTIVE=dev`
+
+**Tear-down drill:**
+1. Trigger `destroy.yml` manually from the GitHub Actions UI
+2. Confirm ECS service and ALB are gone (cost drops to near zero)
+3. Re-run `deploy.yml` (or push a commit)
+4. Confirm site is live again within ~5 minutes
 
 ---
 
