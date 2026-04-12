@@ -242,8 +242,6 @@ Add to `backend/pom.xml` inside `<build><plugins>`:
 
 CI command to build and push: `mvn -pl backend jib:build -DskipTests`
 
-> **Note:** Jib and the Dockerfile in Phase 3 are alternative approaches. Jib is preferred in CI because it needs no Docker installation. The Dockerfile is useful for local testing with `docker run`.
-
 #### 0.4 — Configure actuator health check
 
 ECS requires a health check endpoint to determine if a container is healthy. Spring Actuator is already on the classpath. Verify `application-prod.yaml` exposes `/actuator/health` (covered in 0.1 above).
@@ -252,21 +250,6 @@ The ECS task definition health check should call:
 
 ```
 GET http://localhost:8080/actuator/health
-```
-
-#### 0.5 — Add `.dockerignore`
-
-Create `.dockerignore` at the repo root to prevent bloated images when using the Dockerfile approach:
-
-```
-.git
-.github
-frontend/node_modules
-frontend/.vite
-backend/target
-terraform
-docs
-*.md
 ```
 
 ---
