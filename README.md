@@ -40,16 +40,28 @@ monolith-parent/
 ### Prerequisites
 - Java 21+
 - Maven 3.8+
-- Node.js 20+
+- Node.js 20+ (or use Maven's embedded Node)
+- Docker + Docker Compose (optional, for full-stack local testing)
+- PostgreSQL 16+ running locally on port 5432 (if not using docker-compose)
 
-### Development
+### Local Development
+
+#### Option 1: Backend + Frontend separately (recommended for development)
+
+1. **Start the database**
+   ```bash
+   docker run --name postgres-dev -e POSTGRES_DB=template \
+     -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+     -p 5432:5432 postgres:16-alpine
+   ```
 
 2. **Start Backend (Port 8080)**
    ```bash
-   cd backend
-   mvn spring-boot:run
+   export SPRING_PROFILES_ACTIVE=dev
+   mvn spring-boot:run -pl backend
    ```
-   - Uses H2 in-memory database by default in the `dev` profile.
+   - Uses PostgreSQL localhost (configured in `application-dev.yaml`)
+   - Database is initialized by Hibernate's `ddl-auto: update`
 
 3. **Start Frontend (Port 5173)**
    ```bash
@@ -57,36 +69,106 @@ monolith-parent/
    npm install
    npm run dev
    ```
-   - Vite dev server proxies `/api` to the backend on port 8080.
+   - Vite dev server proxies `/api` requests to the backend on port 8080
+
+#### Option 2: Full stack with docker-compose
+
+Test the full application stack (backend, database, frontend) with a single command:
+
+```bash
+docker compose up --build
+```
+
+- Backend runs on `http://localhost:8080`
+- Frontend runs on `http://localhost:5173` (or served from the backend)
+- PostgreSQL runs on `localhost:5433` (port 5433 to avoid conflicts)
+- Uses `SPRING_PROFILES_ACTIVE=prod` with environment variables
+
+Stop with `Ctrl+C`, tear down with `docker compose down`.
 
 ### Testing
 
-- **Run Backend Tests (Unit & Integration)**
+- **Run all tests (Unit, Integration, Frontend)**
   ```bash
-  cd backend
-  mvn verify
+  mvn clean verify
   ```
-  - This runs both Surefire (unit tests) and Failsafe (integration tests).
+  - Backend: Surefire (unit tests) + Failsafe (integration tests with `*IT.java`)
+  - Backend tests use the `test` profile with H2 in-memory database
+  - Frontend: Vitest unit and integration tests
+  - Flyway is disabled during testing; Hibernate's `ddl-auto: create-drop` handles schema
 
-- **Run Frontend Tests**
+- **Run Backend tests only**
+  ```bash
+  mvn -pl backend verify
+  ```
+
+- **Run Frontend tests only**
   ```bash
   cd frontend
   npm test
   ```
 
-### Production Build
+### Build for Local Testing
 
-Build all modules and package the frontend into the backend JAR:
+Build the full project and create a runnable JAR:
 ```bash
-mvn clean install
+mvn clean package -DskipTests
 ```
 
-Run the final application:
+Run with the dev profile:
 ```bash
-java -jar backend/target/backend-1.0.0.jar
+export SPRING_PROFILES_ACTIVE=dev
+java -jar backend/target/backend-1.0.0-SNAPSHOT.jar
 ```
-- The application serves the frontend UI and backend API from `http://localhost:8080`.
-- The Auth Server must be running separately.
+
+The application serves the frontend UI and backend API from `http://localhost:8080`.
+
+### Build Docker Image (for AWS deployment)
+
+Build and push the backend image to ECR without a local Docker daemon (using Jib):
+
+```bash
+mvn -pl backend jib:build \
+  -DAWS_ACCOUNT_ID=<your-account-id> \
+  -DAWS_REGION=eu-north-1 \
+  -DECR_REPOSITORY=dynamic-form
+```
+
+> Requires AWS credentials configured (`aws configure` or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` environment variables).
+
+For local testing with `docker run`:
+```bash
+# First, build locally with Jib (to Docker daemon instead of ECR)
+mvn -pl backend jib:dockerBuild
+
+# Then run
+docker run -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_URL=jdbc:postgresql://host.docker.internal:5432/dynamicform \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=postgres \
+  -e OAUTH2_ISSUER_URI=http://localhost:9000 \
+  -p 8080:8080 \
+  dynamic-form:1.0.0-SNAPSHOT
+```
+
+## Configuration
+
+The application uses Spring Boot profiles for environment-specific configuration:
+
+| Profile | Database | Flyway | Use case |
+|---------|----------|--------|----------|
+| `dev` | PostgreSQL localhost | Disabled | Local development |
+| `test` | H2 in-memory | Disabled | Unit & integration tests |
+| `prod` | PostgreSQL RDS (env vars) | **Enabled** | AWS deployment |
+| (default) | N/A | Disabled | Will fail; you must set a profile |
+
+Set the profile with `export SPRING_PROFILES_ACTIVE=dev` or pass `-Dspring.profiles.active=prod` to Java.
+
+Config files:
+- `application.yaml` — shared settings (server port, logging, actuator)
+- `application-dev.yaml` — localhost PostgreSQL, `ddl-auto: update`, DEBUG logging
+- `application-prod.yaml` — environment variable placeholders, `ddl-auto: validate`
+- `application-test.yaml` — H2 in-memory, Flyway disabled, minimal logging
 
 ## Architecture
 
@@ -105,6 +187,16 @@ java -jar backend/target/backend-1.0.0.jar
 - **Unit Tests**: Standard JUnit 5 tests with Mockito (e.g., `ItemServiceTest`).
 - **Repository Tests**: Use `@DataJpaTest` for fast, isolated JPA tests (e.g., `ItemRepositoryTest`).
 - **Integration Tests**: Use `@SpringBootTest` with `WebTestClient` and `Testcontainers` for full-context tests (e.g., `ItemControllerTest`, `FrontendIT`).
+
+## Deployment
+
+### AWS
+
+For a complete guide to deploying this application to AWS (ECS Fargate, RDS, CloudFront, etc.), see [docs/AWSDeployPlan.md](docs/AWSDeployPlan.md). The plan includes:
+- Phased implementation with checkpoints
+- Terraform IaC for all infrastructure
+- GitHub Actions CI/CD
+- Smoke tests and tear-down drills
 
 ## License
 

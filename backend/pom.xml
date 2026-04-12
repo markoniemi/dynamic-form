@@ -156,6 +156,34 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.4.4</version>
+        <configuration>
+          <from>
+            <image>eclipse-temurin:21-jre-alpine</image>
+          </from>
+          <to>
+            <image>${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${project.version}</image>
+            <tags>
+              <tag>latest</tag>
+            </tags>
+          </to>
+          <container>
+            <ports>
+              <port>8080</port>
+            </ports>
+            <environment>
+              <SPRING_PROFILES_ACTIVE>prod</SPRING_PROFILES_ACTIVE>
+            </environment>
+            <jvmFlags>
+              <jvmFlag>-Xms256m</jvmFlag>
+              <jvmFlag>-Xmx512m</jvmFlag>
+            </jvmFlags>
+          </container>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <repositories>
