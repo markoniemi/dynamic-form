@@ -6,6 +6,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  flyway:
+    enabled: false  # Only enabled in prod; dev uses ddl-auto, tests are disabled
 
 server:
   port: 8080
