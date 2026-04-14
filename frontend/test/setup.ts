@@ -1,9 +1,21 @@
 import '@testing-library/jest-dom';
-import createFetchMock from 'vitest-fetch-mock';
 import {vi} from 'vitest';
 
-const fetchMocker = createFetchMock(vi);
-fetchMocker.enableMocks();
+// Default mock for /api/config/oauth2-issuer-uri endpoint
+global.fetch = vi.fn((url: string | Request) => {
+  const urlStr = typeof url === 'string' ? url : url.toString();
+
+  if (urlStr.includes('/api/config/oauth2-issuer-uri')) {
+    return Promise.resolve(
+      new Response('http://localhost:9000', {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' },
+      })
+    );
+  }
+
+  return Promise.resolve(new Response('Not found', { status: 404 }));
+}) as any;
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

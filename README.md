@@ -73,16 +73,20 @@ monolith-parent/
 
 #### Option 2: Full stack with docker-compose
 
-Test the full application stack (backend, database, frontend) with a single command:
+Test the full application stack (backend, database, OAuth2 server) in Docker:
 
 ```bash
-docker compose up --build
+# Build the app image locally using Jib (no Dockerfile needed)
+mvn -pl backend jib:dockerBuild
+
+# Then run the full stack
+docker compose up
 ```
 
 - Backend runs on `http://localhost:8080`
-- Frontend runs on `http://localhost:5173` (or served from the backend)
+- OAuth2 server runs on `http://localhost:9000` (for authentication)
 - PostgreSQL runs on `localhost:5433` (port 5433 to avoid conflicts)
-- Uses `SPRING_PROFILES_ACTIVE=prod` with environment variables
+- Uses `SPRING_PROFILES_ACTIVE=prod` with environment variables (PostgreSQL, RDS-like config)
 
 Stop with `Ctrl+C`, tear down with `docker compose down`.
 
@@ -123,25 +127,17 @@ java -jar backend/target/backend-1.0.0-SNAPSHOT.jar
 
 The application serves the frontend UI and backend API from `http://localhost:8080`.
 
-### Build Docker Image (for AWS deployment)
+### Build Docker Image
 
-Build and push the backend image to ECR without a local Docker daemon (using Jib):
+**Local development** — Build the image for use with docker-compose or `docker run`:
 
 ```bash
-mvn -pl backend jib:build \
-  -DAWS_ACCOUNT_ID=<your-account-id> \
-  -DAWS_REGION=eu-north-1 \
-  -DECR_REPOSITORY=dynamic-form
+mvn -pl backend jib:dockerBuild
 ```
 
-> Requires AWS credentials configured (`aws configure` or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` environment variables).
+This creates `dynamic-form:1.0.0-SNAPSHOT` in your local Docker daemon. Then reference it in docker-compose or run it directly:
 
-For local testing with `docker run`:
 ```bash
-# First, build locally with Jib (to Docker daemon instead of ECR)
-mvn -pl backend jib:dockerBuild
-
-# Then run
 docker run -e SPRING_PROFILES_ACTIVE=prod \
   -e DB_URL=jdbc:postgresql://host.docker.internal:5432/dynamicform \
   -e DB_USERNAME=postgres \
@@ -150,6 +146,17 @@ docker run -e SPRING_PROFILES_ACTIVE=prod \
   -p 8080:8080 \
   dynamic-form:1.0.0-SNAPSHOT
 ```
+
+**AWS deployment** — Build and push the backend image to ECR (no local Docker daemon needed):
+
+```bash
+mvn -pl backend jib:build \
+  -Djib.to.image=<AWS_ACCOUNT_ID>.dkr.ecr.eu-north-1.amazonaws.com/dynamic-form:${project.version}
+```
+
+Or use the GitHub Actions workflow in [docs/AWSDeployPlan.md](docs/AWSDeployPlan.md), which automates this.
+
+> Requires AWS credentials configured (`aws configure` or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` environment variables).
 
 ## Configuration
 

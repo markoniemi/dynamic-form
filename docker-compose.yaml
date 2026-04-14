@@ -1,0 +1,37 @@
+services:
+  auth:
+    image: ghcr.io/markoniemi/oauth2-server:latest
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/.well-known/openid-configuration"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dynamicform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"   # 5433 to avoid clashing with a locally running postgres
+    depends_on:
+      - auth
+
+  app:
+    image: dynamic-form:1.0.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/dynamicform
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      OAUTH2_ISSUER_URI: http://auth:9000
+    depends_on:
+      auth:
+        condition: service_healthy
+      db:
+        condition: service_started

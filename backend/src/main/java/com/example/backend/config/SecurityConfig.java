@@ -28,6 +28,8 @@ public class SecurityConfig {
                 authorize
                     .requestMatchers("/webjars/**", "/", "/index.html", "/h2-console/**")
                     .permitAll()
+                    .requestMatchers("/api/config/**")
+                    .permitAll()
                     .requestMatchers("/api/forms/**")
                     .permitAll()
                     .requestMatchers("/api/**")

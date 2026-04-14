@@ -219,7 +219,7 @@ Add to `backend/pom.xml` inside `<build><plugins>`:
             <image>eclipse-temurin:21-jre-alpine</image>
         </from>
         <to>
-            <image>${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${project.version}</image>
+            <image>dynamic-form:${project.version}</image>
             <tags>
                 <tag>latest</tag>
             </tags>
@@ -240,7 +240,16 @@ Add to `backend/pom.xml` inside `<build><plugins>`:
 </plugin>
 ```
 
-CI command to build and push: `mvn -pl backend jib:build -DskipTests`
+**Local build** (Docker daemon):
+```bash
+mvn -pl backend jib:dockerBuild
+```
+
+**CI/AWS deployment** (ECR):
+```bash
+mvn -pl backend jib:build -DskipTests \
+  -Djib.to.image=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<ECR_REPOSITORY>:latest
+```
 
 #### 0.4 — Configure actuator health check
 
@@ -441,35 +450,22 @@ gh secret set OAUTH2_ISSUER_URI --body "<your-production-oauth2-issuer>"
 
 > **Note:** Replace placeholder values with the actual values from the previous steps. You can find your account ID with `aws sts get-caller-identity --query Account --output text`. The RDS endpoint is available after `terraform apply` via `terraform output rds_endpoint`.
 
-### Phase 2 — Dockerfile + local container validation
+### Phase 2 — Docker-compose
 
-Write the Dockerfile and verify the image works locally before touching AWS.
-
-**`Dockerfile`** — multi-stage build at the repo root:
-
-```dockerfile
-# Stage 1: build
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY frontend/pom.xml frontend/pom.xml
-COPY backend/pom.xml backend/pom.xml
-RUN mvn dependency:go-offline -q
-COPY . .
-RUN mvn package -DskipTests
-
-# Stage 2: run
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
-COPY --from=build /app/backend/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-**`docker-compose.yml`** — spin up the full stack locally against a real PostgreSQL:
+**`docker-compose.yml`** — spin up the full stack locally with PostgreSQL and OAuth2 server:
 
 ```yaml
 services:
+  auth:
+    image: ghcr.io/markoniemi/oauth2-server:latest
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/.well-known/openid-configuration"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   db:
     image: postgres:16-alpine
     environment:
@@ -478,9 +474,11 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"   # 5433 to avoid clashing with a locally running postgres
+    depends_on:
+      - auth
 
   app:
-    build: .
+    image: dynamic-form:1.0.0-SNAPSHOT
     ports:
       - "8080:8080"
     environment:
@@ -488,12 +486,34 @@ services:
       DB_URL: jdbc:postgresql://db:5432/dynamicform
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      OAUTH2_ISSUER_URI: http://localhost:9000   # placeholder for local smoke test
+      OAUTH2_ISSUER_URI: http://auth:9000
     depends_on:
-      - db
+      auth:
+        condition: service_healthy
+      db:
+        condition: service_started
 ```
 
-**Checkpoint:** `docker compose up --build` → `curl http://localhost:8080/actuator/health` returns `{"status":"UP"}`.
+**Before running docker-compose, build the app image locally using Jib:**
+
+```bash
+# Build and push to local Docker daemon
+mvn -pl backend jib:dockerBuild
+```
+
+This creates the `dynamic-form:1.0.0-SNAPSHOT` image in your local Docker registry. Then start the stack:
+
+```bash
+docker compose up
+```
+
+**Note on the `auth` service:** The OAuth2 server container (`ghcr.io/markoniemi/oauth2-server:latest`) is the same image used by `TestcontainersConfig` during integration tests. It provides the authorization server that the backend validates JWTs against. The app connects to it via `OAUTH2_ISSUER_URI: http://auth:9000` (internal Docker network DNS).
+
+**Checkpoint:**
+- `mvn -pl backend jib:dockerBuild && docker compose up` — all three services start
+- `curl http://localhost:8080/actuator/health` returns `{"status":"UP"}`
+- `curl http://localhost:9000/.well-known/openid-configuration` returns the OAuth2 metadata (verify auth server is accessible)
+- Frontend can authenticate via the OAuth2 server at `http://localhost:9000`
 
 ---
 
@@ -560,9 +580,7 @@ aws ecr get-login-password --region eu-north-1 | \
   <account-id>.dkr.ecr.eu-north-1.amazonaws.com
 
 mvn -pl backend jib:build -DskipTests \
-  -DAWS_ACCOUNT_ID=<account-id> \
-  -DAWS_REGION=eu-north-1 \
-  -DECR_REPOSITORY=dynamic-form
+  -Djib.to.image=<account-id>.dkr.ecr.eu-north-1.amazonaws.com/dynamic-form:1.0.0-SNAPSHOT
 
 aws ecs update-service \
   --cluster dynamic-form-cluster \
@@ -637,10 +655,8 @@ jobs:
         run: mvn install -DskipTests
       - name: Push backend image
         run: |
-          mvn -pl backend jib:build \
-            -DAWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }} \
-            -DAWS_REGION=${{ secrets.AWS_REGION }} \
-            -DECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
+          mvn -pl backend jib:build -DskipTests \
+            -Djib.to.image=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
       - name: Deploy ECS
         run: |
           aws ecs update-service \

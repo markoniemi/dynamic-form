@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(find C:UsersMarkoNiemiDocumentsGitdynamic-form -name *.json -path */locales/*)",
-      "Bash(find /c/Users/marko/Documents/Git/dynamic-form -type f -name *prod* -o -name *production*)"
+      "Bash(find /c/Users/marko/Documents/Git/dynamic-form -type f -name *prod* -o -name *production*)",
+      "Bash(ls:*)"
     ]
   }
 }
