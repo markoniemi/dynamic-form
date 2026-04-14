@@ -56,9 +56,10 @@ Dockerfile          # Multi-stage: Maven build → slim JRE image
 | `DB_URL` | `jdbc:postgresql://<rds-endpoint>:5432/dynamicform` |
 | `DB_USERNAME` | RDS master username |
 | `DB_PASSWORD` | RDS master password |
-| `OAUTH2_ISSUER_URI` | Production OAuth2 issuer URI |
 | `S3_BUCKET` | Frontend S3 bucket name |
 | `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID (for cache invalidation) |
+
+**Note:** `OAUTH2_ISSUER_URI` is now stored in AWS Parameter Store (`/config/oauth2-issuer-uri`) instead of GitHub Secrets — see Phase 1, Step 5.5.
 
 ---
 
@@ -251,7 +252,55 @@ mvn -pl backend jib:build -DskipTests \
   -Djib.to.image=<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<ECR_REPOSITORY>:latest
 ```
 
-#### 0.4 — Configure actuator health check
+#### 0.4 — Configure OIDC issuer-uri via AWS Parameter Store
+
+The frontend bootstraps by fetching the OIDC issuer URI from `/api/config/oauth2-issuer-uri`. This endpoint should read from AWS Parameter Store in production, but fall back to `application-dev.yaml` locally.
+
+**Update `backend/pom.xml`** — add Spring Cloud AWS:
+
+```xml
+<dependency>
+    <groupId>io.awspring.cloud</groupId>
+    <artifactId>spring-cloud-aws-starter-parameter-store</artifactId>
+    <version>3.1.1</version>
+</dependency>
+```
+
+**Update `ConfigController.java`** — read from the same property Spring Security uses:
+
+```java
+@RestController
+@RequestMapping("/api/config")
+public class ConfigController {
+
+  @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+  private String oauth2IssuerUri;
+
+  @GetMapping("/oauth2-issuer-uri")
+  public String getOauth2IssuerUri() {
+    return oauth2IssuerUri;
+  }
+}
+```
+
+**Update `application-dev.yaml`** — keep localhost (works without AWS):
+
+The existing `spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:9000` is unchanged.
+
+**Update `application-prod.yaml`** — read from AWS Parameter Store:
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${aws:parameter:/config/oauth2-issuer-uri}
+```
+
+The endpoint is already whitelisted in `SecurityConfig.java` (`/api/config/**` permits all), so the frontend can fetch it without authentication.
+
+#### 0.5 — Configure actuator health check
 
 ECS requires a health check endpoint to determine if a container is healthy. Spring Actuator is already on the classpath. Verify `application-prod.yaml` exposes `/actuator/health` (covered in 0.1 above).
 
@@ -407,6 +456,17 @@ Save the following as `deploy-policy.json`:
         "logs:DescribeLogGroups"
       ],
       "Resource": "*"
+    },
+    {
+      "Sid": "SSMParameterStore",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath"
+      ],
+      "Resource": "arn:aws:ssm:*:*:parameter/config/*"
     }
   ]
 }
@@ -432,6 +492,22 @@ This outputs `AccessKeyId` and `SecretAccessKey` — save them immediately, the 
 aws ecr create-repository --repository-name dynamic-form --region eu-north-1
 ```
 
+#### Step 5.5 — Create AWS Parameter Store parameter for OIDC issuer URI
+
+Store the production OAuth2 issuer URI in Parameter Store so the backend can fetch it at startup:
+
+```bash
+aws ssm put-parameter \
+  --name /config/oauth2-issuer-uri \
+  --value "https://your-production-oauth2-issuer.example.com" \
+  --type String \
+  --region eu-north-1
+```
+
+Replace `https://your-production-oauth2-issuer.example.com` with your actual production OAuth2 issuer URI. The ECS task IAM role (created in Phase 5) will have `ssm:GetParameter` permission to retrieve this value at runtime.
+
+> **Note:** You can update the parameter later without redeploying: `aws ssm put-parameter --name /config/oauth2-issuer-uri --value "new-value" --overwrite`.
+
 #### Step 6 — Add secrets to GitHub
 
 ```bash
@@ -441,14 +517,13 @@ gh secret set AWS_REGION --body "eu-north-1"
 gh secret set AWS_ACCOUNT_ID --body "<your-12-digit-account-id>"
 gh secret set ECR_REPOSITORY --body "dynamic-form"
 
-# Set after RDS is created (Phase 2 / terraform apply)
+# Set after RDS is created (Phase 4 / terraform apply)
 gh secret set DB_URL --body "jdbc:postgresql://<rds-endpoint>:5432/dynamicform"
 gh secret set DB_USERNAME --body "<rds-master-username>"
 gh secret set DB_PASSWORD --body "<rds-master-password>"
-gh secret set OAUTH2_ISSUER_URI --body "<your-production-oauth2-issuer>"
 ```
 
-> **Note:** Replace placeholder values with the actual values from the previous steps. You can find your account ID with `aws sts get-caller-identity --query Account --output text`. The RDS endpoint is available after `terraform apply` via `terraform output rds_endpoint`.
+> **Note:** Replace placeholder values with the actual values from the previous steps. You can find your account ID with `aws sts get-caller-identity --query Account --output text`. The RDS endpoint is available after `terraform apply` via `terraform output rds_endpoint`. The `OAUTH2_ISSUER_URI` is now stored in AWS Parameter Store (Step 5.5) instead of GitHub Secrets — the ECS task reads it from Parameter Store at startup.
 
 ### Phase 2 — Docker-compose
 
