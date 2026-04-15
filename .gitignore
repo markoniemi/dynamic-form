@@ -30,3 +30,6 @@ coverage/
 .vscode/
 
 /.claude/worktrees/
+.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
