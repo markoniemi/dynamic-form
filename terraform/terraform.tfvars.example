@@ -1,0 +1,5 @@
+# Copy this file to terraform.tfvars and set actual values
+# DO NOT commit terraform.tfvars to git — it contains secrets
+
+db_username = "postgres"
+db_password = "changeme"

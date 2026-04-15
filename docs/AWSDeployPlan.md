@@ -623,7 +623,90 @@ Write `terraform/rds.tf`:
   - `publicly_accessible = false`
 - Output `rds_endpoint` for use in GitHub Secrets
 
-**Checkpoint:** `terraform apply` → `terraform output rds_endpoint` returns a hostname. Add `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` to GitHub Secrets now (Step 6 in Phase 1).
+Add to `terraform/variables.tf`:
+```hcl
+variable "db_name" {
+  description = "Database name"
+  type        = string
+  default     = "dynamicform"
+}
+
+variable "db_username" {
+  description = "Database master username"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Database master password"
+  type        = string
+  sensitive   = true
+}
+```
+
+Add to `terraform/outputs.tf`:
+```hcl
+output "rds_endpoint" {
+  description = "RDS instance endpoint (hostname:port)"
+  value       = aws_db_instance.main.endpoint
+}
+```
+
+Create `terraform/terraform.tfvars` (never commit):
+```hcl
+db_username = "postgres"
+db_password = "your-secure-password"
+```
+
+Create `terraform/terraform.tfvars.example` (commit this as a template):
+```hcl
+# Copy this file to terraform.tfvars and set actual values
+# DO NOT commit terraform.tfvars to git — it contains secrets
+
+db_username = "postgres"
+db_password = "changeme"
+```
+
+Update `.gitignore` to exclude credentials:
+```
+terraform/terraform.tfvars
+```
+
+**Step 1: Initialize and plan**
+
+```bash
+cd terraform
+terraform init  # If not already done
+terraform plan
+```
+
+**Step 2: Apply**
+
+```bash
+terraform apply
+```
+
+This will prompt you to confirm. Enter `yes`. RDS creation takes ~5 minutes.
+
+**Step 3: Retrieve endpoint and credentials**
+
+```bash
+terraform output rds_endpoint
+# Example output: dynamic-form-db.xyz123.eu-north-1.rds.amazonaws.com:5432
+```
+
+**Step 4: Add to GitHub Secrets**
+
+Using the endpoint from Step 3 and your credentials from `terraform.tfvars`:
+
+```bash
+gh secret set DB_URL --body "jdbc:postgresql://dynamic-form-db.xyz123.eu-north-1.rds.amazonaws.com:5432/dynamicform"
+gh secret set DB_USERNAME --body "postgres"
+gh secret set DB_PASSWORD --body "your-secure-password"
+```
+
+Replace the endpoint with your actual endpoint from `terraform output rds_endpoint`.
+
+**Checkpoint:** RDS instance is created, `terraform output rds_endpoint` returns a hostname with port 5432. GitHub Secrets contain `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
 
 ---
 

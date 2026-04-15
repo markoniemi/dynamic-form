@@ -42,3 +42,8 @@ output "internet_gateway_id" {
   description = "Internet Gateway ID"
   value       = aws_internet_gateway.main.id
 }
+
+output "rds_endpoint" {
+  description = "RDS instance endpoint (hostname:port)"
+  value       = aws_db_instance.main.endpoint
+}
