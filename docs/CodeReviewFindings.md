@@ -67,6 +67,11 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Single-method mapper interface is separate from `FormMapper` with no clear boundary reason.
   **Fix:** Consider consolidating into `FormMapper` if the mapping is related, or leave as-is if the separation is intentional.
 
+- [ ] **B14** 🆕 — `e2e/pages/BasePage.java`, `e2e/**`
+  Test suite uses Selenium WebDriver for browser automation. Selenium has known issues with flakiness, requires explicit waits, and has a steeper learning curve.
+  **Recommendation:** Migrate to Playwright (or similar modern tool like Cypress). Playwright offers: auto-wait (eliminates manual waits), better reliability, native support for multiple browsers (Chrome, Firefox, Safari), superior debugging/tracing, and faster test execution.
+  **Scope:** This is a strategic recommendation for future work; existing Selenium tests should follow best practices (B10) until migration.
+
 ---
 
 ## Frontend (TypeScript / React)
