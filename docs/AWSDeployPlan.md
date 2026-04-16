@@ -699,7 +699,7 @@ terraform output rds_endpoint
 Using the endpoint from Step 3 and your credentials from `terraform.tfvars`:
 
 ```bash
-gh secret set DB_URL --body "jdbc:postgresql://dynamic-form-db.xyz123.eu-north-1.rds.amazonaws.com:5432/dynamicform"
+gh secret set DB_URL --body "jdbc:postgresql://dynamic-form-db.cvcaek6qu25h.eu-north-1.rds.amazonaws.com:5432/dynamicform"
 gh secret set DB_USERNAME --body "postgres"
 gh secret set DB_PASSWORD --body "your-secure-password"
 ```
