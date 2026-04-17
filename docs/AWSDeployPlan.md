@@ -497,11 +497,7 @@ aws ecr create-repository --repository-name dynamic-form --region eu-north-1
 Store the production OAuth2 issuer URI in Parameter Store so the backend can fetch it at startup:
 
 ```bash
-aws ssm put-parameter \
-  --name /config/oauth2-issuer-uri \
-  --value "https://your-production-oauth2-issuer.example.com" \
-  --type String \
-  --region eu-north-1
+aws ssm put-parameter --name /config/oauth2-issuer-uri --value "https://your-production-oauth2-issuer.example.com" --type String --region eu-north-1
 ```
 
 Replace `https://your-production-oauth2-issuer.example.com` with your actual production OAuth2 issuer URI. The ECS task IAM role (created in Phase 5) will have `ssm:GetParameter` permission to retrieve this value at runtime.
@@ -691,7 +687,7 @@ This will prompt you to confirm. Enter `yes`. RDS creation takes ~5 minutes.
 
 ```bash
 terraform output rds_endpoint
-# Example output: dynamic-form-db.xyz123.eu-north-1.rds.amazonaws.com:5432
+# Example output: dynamic-form-db.cvcaek6qu25h.eu-north-1.rds.amazonaws.com:5432
 ```
 
 **Step 4: Add to GitHub Secrets**
@@ -716,6 +712,8 @@ Write `terraform/ecr.tf`, `terraform/ecs.tf`, and `terraform/alb.tf`:
 
 **`terraform/ecr.tf`:**
 - `aws_ecr_repository` named `dynamic-form`
+- ECR lifecycle policy to keep last 10 images
+- Image scanning enabled on push
 
 **`terraform/alb.tf`:**
 - `aws_lb` (type `application`) in the public subnets, attached to `alb-sg`
@@ -723,31 +721,190 @@ Write `terraform/ecr.tf`, `terraform/ecs.tf`, and `terraform/alb.tf`:
 - `aws_lb_listener` on port 80 forwarding to the target group
 
 **`terraform/ecs.tf`:**
-- `aws_ecs_cluster`
-- `aws_ecs_task_definition` — Fargate, 512 CPU / 1024 MB memory, container image from ECR `latest`, environment variables: `SPRING_PROFILES_ACTIVE=prod`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `OAUTH2_ISSUER_URI`; health check: `CMD-SHELL curl -f http://localhost:8080/actuator/health`; log driver `awslogs`
+- `aws_cloudwatch_log_group` for ECS logs (7 day retention)
+- `aws_ecs_cluster` with Container Insights enabled
+- `aws_ecs_task_definition` — Fargate, 512 CPU / 1024 MB memory, container image from ECR `latest`, environment variables: `SPRING_PROFILES_ACTIVE=prod`; secrets pulled from AWS SSM Parameter Store: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `OAUTH2_ISSUER_URI`; health check: `CMD-SHELL curl -f http://localhost:8080/actuator/health`; log driver `awslogs`
 - `aws_ecs_service` — desired count 1, launch type FARGATE, network config in public subnets with `ecs-sg`, load balancer attached to the target group
 
 **`terraform/iam.tf`:**
 - `aws_iam_role` for ECS task execution with `AmazonECSTaskExecutionRolePolicy`
+- `aws_iam_role` for ECS task (application permissions)
+- Policies for Parameter Store access and CloudWatch Logs
 
-After `terraform apply`, do a **manual first push** to confirm the pipeline before automating it:
+**Update `terraform/variables.tf`:**
+Add the following variables:
+```hcl
+variable "ecr_repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
+  default     = "dynamic-form"
+}
 
-```bash
-aws ecr get-login-password --region eu-north-1 | \
-  docker login --username AWS --password-stdin \
-  <account-id>.dkr.ecr.eu-north-1.amazonaws.com
+variable "ecs_task_cpu" {
+  description = "ECS task CPU units (256, 512, 1024, 2048, 4096)"
+  type        = string
+  default     = "512"
+}
 
-mvn -pl backend jib:build -DskipTests \
-  -Djib.to.image=<account-id>.dkr.ecr.eu-north-1.amazonaws.com/dynamic-form:1.0.0-SNAPSHOT
+variable "ecs_task_memory" {
+  description = "ECS task memory in MB (512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192)"
+  type        = string
+  default     = "1024"
+}
 
-aws ecs update-service \
-  --cluster dynamic-form-cluster \
-  --service dynamic-form-service \
-  --force-new-deployment \
-  --region eu-north-1
+variable "ecs_desired_count" {
+  description = "Desired number of ECS tasks"
+  type        = number
+  default     = 1
+}
 ```
 
-**Checkpoint:** ALB DNS name (from `terraform output alb_dns`) responds to `GET /actuator/health` with `{"status":"UP"}`.
+**Update `terraform/outputs.tf`:**
+Add the following outputs:
+```hcl
+output "ecr_repository_url" {
+  description = "ECR repository URL"
+  value       = aws_ecr_repository.main.repository_url
+}
+
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = aws_lb.main.dns_name
+}
+
+output "alb_arn" {
+  description = "ARN of the Application Load Balancer"
+  value       = aws_lb.main.arn
+}
+
+output "ecs_cluster_name" {
+  description = "Name of the ECS cluster"
+  value       = aws_ecs_cluster.main.name
+}
+
+output "ecs_service_name" {
+  description = "Name of the ECS service"
+  value       = aws_ecs_service.app.name
+}
+```
+
+#### Step 1 — Set up AWS Cognito (OAuth2 authorization server)
+
+Create an AWS Cognito User Pool for OAuth2:
+
+```bash
+aws cognito-idp create-user-pool --pool-name dynamic-form-pool --region eu-north-1
+```
+
+Save the `Id` from the output (e.g., `eu-north-1_abc123xyz`). Then retrieve the Cognito metadata to get the issuer URI:
+
+```bash
+aws cognito-idp describe-user-pool --user-pool-id <pool-id> --region eu-north-1
+```
+
+Look for the `Arn` field in the output. The issuer URI will be: `https://cognito-idp.<region>.amazonaws.com/<user-pool-id>`
+
+Example: `https://cognito-idp.eu-north-1.amazonaws.com/eu-north-1_abc123xyz`
+
+#### Step 2 — Create AWS Parameter Store parameters
+
+The ECS task definition pulls database credentials and OAuth2 issuer URI from AWS Systems Manager Parameter Store:
+
+```bash
+# RDS connection URL (use the endpoint from Phase 4)
+aws ssm put-parameter --name /config/db-url --value "jdbc:postgresql://dynamic-form-db.cvcaek6qu25h.eu-north-1.rds.amazonaws.com:5432/dynamicform" --type String --region eu-north-1
+
+# RDS username
+aws ssm put-parameter --name /config/db-username --value "postgres" --type String --region eu-north-1
+
+# RDS password (SecureString for encryption at rest)
+aws ssm put-parameter --name /config/db-password --value "your-secure-password" --type SecureString --region eu-north-1
+
+# OAuth2 issuer URI from Cognito
+aws ssm put-parameter --name /config/oauth2-issuer-uri --value "https://cognito-idp.eu-north-1.amazonaws.com/eu-north-1_abc123xyz" --type String --region eu-north-1
+```
+
+Replace placeholders with actual values:
+- `dynamic-form-db.cvcaek6qu25h.eu-north-1.rds.amazonaws.com` — your RDS endpoint from `terraform output rds_endpoint` (Phase 4)
+- `your-secure-password` — the RDS master password from `terraform.tfvars`
+- `https://cognito-idp.eu-north-1.amazonaws.com/eu-north-1_abc123xyz` — your Cognito user pool issuer URI
+
+#### Step 3 — Deploy compute infrastructure
+
+```bash
+cd terraform
+terraform init  # If not already done
+terraform plan
+terraform apply
+```
+
+When prompted, confirm with `yes`. This creates the ECR repository, ECS cluster, ALB, and related resources (~2 minutes).
+
+#### Step 4 — Capture outputs for the next phase
+
+```bash
+terraform output ecr_repository_url
+terraform output alb_dns_name
+terraform output ecs_cluster_name
+terraform output ecs_service_name
+```
+
+Save these values — they're needed for the manual first push and Phase 6 (CloudFront setup).
+
+#### Step 5 — Manual first push to confirm the pipeline
+
+Before running the deploy workflow, do a manual push to verify the entire pipeline works end-to-end.
+
+**Step 5a — Authenticate with ECR**
+
+```bash
+aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.eu-north-1.amazonaws.com
+```
+
+Replace `<account-id>` with your AWS account ID (from `aws sts get-caller-identity --query Account --output text`).
+
+**Step 5b — Build and push the Docker image**
+
+Use the ECR repository URL from Step 3:
+
+```bash
+mvn -pl backend jib:build -DskipTests -Djib.to.image=<ecr-repository-url>:latest
+```
+
+Example:
+```bash
+mvn -pl backend jib:build -DskipTests -Djib.to.image=123456789012.dkr.ecr.eu-north-1.amazonaws.com/dynamic-form:latest
+```
+
+This builds the Spring Boot app and pushes it directly to ECR (~2 minutes).
+
+**Step 5c — Force ECS to redeploy with the new image**
+
+```bash
+aws ecs update-service --cluster <ecs-cluster-name> --service <ecs-service-name> --force-new-deployment --region eu-north-1
+```
+
+Replace with values from Step 3 (or use the defaults: `dynamic-form-cluster` and `dynamic-form-service`).
+
+**Step 5d — Wait for the task to stabilize and verify**
+
+```bash
+# Wait ~30 seconds for the task to start, then check the ALB
+curl http://<alb-dns-name>/actuator/health
+```
+
+The ALB DNS name is from Step 3 output. You should see:
+```json
+{"status":"UP"}
+```
+
+If you see a connection refused, wait another 30 seconds (ECS task is still starting). If the health check fails after 2 minutes, check the ECS task logs in CloudWatch (`/ecs/dynamic-form-app` log group).
+
+**Checkpoint:** 
+- ECR repository contains the latest image
+- ECS service deployed a new task running the image
+- ALB health check passes and task is in `RUNNING` state (verify in AWS console or via `aws ecs describe-tasks`)
+- `curl http://<alb-dns-name>/actuator/health` returns `{"status":"UP"}`
 
 ---
 
@@ -767,13 +924,13 @@ After `terraform apply`, do a **manual first sync**:
 
 ```bash
 # Build the frontend
-mvn -pl frontend generate-resources   # runs npm install + vite build
+mvn -pl frontend generate-resources
 
+# Sync to S3
 aws s3 sync frontend/dist/ s3://<bucket-name> --delete
 
-aws cloudfront create-invalidation \
-  --distribution-id <distribution-id> \
-  --paths "/index.html"
+# Invalidate CloudFront cache
+aws cloudfront create-invalidation --distribution-id <distribution-id> --paths "/index.html"
 ```
 
 Add `S3_BUCKET` and `CLOUDFRONT_DISTRIBUTION_ID` to GitHub Secrets.

@@ -34,3 +34,8 @@ coverage/
 terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/terraform.tfvars
+
+# Deployment configuration (contains secrets)
+deploy.env
+deploy.*.env
+!deploy.*.env.example
