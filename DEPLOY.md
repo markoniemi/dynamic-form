@@ -204,11 +204,39 @@ HEALTH_CHECK_WAIT=60      # Wait 1 minute before checking
 - ✅ **Secrets** — `deploy.env` is .gitignored (never committed)
 - ✅ **Summary output** — Shows final configuration before deploying
 
-## Reverse (Teardown)
+## Cleanup & Teardown
 
+### Complete Cleanup (Delete Everything)
+
+To test deployment from scratch or avoid AWS costs:
+
+**Interactive (asks for confirmation):**
 ```bash
-cd terraform
-terraform destroy
+bash cleanup.sh
+```
+
+**Non-interactive (destroys immediately):**
+```bash
+bash cleanup.sh --force
+```
+
+**On Windows (Git Bash):**
+```bash
+cleanup.bat              # Interactive
+cleanup.bat --force      # Non-interactive
+```
+
+The script will:
+- ✅ Delete all Terraform resources (ECS, ALB, RDS, VPC, etc.)
+- ✅ Clear SSM parameters
+- ✅ Remove ECR images (keeps repository for reuse)
+- ✅ Clean up local terraform state
+
+**Cost after cleanup:** ~$0/month
+
+Then redeploy from scratch:
+```bash
+bash deploy.sh postgres
 ```
 
 ## See Also
