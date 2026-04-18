@@ -61,6 +61,7 @@ AWS_REGION="eu-north-1"
 IAM_USER_NAME="github-actions-deploy"
 IAM_POLICY_NAME="dynamic-form-deploy-policy"
 COGNITO_POOL_NAME="dynamic-form-pool"
+TERRAFORM_DIR="terraform"
 
 # ─── Check prerequisites ────────────────────────────────
 check_prerequisites() {
@@ -113,8 +114,8 @@ check_iam_user() {
 
     if aws iam get-user --user-name "$IAM_USER_NAME" > /dev/null 2>&1; then
         log_warning "IAM user '$IAM_USER_NAME' already exists"
-        read -p "Delete and recreate it? (yes/no): " recreate
-        if [[ "$recreate" == "yes" ]]; then
+        read -p "Delete and recreate it? (y/n): " recreate
+        if [[ "$recreate" == "y" ]]; then
             log_info "Deleting existing IAM user and policies..."
             aws iam delete-access-key --user-name "$IAM_USER_NAME" --access-key-id "$(aws iam list-access-keys --user-name "$IAM_USER_NAME" --query 'AccessKeyMetadata[0].AccessKeyId' --output text)" 2>/dev/null || true
             aws iam delete-user-policy --user-name "$IAM_USER_NAME" --policy-name "$IAM_POLICY_NAME" 2>/dev/null || true
@@ -171,10 +172,11 @@ generate_access_keys() {
     log_step "Generating access keys for GitHub Actions"
 
     log_info "Creating access key..."
-    local keys=$(aws iam create-access-key --user-name "$IAM_USER_NAME" --output json)
+    # AWS text output format: ACCESSKEY <AccessKeyId> <CreateDate> <SecretAccessKey> <Status> <UserName>
+    local keys=$(aws iam create-access-key --user-name "$IAM_USER_NAME" --output text)
 
-    AWS_ACCESS_KEY_ID=$(echo "$keys" | jq -r '.AccessKey.AccessKeyId')
-    AWS_SECRET_ACCESS_KEY=$(echo "$keys" | jq -r '.AccessKey.SecretAccessKey')
+    AWS_ACCESS_KEY_ID=$(echo "$keys" | awk '{print $2}')
+    AWS_SECRET_ACCESS_KEY=$(echo "$keys" | awk '{print $4}')
 
     log_success "Access keys generated"
     log_warning "SAVE THESE IMMEDIATELY — Secret access key shown only once:"
@@ -182,6 +184,53 @@ generate_access_keys() {
     echo "  Access Key ID:     $AWS_ACCESS_KEY_ID"
     echo "  Secret Access Key: $AWS_SECRET_ACCESS_KEY"
     echo
+}
+
+# ─── Setup RDS Database ────────────────────────────────
+setup_rds() {
+    log_step "Setting up RDS PostgreSQL Database"
+
+    read -sp "Enter RDS master password (will be used for terraform): " RDS_PASSWORD
+    echo
+
+    if [[ -z "$RDS_PASSWORD" ]]; then
+        log_error "RDS password cannot be empty"
+        exit 1
+    fi
+
+    log_info "Creating terraform.tfvars with RDS configuration..."
+    cat > "${TERRAFORM_DIR}/terraform.tfvars" <<EOF
+db_username = "postgres"
+db_password = "$RDS_PASSWORD"
+EOF
+    log_success "terraform.tfvars created"
+
+    log_info "Initializing Terraform..."
+    cd "$TERRAFORM_DIR"
+    terraform init > /dev/null 2>&1 || {
+        log_error "Terraform init failed"
+        exit 1
+    }
+    log_success "Terraform initialized"
+
+    log_info "Creating infrastructure (VPC, subnets, RDS instance - this may take 10-15 minutes)..."
+    if terraform apply -auto-approve > /tmp/tf-apply.log 2>&1; then
+        log_success "Infrastructure created successfully"
+    else
+        log_error "Infrastructure creation failed"
+        tail -30 /tmp/tf-apply.log
+        exit 1
+    fi
+
+    RDS_ENDPOINT=$(terraform output -raw rds_endpoint 2>/dev/null)
+    if [[ -z "$RDS_ENDPOINT" ]]; then
+        log_error "Could not retrieve RDS endpoint"
+        exit 1
+    fi
+
+    cd ..
+    log_success "RDS Endpoint: $RDS_ENDPOINT"
+    log_info "RDS Password: (saved in terraform/terraform.tfvars)"
 }
 
 # ─── Setup Cognito User Pool ────────────────────────────
@@ -211,6 +260,83 @@ setup_cognito() {
 
     COGNITO_ISSUER_URI="https://cognito-idp.${AWS_REGION}.amazonaws.com/${COGNITO_POOL_ID}"
     log_info "Cognito Issuer URI: $COGNITO_ISSUER_URI"
+
+    # Create test users
+    create_cognito_test_users
+}
+
+# ─── Create Cognito test users ──────────────────────────
+create_cognito_test_users() {
+    log_step "Creating Cognito test users"
+
+    # Define test users: username, password, email, role
+    declare -A test_users=(
+        [admin]="admin admin@example.com ROLE_ADMIN"
+        [user]="user user@example.com ROLE_USER"
+    )
+
+    # Create groups first
+    log_info "Creating Cognito groups..."
+    for group in ROLE_ADMIN ROLE_USER; do
+        if aws cognito-idp get-group --user-pool-id "$COGNITO_POOL_ID" --group-name "$group" \
+            --region "$AWS_REGION" > /dev/null 2>&1; then
+            log_info "  Group already exists: $group"
+        else
+            aws cognito-idp create-group \
+                --user-pool-id "$COGNITO_POOL_ID" \
+                --group-name "$group" \
+                --description "Role group $group" \
+                --region "$AWS_REGION" > /dev/null 2>&1 && \
+                log_success "  Created group: $group" || \
+                log_warning "  Failed to create group: $group"
+        fi
+    done
+
+    # Create users
+    log_info "Creating test users..."
+    for username in "${!test_users[@]}"; do
+        read -r password email role <<< "${test_users[$username]}"
+
+        if aws cognito-idp admin-get-user --user-pool-id "$COGNITO_POOL_ID" --username "$username" \
+            --region "$AWS_REGION" > /dev/null 2>&1; then
+            log_warning "  User already exists: $username"
+        else
+            aws cognito-idp admin-create-user \
+                --user-pool-id "$COGNITO_POOL_ID" \
+                --username "$username" \
+                --temporary-password "$password" \
+                --message-action SUPPRESS \
+                --user-attributes "Name=email,Value=$email" "Name=email_verified,Value=true" \
+                --region "$AWS_REGION" > /dev/null 2>&1 || {
+                log_error "Failed to create user: $username"
+                continue
+            }
+
+            # Set permanent password
+            aws cognito-idp admin-set-user-password \
+                --user-pool-id "$COGNITO_POOL_ID" \
+                --username "$username" \
+                --password "$password" \
+                --permanent \
+                --region "$AWS_REGION" > /dev/null 2>&1 || {
+                log_error "Failed to set password for user: $username"
+                continue
+            }
+
+            log_success "  Created user: $username (password: $password)"
+
+            # Add user to group
+            aws cognito-idp admin-add-user-to-group \
+                --user-pool-id "$COGNITO_POOL_ID" \
+                --username "$username" \
+                --group-name "$role" \
+                --region "$AWS_REGION" > /dev/null 2>&1 || {
+                log_error "Failed to add user to group: $username -> $role"
+            }
+        fi
+    done
+
+    log_success "Test users configured"
 }
 
 # ─── Set GitHub secrets ─────────────────────────────────
@@ -253,14 +379,23 @@ print_summary() {
     echo
     echo "✅ All prerequisites configured:"
     echo
-    echo "AWS Setup:"
+    echo "AWS Infrastructure:"
     echo "  • IAM User: $IAM_USER_NAME"
     echo "  • AWS Account ID: $AWS_ACCOUNT_ID"
     echo "  • AWS Region: $AWS_REGION"
     echo
-    echo "Cognito Setup:"
-    echo "  • User Pool ID: $COGNITO_POOL_ID"
-    echo "  • Issuer URI: $COGNITO_ISSUER_URI"
+    echo "Database:"
+    echo "  • RDS Endpoint: $RDS_ENDPOINT"
+    echo "  • RDS Username: postgres"
+    echo "  • RDS Password: (saved in terraform/terraform.tfvars)"
+    echo
+    echo "Authentication:"
+    echo "  • Cognito Pool ID: $COGNITO_POOL_ID"
+    echo "  • Cognito Issuer URI: $COGNITO_ISSUER_URI"
+    echo
+    echo "Test Users (for OAuth2 testing):"
+    echo "  • admin / admin (ROLE_ADMIN)"
+    echo "  • user / user (ROLE_USER)"
     echo
     echo "GitHub Secrets:"
     echo "  • AWS_ACCESS_KEY_ID"
@@ -273,10 +408,9 @@ print_summary() {
     echo
     echo "Next steps:"
     echo "  1. Complete Phase 0 (application configuration)"
-    echo "  2. Complete Phase 4 (create RDS instance)"
-    echo "  3. Run the deployment:"
+    echo "  2. Run the deployment:"
     echo
-    echo "     bash deploy.sh <your-rds-password>"
+    echo "     bash deploy.sh postgres"
     echo
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo
@@ -293,6 +427,7 @@ main() {
     create_iam_user
     attach_iam_policy
     generate_access_keys
+    setup_rds
     setup_cognito
     set_github_secrets
     print_summary

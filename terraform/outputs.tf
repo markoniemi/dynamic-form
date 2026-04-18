@@ -72,3 +72,22 @@ output "ecs_service_name" {
   description = "Name of the ECS service"
   value       = aws_ecs_service.app.name
 }
+
+output "test_users" {
+  description = "Test users are created by setup.sh via AWS CLI"
+  value = var.create_test_users ? {
+    admin = {
+      username = "admin"
+      password = "admin"
+      email    = "admin@example.com"
+      role     = "ROLE_ADMIN"
+    }
+    user = {
+      username = "user"
+      password = "user"
+      email    = "user@example.com"
+      role     = "ROLE_USER"
+    }
+  } : null
+  sensitive = false
+}

@@ -81,6 +81,7 @@ HEALTH_CHECK_ENDPOINT=${HEALTH_CHECK_ENDPOINT:-/actuator/health}
 HEALTH_CHECK_TIMEOUT=${HEALTH_CHECK_TIMEOUT:-120}
 HEALTH_CHECK_WAIT=${HEALTH_CHECK_WAIT:-30}
 AWS_REGION=${AWS_REGION:-eu-north-1}
+CREATE_TEST_USERS=${CREATE_TEST_USERS:-true}
 
 # ─── Auto-derive AWS Account ID ─────────────────────────
 derive_aws_account_id() {
@@ -229,7 +230,8 @@ deploy_terraform() {
 
     if [[ "$TERRAFORM_AUTO_APPROVE" == "true" ]]; then
         log_info "  Running: terraform apply (auto-approved)"
-        if ! terraform apply -no-color -auto-approve 2>&1; then
+        if ! terraform apply -no-color -auto-approve \
+            -var="create_test_users=$CREATE_TEST_USERS" 2>&1; then
             log_error "Terraform apply failed"
             log_error "Review the error above and troubleshoot"
             exit 1

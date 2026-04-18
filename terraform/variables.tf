@@ -80,3 +80,9 @@ variable "ecs_desired_count" {
   type        = number
   default     = 1
 }
+
+variable "create_test_users" {
+  description = "Create test users in Cognito User Pool for testing (default: true)"
+  type        = bool
+  default     = true
+}

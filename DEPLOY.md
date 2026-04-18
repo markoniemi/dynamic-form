@@ -4,7 +4,7 @@ One-command deployment of the entire Dynamic Form application to AWS using Terra
 
 ## Complete Workflow
 
-### **Step 1: One-Time Setup (AWS + GitHub)**
+### **Step 1: One-Time Setup (AWS + GitHub + RDS)**
 
 Run the setup script once to configure everything:
 
@@ -22,12 +22,16 @@ This script will:
 - ✅ Create IAM user (`github-actions-deploy`)
 - ✅ Create and attach IAM policy
 - ✅ Generate AWS access keys
+- ✅ **Create RDS PostgreSQL database** (saves password in `terraform/terraform.tfvars`)
 - ✅ Create Cognito User Pool for OAuth2
 - ✅ Set GitHub secrets automatically
 
 **Prerequisites for setup:**
 - AWS CLI configured with **admin credentials** (`aws configure`)
 - GitHub CLI installed and authenticated (`gh auth login`)
+
+**During setup you'll be prompted for:**
+- RDS master password (saved securely in terraform/terraform.tfvars)
 
 ### **Step 2: Prepare Application (Phase 0)**
 
@@ -38,31 +42,20 @@ Complete Phase 0 from [AWSDeployPlan.md](docs/AWSDeployPlan.md):
 - Configure OAuth2 issuer URI endpoint
 - Configure actuator health check
 
-### **Step 3: Create RDS Database (Phase 4)**
+### **Step 3: Deploy Application**
 
-Create the RDS instance manually or with Terraform:
-```bash
-cd terraform
-terraform apply -target=aws_db_subnet_group.main -target=aws_db_instance.main
-cd ..
-```
-
-Save the RDS password — you'll need it for deployment.
-
-### **Step 4: Deploy Application**
-
-Run the deploy script with your RDS password:
+Run the deploy script:
 
 ```bash
-bash deploy.sh your-rds-password
+bash deploy.sh postgres
 ```
 
 The deployment will:
 - ✅ Auto-derive AWS Account ID
-- ✅ Auto-derive RDS endpoint
+- ✅ Auto-derive RDS endpoint (from Phase 1)
 - ✅ Auto-create/reuse Cognito pool
 - ✅ Create SSM parameters
-- ✅ Deploy all infrastructure (Phases 3-5)
+- ✅ Deploy application infrastructure (compute, ALB, ECS)
 - ✅ Build and push Docker image
 - ✅ Deploy to ECS
 - ✅ Verify health check
@@ -71,22 +64,73 @@ The deployment will:
 
 ## Quick Start (If Already Set Up)
 
-**Option 1: Command-line (Recommended)**
+After running `setup.sh` once, deploy is simple:
+
 ```bash
-bash deploy.sh your-rds-password
+bash deploy.sh postgres
 ```
 
-**Option 2: Environment variable**
+That's it! RDS password is already saved from setup.sh in `terraform/terraform.tfvars`.
+
+## Testing with Cognito Test Users
+
+### Test Users (Enabled by Default)
+
+Test users are **created automatically** by default when you deploy. To disable them:
+
+**To disable test users (if you don't want them):**
+
 ```bash
-export RDS_PASSWORD=your-rds-password
-bash deploy.sh
+CREATE_TEST_USERS=false bash deploy.sh postgres
 ```
 
-**Option 3: Configuration file**
+Or via Terraform:
 ```bash
-echo "RDS_PASSWORD=your-rds-password" > deploy.env
-bash deploy.sh
+cd terraform
+terraform apply -var="create_test_users=false"
+cd ..
 ```
+
+**Default behavior:** Test users are created automatically
+
+This creates two test users with roles:
+
+| Username | Password | Email | Role |
+|----------|----------|-------|------|
+| `admin` | `admin` | admin@example.com | `ROLE_ADMIN` |
+| `user` | `user` | user@example.com | `ROLE_USER` |
+
+View credentials after deployment:
+```bash
+cd terraform
+terraform output test_users
+cd ..
+```
+
+### Testing OAuth2 Login
+
+1. Go to: `http://<alb-dns>/`
+2. Click "Login with OAuth2"
+3. Use any test user credentials above
+4. You'll be redirected to Cognito login
+5. After login, redirected back to the app
+
+### Remove Test Users
+
+If you don't want test users, disable them:
+
+```bash
+bash deploy.sh postgres -e CREATE_TEST_USERS=false
+```
+
+Or via Terraform:
+```bash
+cd terraform
+terraform apply -var="create_test_users=false"
+cd ..
+```
+
+---
 
 ## Configuration — Optional!
 
