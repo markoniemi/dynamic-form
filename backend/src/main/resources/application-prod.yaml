@@ -14,4 +14,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${aws:parameter:/config/oauth2-issuer-uri}
+          issuer-uri: ${aws:parameter:oauth2-issuer-uri}
