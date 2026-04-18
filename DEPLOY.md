@@ -2,9 +2,76 @@
 
 One-command deployment of the entire Dynamic Form application to AWS using Terraform, ECR, ECS, and RDS.
 
-## Quick Start
+## Complete Workflow
 
-**Option 1: Command-line (Recommended — no file needed!)**
+### **Step 1: One-Time Setup (AWS + GitHub)**
+
+Run the setup script once to configure everything:
+
+**Git Bash:**
+```bash
+bash setup.sh
+```
+
+**Windows Command Prompt:**
+```bash
+setup.bat
+```
+
+This script will:
+- ✅ Create IAM user (`github-actions-deploy`)
+- ✅ Create and attach IAM policy
+- ✅ Generate AWS access keys
+- ✅ Create Cognito User Pool for OAuth2
+- ✅ Set GitHub secrets automatically
+
+**Prerequisites for setup:**
+- AWS CLI configured with **admin credentials** (`aws configure`)
+- GitHub CLI installed and authenticated (`gh auth login`)
+
+### **Step 2: Prepare Application (Phase 0)**
+
+Complete Phase 0 from [AWSDeployPlan.md](docs/AWSDeployPlan.md):
+- Restructure Spring Boot configuration (application.yaml, profiles)
+- Add Flyway database migrations
+- Add Maven Jib plugin
+- Configure OAuth2 issuer URI endpoint
+- Configure actuator health check
+
+### **Step 3: Create RDS Database (Phase 4)**
+
+Create the RDS instance manually or with Terraform:
+```bash
+cd terraform
+terraform apply -target=aws_db_subnet_group.main -target=aws_db_instance.main
+cd ..
+```
+
+Save the RDS password — you'll need it for deployment.
+
+### **Step 4: Deploy Application**
+
+Run the deploy script with your RDS password:
+
+```bash
+bash deploy.sh your-rds-password
+```
+
+The deployment will:
+- ✅ Auto-derive AWS Account ID
+- ✅ Auto-derive RDS endpoint
+- ✅ Auto-create/reuse Cognito pool
+- ✅ Create SSM parameters
+- ✅ Deploy all infrastructure (Phases 3-5)
+- ✅ Build and push Docker image
+- ✅ Deploy to ECS
+- ✅ Verify health check
+
+---
+
+## Quick Start (If Already Set Up)
+
+**Option 1: Command-line (Recommended)**
 ```bash
 bash deploy.sh your-rds-password
 ```
@@ -120,20 +187,22 @@ bash deploy.sh ${{ secrets.RDS_PASSWORD }}
 ## Prerequisites
 
 **CLI Tools:**
-- ✅ **AWS CLI** — `aws configure` with credentials
+- ✅ **AWS CLI** — `aws configure` with **admin credentials**
+- ✅ **GitHub CLI** — `gh auth login` (authenticated)
 - ✅ **Docker** — Running daemon (for Jib build)
 - ✅ **Maven** — With Java 21+ installed
 - ✅ **Terraform** — 1.0+
 - ✅ **curl** — For health checks
 - ✅ **Bash** — 4.0+ (Linux/macOS) or WSL (Windows)
 
-**Completed Phases:**
+**Initial Setup (One-Time):**
+- ⚠️ **Phase 1 Setup** — Run `bash setup.sh` to create IAM user, policy, and GitHub secrets
 - ✅ **Phase 0** — Application configuration (application.yaml, Flyway, Jib plugin, ConfigController, Actuator)
-- ✅ **Phase 1** (partial) — AWS IAM user, policies, GitHub Actions user setup
 - ✅ **Phase 2** (optional) — Docker-compose (only needed for local testing)
 
-**Database Prerequisite:**
-- ✅ **Phase 4 completed** — RDS instance already created with password known
+**Per-Deployment:**
+- ✅ **Phase 4** — RDS instance with known password
+- ✅ **RDS_PASSWORD** — Master password for the RDS database
 
 ## Troubleshooting
 
