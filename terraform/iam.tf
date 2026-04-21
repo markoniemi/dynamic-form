@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_ssm_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = "arn:aws:ssm:${var.aws_region}:*:parameter/*"
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/*"
       }
     ]
   })
@@ -84,7 +84,7 @@ resource "aws_iam_role_policy" "ecs_task_parameter_store_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ]
-        Resource = "arn:aws:ssm:${var.aws_region}:*:parameter/config/*"
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/*"
       }
     ]
   })

@@ -4,7 +4,7 @@
 # AWS & GitHub Setup Script — One-time Initial Configuration
 #
 # Usage:
-#   bash setup.sh
+#   bash setup.sh <rds_password>
 #
 # This script performs one-time setup:
 #   1. Verifies AWS credentials (admin access required)
@@ -188,20 +188,20 @@ generate_access_keys() {
 
 # ─── Setup RDS Database ────────────────────────────────
 setup_rds() {
+    local rds_password="$1"
+
     log_step "Setting up RDS PostgreSQL Database"
 
-    read -sp "Enter RDS master password (will be used for terraform): " RDS_PASSWORD
-    echo
-
-    if [[ -z "$RDS_PASSWORD" ]]; then
-        log_error "RDS password cannot be empty"
+    if [[ -z "$rds_password" ]]; then
+        log_error "RDS password is required"
+        log_error "Usage: bash setup.sh <rds_password>"
         exit 1
     fi
 
     log_info "Creating terraform.tfvars with RDS configuration..."
     cat > "${TERRAFORM_DIR}/terraform.tfvars" <<EOF
 db_username = "postgres"
-db_password = "$RDS_PASSWORD"
+db_password = "$rds_password"
 EOF
     log_success "terraform.tfvars created"
 
@@ -418,6 +418,14 @@ print_summary() {
 
 # ─── Main execution ─────────────────────────────────────
 main() {
+    local rds_password="${1:-}"
+
+    if [[ -z "$rds_password" ]]; then
+        log_error "RDS password is required"
+        log_error "Usage: bash setup.sh <rds_password>"
+        exit 1
+    fi
+
     log_info "AWS & GitHub Setup Script"
     log_warning "This is a one-time setup. Ensure you have admin AWS credentials!"
     echo
@@ -427,7 +435,7 @@ main() {
     create_iam_user
     attach_iam_policy
     generate_access_keys
-    setup_rds
+    setup_rds "$rds_password"
     setup_cognito
     set_github_secrets
     print_summary

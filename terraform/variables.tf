@@ -66,13 +66,13 @@ variable "ecr_repository_name" {
 variable "ecs_task_cpu" {
   description = "ECS task CPU units (256, 512, 1024, 2048, 4096)"
   type        = string
-  default     = "512"
+  default     = "1024"
 }
 
 variable "ecs_task_memory" {
   description = "ECS task memory in MB (512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192)"
   type        = string
-  default     = "1024"
+  default     = "2048"
 }
 
 variable "ecs_desired_count" {

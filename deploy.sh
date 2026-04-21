@@ -279,7 +279,8 @@ build_and_push_image() {
     }
 
     log_info "  Building image with Jib (this may take 2-3 minutes)"
-    mvn -pl backend jib:build -DskipTests \
+    mvn -pl frontend install -DskipTests
+    mvn -pl backend install jib:build -DskipTests \
         -Djib.to.image="${ECR_REPOSITORY_URL}:latest" \
         -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
         > /tmp/jib-build.log 2>&1 || {
