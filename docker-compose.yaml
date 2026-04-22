@@ -3,11 +3,11 @@ services:
     image: ghcr.io/markoniemi/oauth2-server:latest
     ports:
       - "9000:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/.well-known/openid-configuration"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:9000/.well-known/openid-configuration"]
+#      interval: 5s
+#      timeout: 3s
+#      retries: 10
 
   db:
     image: postgres:16-alpine
@@ -31,7 +31,7 @@ services:
       DB_PASSWORD: postgres
       OAUTH2_ISSUER_URI: http://auth:9000
     depends_on:
-      auth:
-        condition: service_healthy
+#      auth:
+#        condition: service_healthy
       db:
         condition: service_started

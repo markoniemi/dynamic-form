@@ -26,7 +26,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorize ->
                 authorize
-                    .requestMatchers("/webjars/**", "/", "/index.html", "/h2-console/**")
+                    .requestMatchers("/webjars/**", "/", "/index.html", "/assets/**", "/h2-console/**")
                     .permitAll()
                     .requestMatchers("/api/config/**")
                     .permitAll()
