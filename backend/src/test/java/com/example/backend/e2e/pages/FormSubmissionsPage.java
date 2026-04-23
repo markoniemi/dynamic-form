@@ -1,33 +1,34 @@
 package com.example.backend.e2e.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import java.util.List;
 
 public class FormSubmissionsPage extends BasePage {
+  private static final String HEADING = "h2:has-text('Form Submissions')";
+  private static final String EMPTY_ALERT = ".alert-info";
+  private static final String TABLE_ROWS = "table tbody tr";
 
-  @FindBy(xpath = "//h2[contains(text(), 'Form Submissions')]")
-  private WebElement heading;
-
-  @FindBy(css = ".alert-info")
-  private WebElement emptyAlert;
-
-  public FormSubmissionsPage(WebDriver driver) {
-    super(driver);
+  public FormSubmissionsPage(Page page) {
+    super(page);
   }
 
   public void waitForLoad() {
-    wait.until(ExpectedConditions.visibilityOf(heading));
+    page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
   }
 
   public boolean isSubmissionPresent(String text) {
     waitForLoad();
     try {
-      wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table tbody tr")));
-      return driver.findElements(By.cssSelector("table tbody tr"))
-          .stream().anyMatch(row -> row.getText().contains(text));
+      page.waitForSelector(TABLE_ROWS, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+      Locator rows = page.locator(TABLE_ROWS);
+      int count = rows.count();
+      for (int i = 0; i < count; i++) {
+        if (rows.nth(i).textContent().contains(text)) {
+          return true;
+        }
+      }
+      return false;
     } catch (Exception e) {
       return false;
     }
@@ -35,34 +36,28 @@ public class FormSubmissionsPage extends BasePage {
 
   public String getFirstSubmissionId() {
     waitForLoad();
-    WebElement firstCell = wait.until(ExpectedConditions.visibilityOfElementLocated(
-        By.xpath("//table/tbody/tr[1]/td[1]")));
-    return firstCell.getText();
+    return page.textContent("//table/tbody/tr[1]/td[1]");
   }
 
   public void viewFirstSubmission() {
     waitForLoad();
-    WebElement viewButton = wait.until(ExpectedConditions.elementToBeClickable(
-        By.xpath("//table/tbody/tr[1]//button[contains(text(), 'View')]")));
-    viewButton.click();
+    page.click("//table/tbody/tr[1]//button:has-text('View')");
   }
 
   public void editFirstSubmission() {
     waitForLoad();
-    WebElement editButton = wait.until(ExpectedConditions.elementToBeClickable(
-        By.xpath("//table/tbody/tr[1]//button[contains(text(), 'Edit')]")));
-    editButton.click();
+    page.click("//table/tbody/tr[1]//button:has-text('Edit')");
   }
 
   public int getSubmissionCount() {
     waitForLoad();
-    return driver.findElements(By.cssSelector("table tbody tr")).size();
+    return page.locator(TABLE_ROWS).count();
   }
 
   public boolean isEmpty() {
     try {
-      wait.until(ExpectedConditions.visibilityOf(emptyAlert));
-      return emptyAlert.isDisplayed();
+      page.waitForSelector(EMPTY_ALERT, new Page.WaitForSelectorOptions().setTimeout(2000));
+      return page.locator(EMPTY_ALERT).isVisible();
     } catch (Exception e) {
       return false;
     }

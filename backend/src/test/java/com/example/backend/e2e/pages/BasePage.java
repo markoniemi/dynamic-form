@@ -1,20 +1,15 @@
 package com.example.backend.e2e.pages;
 
-import java.time.Duration;
+import com.microsoft.playwright.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Slf4j
 public abstract class BasePage {
-  protected WebDriver driver;
-  protected WebDriverWait wait;
+  protected static final int TIMEOUT_MS = 10000;
+  protected Page page;
 
-  public BasePage(WebDriver driver) {
-    this.driver = driver;
-    this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    PageFactory.initElements(driver, this);
+  public BasePage(Page page) {
+    this.page = page;
   }
 
   protected void sleep(int ms) {

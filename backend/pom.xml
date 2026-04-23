@@ -108,15 +108,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>4.31.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.github.bonigarcia</groupId>
-      <artifactId>webdrivermanager</artifactId>
-      <version>6.1.0</version>
+      <groupId>com.microsoft.playwright</groupId>
+      <artifactId>playwright</artifactId>
+      <version>1.48.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>

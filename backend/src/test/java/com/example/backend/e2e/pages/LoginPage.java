@@ -1,28 +1,20 @@
 package com.example.backend.e2e.pages;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.microsoft.playwright.Page;
 
 public class LoginPage extends BasePage {
-  @FindBy(name = "username")
-  private WebElement usernameInput;
+  private static final String USERNAME_INPUT = "input[name='username']";
+  private static final String PASSWORD_INPUT = "input[name='password']";
+  private static final String LOGIN_BUTTON = "button[type='submit']";
 
-  @FindBy(name = "password")
-  private WebElement passwordInput;
-
-  @FindBy(css = "button[type='submit']")
-  private WebElement loginButton;
-
-  public LoginPage(WebDriver driver) {
-    super(driver);
+  public LoginPage(Page page) {
+    super(page);
   }
 
   public void login(String username, String password) {
-    wait.until(ExpectedConditions.visibilityOf(usernameInput));
-    usernameInput.sendKeys(username);
-    passwordInput.sendKeys(password);
-    loginButton.click();
+    page.waitForSelector(USERNAME_INPUT, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.fill(USERNAME_INPUT, username);
+    page.fill(PASSWORD_INPUT, password);
+    page.click(LOGIN_BUTTON);
   }
 }
