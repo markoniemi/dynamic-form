@@ -27,13 +27,13 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   File uses 4-space indentation. Project requires 2-space (Google Java Style).
   **Fix:** Reformat to 2-space indentation throughout the file.
 
-- [ ] **B8** ⬆ — `config/WebConfig.java:16`
+- [-] **B8** — `config/WebConfig.java:16`
   WebJar path contains hardcoded version `1.0.0-SNAPSHOT`. Hardcoded config values violate the externalization rule (Effective Java Item 5 spirit — don't hardwire resources).
-  **Fix:** Externalize to `application.yaml` and inject with `@Value("${frontend.webjar.version}")`.
+  **Won't fix:** Acceptable for development; externalization deferred as low priority.
 
-- [ ] **B9** ⬆ — `config/SecurityConfig.java:47-48`
+- [-] **B9** — `config/SecurityConfig.java:47-48`
   CORS allowed origins (`http://localhost:8080`, `http://localhost:5173`, `http://localhost:9000`) are hardcoded in source — must differ per environment.
-  **Fix:** Move to `application.yaml` as `cors.allowed-origins` list; inject with `@ConfigurationProperties`.
+  **Won't fix:** Current configuration sufficient for development environment.
 
 ### Should Fix
 
