@@ -39,7 +39,7 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run ci</arguments>
                         </configuration>
                     </execution>
                 </executions>
