@@ -1,6 +1,5 @@
 package com.example.backend.e2e.pages;
 
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class FormsPage extends BasePage {
@@ -32,13 +31,13 @@ public class FormsPage extends BasePage {
   public void openForm(String formKey) {
     waitForLoad();
     String formTitle = toTitleCase(formKey);
-    String xpath = String.format("//td[contains(text(), '%s')]/..//button:has-text('Open Form')", formTitle);
+    String xpath = String.format("//td[contains(text(), '%s')]/..//button[contains(text(), 'Open Form')]", formTitle);
     page.click(xpath);
   }
 
   public void openFirstForm() {
     waitForLoad();
-    page.click("//tbody/tr[1]//button:has-text('Open Form')");
+    page.click("//tbody/tr[1]//button[contains(text(), 'Open Form')]");
   }
 
   private String toTitleCase(String key) {

@@ -2,7 +2,6 @@ package com.example.backend.e2e.pages;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import java.util.List;
 
 public class FormSubmissionsPage extends BasePage {
   private static final String HEADING = "h2:has-text('Form Submissions')";
@@ -41,12 +40,12 @@ public class FormSubmissionsPage extends BasePage {
 
   public void viewFirstSubmission() {
     waitForLoad();
-    page.click("//table/tbody/tr[1]//button:has-text('View')");
+    page.click("//table/tbody/tr[1]//button[contains(text(), 'View')]");
   }
 
   public void editFirstSubmission() {
     waitForLoad();
-    page.click("//table/tbody/tr[1]//button:has-text('Edit')");
+    page.click("//table/tbody/tr[1]//button[contains(text(), 'Edit')]");
   }
 
   public int getSubmissionCount() {

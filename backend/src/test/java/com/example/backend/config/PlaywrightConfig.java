@@ -2,14 +2,18 @@ package com.example.backend.config;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import jakarta.annotation.PreDestroy;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 @Slf4j
+@TestConfiguration(proxyBeanMethods = false)
 public class PlaywrightConfig {
   private static Playwright playwrightInstance;
   private static Browser browserInstance;
@@ -29,9 +33,9 @@ public class PlaywrightConfig {
           playwright
               .chromium()
               .launch(
-                  new Browser.LaunchOptions()
+                  new BrowserType.LaunchOptions()
                       .setHeadless(true)
-                      .setArgs("--disable-sandbox", "--disable-dev-shm-usage"));
+                      .setArgs(Arrays.asList("--disable-sandbox", "--disable-dev-shm-usage")));
     }
     return browserInstance;
   }
