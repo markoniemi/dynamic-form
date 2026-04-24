@@ -13,7 +13,10 @@
       "Bash(MSYS_NO_PATHCONV=1 aws ec2 describe-security-groups *)",
       "Bash(MSYS_NO_PATHCONV=1 aws rds describe-db-instances *)",
       "Bash(MSYS_NO_PATHCONV=1 aws ssm get-parameter *)",
-      "Bash(terraform init *)"
+      "Bash(terraform init *)",
+      "Bash(xargs grep *)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs"
     ]
   }
 }

@@ -1,66 +1,43 @@
 package com.example.backend.e2e.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.microsoft.playwright.Page;
 
 public class FormsPage extends BasePage {
-  @FindBy(xpath = "//button[contains(text(), 'Login with OAuth2')]")
-  private WebElement loginButton;
+  private static final String LOGIN_BUTTON = "button:has-text('Login with OAuth2')";
+  private static final String HEADING = "h2:has-text('Available Forms')";
+  private static final String SUBMISSIONS_LINK = "a:has-text('Submissions')";
+  private static final String LOGOUT_BUTTON = "button:has-text('Logout')";
 
-  @FindBy(xpath = "//h2[contains(text(), 'Available Forms')]")
-  private WebElement heading;
-
-  @FindBy(xpath = "//a[contains(text(), 'Submissions')]")
-  private WebElement formSubmissionsLink;
-
-  @FindBy(xpath = "//button[contains(text(), 'Logout')]")
-  private WebElement logoutButton;
-
-  public FormsPage(WebDriver driver) {
-    super(driver);
+  public FormsPage(Page page) {
+    super(page);
   }
 
   public void clickLogin() {
-    wait.until(ExpectedConditions.elementToBeClickable(loginButton));
-    loginButton.click();
+    page.click(LOGIN_BUTTON);
   }
 
   public void clickLogout() {
-    wait.until(ExpectedConditions.elementToBeClickable(logoutButton));
-    logoutButton.click();
+    page.click(LOGOUT_BUTTON);
   }
 
   public void clickFormSubmissions() {
-    wait.until(ExpectedConditions.elementToBeClickable(formSubmissionsLink));
-    formSubmissionsLink.click();
+    page.click(SUBMISSIONS_LINK);
   }
 
   public void waitForLoad() {
-    wait.until(ExpectedConditions.visibilityOf(heading));
+    page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
   }
 
   public void openForm(String formKey) {
     waitForLoad();
     String formTitle = toTitleCase(formKey);
-    WebElement formRow =
-        wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//td[contains(text(), '" + formTitle + "')]/..")));
-    WebElement openButton =
-        formRow.findElement(By.xpath(".//button[contains(text(), 'Open Form')]"));
-    openButton.click();
+    String xpath = String.format("//td[contains(text(), '%s')]/..//button[contains(text(), 'Open Form')]", formTitle);
+    page.click(xpath);
   }
 
   public void openFirstForm() {
     waitForLoad();
-    WebElement firstButton =
-        wait.until(
-            ExpectedConditions.elementToBeClickable(
-                By.xpath("//tbody/tr[1]//button[contains(text(), 'Open Form')]")));
-    firstButton.click();
+    page.click("//tbody/tr[1]//button[contains(text(), 'Open Form')]");
   }
 
   private String toTitleCase(String key) {

@@ -1,108 +1,77 @@
 package com.example.backend.e2e.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
+import com.microsoft.playwright.Page;
 
 public class FormSubmissionPage extends BasePage {
+  private static final String FORM_TITLE = "h2.card-title";
+  private static final String SUBMIT_BUTTON = "button:has-text('Submit')";
+  private static final String CANCEL_BUTTON = "button:has-text('Cancel')";
+  private static final String SUCCESS_ALERT = ".alert-success";
+  private static final String ERROR_ALERT = ".alert-danger";
 
-  @FindBy(css = "h2.card-title")
-  private WebElement formTitle;
-
-  @FindBy(xpath = "//button[normalize-space()='Submit']")
-  private WebElement submitButton;
-
-  @FindBy(xpath = "//button[normalize-space()='Cancel']")
-  private WebElement cancelButton;
-
-  @FindBy(css = ".alert-success")
-  private WebElement successAlert;
-
-  @FindBy(css = ".alert-danger")
-  private WebElement errorAlert;
-
-  public FormSubmissionPage(WebDriver driver) {
-    super(driver);
+  public FormSubmissionPage(Page page) {
+    super(page);
   }
 
   public void waitForLoad() {
-    wait.until(ExpectedConditions.visibilityOf(formTitle));
+    page.waitForSelector(FORM_TITLE, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
   }
 
   public String getFormTitle() {
     waitForLoad();
-    return formTitle.getText();
+    return page.textContent(FORM_TITLE);
   }
 
   public void fillTextField(String fieldName, String value) {
-    WebElement input =
-        wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("input[name='" + fieldName + "']")));
-    input.clear();
-    input.sendKeys(value);
+    String selector = String.format("input[name='%s']", fieldName);
+    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.fill(selector, value);
   }
 
   public void fillTextArea(String fieldName, String value) {
-    WebElement area =
-        wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("textarea[name='" + fieldName + "']")));
-    area.clear();
-    area.sendKeys(value);
+    String selector = String.format("textarea[name='%s']", fieldName);
+    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.fill(selector, value);
   }
 
   public void selectOption(String fieldName, String visibleText) {
-    WebElement selectEl =
-        wait.until(
-            ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("select[name='" + fieldName + "']")));
-    new Select(selectEl).selectByVisibleText(visibleText);
+    String selector = String.format("select[name='%s']", fieldName);
+    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.selectOption(selector, visibleText);
   }
 
   public void selectRadio(String fieldName, String value) {
-    WebElement radio =
-        wait.until(
-            ExpectedConditions.elementToBeClickable(
-                By.cssSelector(
-                    "input[type='radio'][name='" + fieldName + "'][value='" + value + "']")));
-    radio.click();
+    String selector = String.format("input[type='radio'][name='%s'][value='%s']", fieldName, value);
+    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.click(selector);
   }
 
   public void checkCheckbox(String fieldName, String value) {
-    WebElement checkbox =
-        wait.until(
-            ExpectedConditions.elementToBeClickable(
-                By.cssSelector(
-                    "input[type='checkbox'][name='" + fieldName + "'][value='" + value + "']")));
-    if (!checkbox.isSelected()) {
-      checkbox.click();
+    String selector = String.format("input[type='checkbox'][name='%s'][value='%s']", fieldName, value);
+    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    if (!page.locator(selector).isChecked()) {
+      page.click(selector);
     }
   }
 
   public void submit() {
-    wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-    submitButton.click();
+    page.click(SUBMIT_BUTTON);
   }
 
   public boolean isSuccessMessageDisplayed() {
     try {
-      wait.until(ExpectedConditions.visibilityOf(successAlert));
-      return successAlert.isDisplayed();
+      page.waitForSelector(SUCCESS_ALERT, new Page.WaitForSelectorOptions().setTimeout(2000));
+      return page.locator(SUCCESS_ALERT).isVisible();
     } catch (Exception e) {
       return false;
     }
   }
 
   public boolean isSubmitDisabled() {
-    return !submitButton.isEnabled() || Boolean.parseBoolean(submitButton.getAttribute("disabled"));
+    return page.locator(SUBMIT_BUTTON).isDisabled();
   }
 
   public void cancel() {
-    wait.until(ExpectedConditions.elementToBeClickable(cancelButton));
-    cancelButton.click();
+    page.click(CANCEL_BUTTON);
   }
 }

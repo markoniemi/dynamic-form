@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.backend.IntegrationTestBase;
 import com.example.backend.e2e.pages.*;
+import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FrontendIT extends IntegrationTestBase {
 
-  @Autowired private WebDriver driver;
+  @Autowired private Page page;
   private LoginPage loginPage;
   private FormsPage formsPage;
   private FormSubmissionPage formSubmissionPage;
@@ -21,17 +21,17 @@ public class FrontendIT extends IntegrationTestBase {
 
   @BeforeEach
   void setup() {
-    loginPage = new LoginPage(driver);
-    formsPage = new FormsPage(driver);
-    formSubmissionPage = new FormSubmissionPage(driver);
-    formSubmissionsPage = new FormSubmissionsPage(driver);
-    submissionDetailPage = new SubmissionDetailPage(driver);
+    loginPage = new LoginPage(page);
+    formsPage = new FormsPage(page);
+    formSubmissionPage = new FormSubmissionPage(page);
+    formSubmissionsPage = new FormSubmissionsPage(page);
+    submissionDetailPage = new SubmissionDetailPage(page);
   }
 
   @Test
   void loginAndFormSubmission() {
     // 1. Navigate to Home Page and login
-    driver.get("http://localhost:8080");
+    page.navigate("http://localhost:8080");
     // 2. Login
     formsPage.clickLogin();
     // 3. Login on Auth Server
@@ -73,9 +73,9 @@ public class FrontendIT extends IntegrationTestBase {
   @Test
   void editSubmission() {
     // 1. Navigate to Submissions page
-    driver.get("http://localhost:8080");
+    page.navigate("http://localhost:8080");
     // 2. Login if not already
-    if (!driver.getCurrentUrl().contains("submissions")) {
+    if (!page.url().contains("submissions")) {
       formsPage.clickLogin();
       loginPage.login("admin", "admin");
     }
@@ -103,7 +103,7 @@ public class FrontendIT extends IntegrationTestBase {
   @Test
   void userAccessControlTest() {
     // 1. Admin creates a submission
-    driver.get("http://localhost:8080");
+    page.navigate("http://localhost:8080");
     formsPage.clickLogin();
     loginPage.login("admin", "admin");
     formsPage.openForm("contact");
