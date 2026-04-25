@@ -15,6 +15,45 @@ description: Full-stack feature implementation for the Dynamic Form app. Use whe
 
 ---
 
+## RFC 7807 error handling
+
+All API errors follow [RFC 7807 Problem Details](https://tools.ietf.org/html/rfc7807). The response is a `ProblemDetail` object with:
+- `type`: URI identifying the problem (e.g., `about:blank`)
+- `title`: Short human-readable summary (e.g., "Bad Request")
+- `status`: HTTP status code (400, 404, 409, 403, 500)
+- `detail`: Optional details about the specific error
+- `errors`: Array of field-level validation errors (custom extension):
+  ```json
+  {
+    "field": "email",
+    "message": "Must be a valid email address",
+    "code": "invalid_format"
+  }
+  ```
+
+**Backend**: `GlobalExceptionHandler` catches exceptions and maps them to `ProblemDetail`:
+- `MethodArgumentNotValidException` → 400 with `errors` array (field validation failures)
+- `NoSuchElementException` → 404 "Not found"
+- `IllegalArgumentException` → 400 "Bad request"
+- `IllegalStateException` → 409 "Conflict"
+- `SecurityException` / `AccessDeniedException` → 403 "Forbidden"
+- Unhandled exceptions → 500 "Internal server error"
+
+**Frontend**: React Query automatically returns the `ProblemDetail` in error responses. Use:
+```typescript
+const { error } = useQuery(...);
+if (error) {
+  const problem = error.response?.data; // ProblemDetail
+  problem.errors?.forEach(({ field, message }) => {
+    form.setError(field, { message });
+  });
+}
+```
+
+When designing an API endpoint, ensure the service throws only standard Java exceptions; the handler maps them to the correct HTTP status automatically.
+
+---
+
 ## API contract design
 
 Before writing code, agree on:

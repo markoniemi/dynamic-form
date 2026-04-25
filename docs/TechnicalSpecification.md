@@ -292,6 +292,52 @@ Routes configured in `Content.tsx` using react-router-dom v7:
 | `/create-form` | EditForm | Create form definition |
 | `/submissions` | FormSubmissions | All submissions |
 
+### 3.5 Error Handling and API Responses
+
+**RFC 7807 Problem Details**
+
+The API follows [RFC 7807](https://tools.ietf.org/html/rfc7807) standard for error responses. All errors are returned as `ProblemDetail` JSON with a standard envelope:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Error title",
+  "status": 400,
+  "detail": "Error details",
+  "errors": [
+    { "field": "formKey", "message": "Form key is required", "code": "NotBlank" }
+  ]
+}
+```
+
+**Validation Error Extension**
+
+Validation errors include an `errors` array with field-level details:
+- `field` — form field name (null for class-level constraints)
+- `message` — human-readable resolved error message
+- `code` — constraint annotation short name (e.g., `"NotBlank"`, `"Pattern"`)
+
+**Global Exception Handler** (`GlobalExceptionHandler.java`)
+
+Centralized exception handling via `@RestControllerAdvice`:
+
+| Exception | HTTP Status | Behavior |
+|-----------|-------------|----------|
+| `MethodArgumentNotValidException` | 400 | Request body validation failure → includes field errors |
+| `ConstraintViolationException` | 400 | Method parameter validation failure → includes field errors |
+| `IllegalArgumentException` | 400 | Invalid input |
+| `NoSuchElementException` | 404 | Resource not found |
+| `NoResourceFoundException` | 404 | Endpoint not found |
+| `SecurityException` | 403 | Authorization failure |
+| `IllegalStateException` | 409 | Invalid state transition |
+| `Exception` (catch-all) | 500 | Unhandled exceptions |
+
+**Frontend Error Handling** (`services/http.ts`)
+
+- `ApiValidationError` — custom error class for validation failures
+- Validation errors are wired into react-hook-form's `setError` to display inline on form fields
+- All other errors are surfaced as top-level alerts
+
 ## 4. Data Model
 
 ### 4.1 Database Schema
