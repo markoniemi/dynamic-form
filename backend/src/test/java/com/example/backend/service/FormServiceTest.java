@@ -22,7 +22,7 @@ class FormServiceTest {
   @InjectMocks private FormService formService;
 
   @Test
-  void getForm() {
+  void getFormWithValidKeyReturnsForm() {
     Form mockForm =
         Form.builder()
             .id(1L)
@@ -46,7 +46,7 @@ class FormServiceTest {
   }
 
   @Test
-  void saveForm() {
+  void saveFormPersistsFormData() {
     Form newForm = Form.builder().formKey("new-form").title("New Form").fields(List.of()).build();
     when(formRepository.save(newForm)).thenReturn(newForm);
 
@@ -57,7 +57,7 @@ class FormServiceTest {
   }
 
   @Test
-  void existsByFormKey() {
+  void existsByFormKeyReturnsTrueForExistingKey() {
     when(formRepository.existsByFormKey("form1")).thenReturn(true);
     when(formRepository.existsByFormKey("unknown")).thenReturn(false);
 

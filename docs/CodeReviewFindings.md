@@ -37,9 +37,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 
 ### Should Fix
 
-- [ ] **B5** — `service/FormServiceTest.java:25,49,60`
+- [x] **B5** — `service/FormServiceTest.java:25,49,60`
   Test method names (`getForm()`, `saveForm()`, `existsByFormKey()`) don't follow the project naming convention.
-  **Fix:** Rename to descriptive forms, e.g. `getFormWithValidKeyReturnsForm()`, `saveFormPersistsFormData()`, `existsByFormKeyReturnsTrueForExistingKey()`.
+  **Fix:** Renamed to `getFormWithValidKeyReturnsForm()`, `saveFormPersistsFormData()`, `existsByFormKeyReturnsTrueForExistingKey()`.
 
 - [ ] **B6** — `controller/FormDataControllerTest.java:106`
   Delete test uses hardcoded `"user"` string that may not match the JWT principal configured elsewhere in the test setup.
