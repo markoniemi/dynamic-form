@@ -59,9 +59,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
 
 ### Consider
 
-- [ ] **B12** 🆕 — `controller/FormController.java`, `controller/FormDataController.java`
+- [-] **B12** 🆕 — `controller/FormController.java`, `controller/FormDataController.java`
   Controllers don't document which exceptions propagate from the service layer.
-  **Fix:** Add Javadoc `@throws` clauses on controller methods documenting expected service exceptions.
+  **Won't fix:** Practice app; full Javadoc documentation not necessary for this scope.
 
 - [ ] **B13** 🆕 — `mapper/FormListItemMapper.java`
   Single-method mapper interface is separate from `FormMapper` with no clear boundary reason.
