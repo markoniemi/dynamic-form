@@ -53,9 +53,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Uses `Thread.sleep()` for waits in Selenium tests, and swallows `InterruptedException` silently (Effective Java Item 77 — never swallow exceptions).
   **Won't fix:** Obsolete. Codebase migrated from Selenium to Playwright. Playwright provides auto-wait features, eliminating the need for manual waits.
 
-- [ ] **B11** — `service/FormDataService.java:41`
+- [x] **B11** — `service/FormDataService.java`
   `@NotNull` on service method parameters is redundant — Jakarta Validation only runs via the bean validation framework on controller inputs.
-  **Fix:** Remove `@NotNull` from service method signatures; use `Objects.requireNonNull()` if null-guarding is genuinely needed (Effective Java Item 49).
+  **Fix:** Added `@Validated` annotation to the class to enable method-level validation. This provides service-level protection essential when multiple controller versions may call the same service.
 
 ### Consider
 
