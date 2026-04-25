@@ -4,9 +4,28 @@ export interface RequestOptions extends RequestInit {
   token?: string;
 }
 
-export interface ErrorDto {
+export interface ValidationError {
+  field: string | null;
   message: string;
-  errors?: Record<string, string>;
+  code: string;
+}
+
+export interface ProblemDetail {
+  type?: string;
+  title?: string;
+  status?: number;
+  detail?: string;
+  errors?: ValidationError[];
+}
+
+export class ApiValidationError extends Error {
+  constructor(
+    message: string,
+    public readonly validationErrors: ValidationError[]
+  ) {
+    super(message);
+    this.name = 'ApiValidationError';
+  }
 }
 
 export const http = {
@@ -31,8 +50,14 @@ export const http = {
     if (!response.ok) {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.indexOf('application/json') !== -1) {
-        const errorData = (await response.json()) as ErrorDto;
-        throw new Error(errorData.message || `API request failed: ${response.statusText}`);
+        const pd = (await response.json()) as ProblemDetail;
+        if (pd.errors?.length) {
+          throw new ApiValidationError(
+            pd.title ?? pd.detail ?? 'Validation failed',
+            pd.errors
+          );
+        }
+        throw new Error(pd.detail ?? pd.title ?? `API request failed: ${response.statusText}`);
       }
       throw new Error(`API request failed: ${response.statusText}`);
     }

@@ -4,6 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
+import {ApiValidationError} from '../services/http';
 import {formClient} from '../services/formClient';
 import {formDataClient} from '../services/formDataClient';
 import {DynamicForm} from '../components/DynamicForm.tsx';
@@ -24,6 +25,7 @@ export const FormSubmission: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
+    setError,
     formState: {errors},
   } = useForm();
 
@@ -80,6 +82,15 @@ export const FormSubmission: React.FC = () => {
       setTimeout(() => {
         navigate('/submissions');
       }, 2000);
+    },
+    onError: (err) => {
+      if (err instanceof ApiValidationError) {
+        err.validationErrors.forEach(({field, message}) => {
+          if (field) {
+            setError(field, {message});
+          }
+        });
+      }
     },
   });
 
