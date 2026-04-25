@@ -100,9 +100,9 @@ class FormDataControllerTest {
         .perform(
             delete("/api/form-data/submission/1")
                 .with(csrf())
-                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .with(jwt().jwt(jwt -> jwt.claim("sub", "testuser")).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
         .andExpect(status().isOk());
 
-    verify(formDataService).deleteFormSubmission(1L, "user");
+    verify(formDataService).deleteFormSubmission(1L, "testuser");
   }
 }

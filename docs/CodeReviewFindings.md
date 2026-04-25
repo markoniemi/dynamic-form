@@ -41,9 +41,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Test method names (`getForm()`, `saveForm()`, `existsByFormKey()`) don't follow the project naming convention.
   **Fix:** Renamed to `getFormWithValidKeyReturnsForm()`, `saveFormPersistsFormData()`, `existsByFormKeyReturnsTrueForExistingKey()`.
 
-- [ ] **B6** — `controller/FormDataControllerTest.java:106`
+- [x] **B6** — `controller/FormDataControllerTest.java:106`
   Delete test uses hardcoded `"user"` string that may not match the JWT principal configured elsewhere in the test setup.
-  **Fix:** Use the same username value as the JWT mock in the test base class.
+  **Fix:** Added JWT claim to explicitly set the principal to `"testuser"`, matching the `submitForm()` test. Updated verify to expect `"testuser"`.
 
 - [ ] **B7** — `controller/GlobalExceptionHandler.java:46-50`
   Handler catches `SecurityException` but the service throws `AccessDeniedException` — the handler misses the actual exception being thrown.
