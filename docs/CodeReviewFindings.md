@@ -49,9 +49,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Handler catches `SecurityException` but the service throws `AccessDeniedException` — the handler misses the actual exception being thrown.
   **Fix:** Resolved automatically by B2 fix. FormDataService now throws `SecurityException` (lines 45, 75), and GlobalExceptionHandler correctly catches it (line 68).
 
-- [ ] **B10** — `e2e/pages/BasePage.java:20-26`
+- [-] **B10** — `e2e/pages/BasePage.java:15-21`
   Uses `Thread.sleep()` for waits in Selenium tests, and swallows `InterruptedException` silently (Effective Java Item 77 — never swallow exceptions).
-  **Fix:** Replace with `WebDriverWait` + `ExpectedConditions`; if sleep must stay, call `Thread.currentThread().interrupt()` in the catch block.
+  **Won't fix:** Obsolete. Codebase migrated from Selenium to Playwright. Playwright provides auto-wait features, eliminating the need for manual waits.
 
 - [ ] **B11** — `service/FormDataService.java:41`
   `@NotNull` on service method parameters is redundant — Jakarta Validation only runs via the bean validation framework on controller inputs.
