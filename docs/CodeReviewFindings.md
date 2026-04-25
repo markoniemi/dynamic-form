@@ -45,9 +45,9 @@ Legend: `[ ]` open · `[x]` fixed · `[-]` won't fix · `⬆` severity upgraded 
   Delete test uses hardcoded `"user"` string that may not match the JWT principal configured elsewhere in the test setup.
   **Fix:** Added JWT claim to explicitly set the principal to `"testuser"`, matching the `submitForm()` test. Updated verify to expect `"testuser"`.
 
-- [ ] **B7** — `controller/GlobalExceptionHandler.java:46-50`
+- [x] **B7** — `controller/GlobalExceptionHandler.java:68`
   Handler catches `SecurityException` but the service throws `AccessDeniedException` — the handler misses the actual exception being thrown.
-  **Fix:** Resolved automatically when B2/B3 are fixed by switching to `SecurityException`; no separate handler change needed.
+  **Fix:** Resolved automatically by B2 fix. FormDataService now throws `SecurityException` (lines 45, 75), and GlobalExceptionHandler correctly catches it (line 68).
 
 - [ ] **B10** — `e2e/pages/BasePage.java:20-26`
   Uses `Thread.sleep()` for waits in Selenium tests, and swallows `InterruptedException` silently (Effective Java Item 77 — never swallow exceptions).
