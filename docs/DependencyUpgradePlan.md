@@ -1,7 +1,7 @@
 # Dependency Upgrade Plan
 
 Generated: 2026-04-25  
-Current Status: Not started
+Current Status: Phase 1 Complete (2026-04-26)
 
 ---
 
@@ -13,7 +13,7 @@ Current Status: Not started
 **Action:** Update `spring-boot-starter-parent` version in `pom.xml`  
 **Notes:** 3.5.14 is latest stable in 3.5.x line. Patch updates are backward compatible.
 
-- [ ] Update parent version to 3.5.14
+- [x] Update parent version to 3.5.14
 
 ### Spring Boot 3.5.x → 4.0.3 (Major)
 **Priority:** Medium (new features, requires testing)  
@@ -117,9 +117,9 @@ Current Status: Not started
 ## Recommended Update Order
 
 1. **Phase 1 (Safe, Low Risk):**
-   - [ ] Spring Boot 3.5.6 → 3.5.14 (patch)
-   - [ ] React patch updates (if any)
-   - [ ] Check other npm patch updates
+   - [x] Spring Boot 3.5.6 → 3.5.14 (patch)
+   - [x] React patch updates (if any)
+   - [x] Check other npm patch updates
 
 2. **Phase 2 (Medium Risk, requires testing):**
    - [ ] TypeScript 5.9.3 → 6.0.2
@@ -134,12 +134,11 @@ Current Status: Not started
 
 ## Testing Checklist After Each Update
 
-- [ ] Backend: `mvn clean test`
 - [ ] Frontend: `npm run compile`
 - [ ] Frontend: `npm run build`
 - [ ] Frontend: `npm test`
-- [ ] E2E: `mvn verify` (if applicable)
-- [ ] Manual browser testing of key features
+- [ ] Backend: `mvn -f backend/pom.xml install`
+- [ ] E2E: `mvn install`
 
 ---
 
