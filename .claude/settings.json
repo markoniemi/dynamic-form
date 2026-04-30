@@ -7,7 +7,6 @@
       "Bash(mvn:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
-      "Bash(git:*)",
       "Bash(tsc:*)",
       "Bash(java:*)",
       "Bash(bash -c*)",
