@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import {vi} from 'vitest';
 
 // Default mock for /api/config/oauth2-issuer-uri endpoint
-global.fetch = vi.fn((url: string | Request) => {
+globalThis.fetch = vi.fn((url: string | Request) => {
   const urlStr = typeof url === 'string' ? url : url.toString();
 
   if (urlStr.includes('/api/config/oauth2-issuer-uri')) {
