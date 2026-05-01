@@ -242,10 +242,9 @@ Sources: Effective TypeScript 2nd Ed, Programming TypeScript (O'Reilly), Google 
 
 ### Should Fix — Type Safety
 
-- [ ] **F34** 🆕 — `types/Form.ts:1-43`
-  All interfaces (`FormField`, `FieldOption`, `Form`, `FormDataDto`, `FormListItem`) use mutable properties. Types representing API responses should be `readonly` by default to prevent accidental mutation.
-  **Source:** Programming TypeScript (readonly-by-default); Effective TypeScript Item 17.
-  **Fix:** Add `readonly` to all property definitions on API response types. For types also used in form editing (e.g. `FormField` in `EditForm.tsx`), consider splitting into `ReadonlyFormField` (for display) and mutable `EditableFormField` (for editing), or use `Readonly<FormField>` at consumption sites.
+- [-] **F34** 🆕 — `types/Form.ts:1-43`
+  Interfaces use mutable properties. The readonly-by-default pattern (Programming TypeScript, Effective TypeScript Item 17) applies to immutable, display-only types, not form data being edited.
+  **Won't fix:** This is a form-editing application where FormField, Form, and CreateForm are actively mutated. Readonly creates friction without preventing real bugs in editing workflows. FormListItem and FormDataDto remain readonly for display-only contexts.
 
 - [ ] **F35** 🆕 — `i18n.ts:15-30`
   `format` callback returns raw `value` at line 30 without narrowing. The i18next callback expects `string` returns, but when `value` is not a `Date`, the function returns whatever was passed in (typed `any` by i18next).

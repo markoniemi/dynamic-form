@@ -32,7 +32,7 @@ export const Forms: React.FC = () => {
       </Row>
 
       {error && (
-        <Alert variant="danger">{(error as Error).message || t('common.error')}</Alert>
+        <Alert variant="danger">{error.message || t('common.error')}</Alert>
       )}
 
       {isLoading ? (

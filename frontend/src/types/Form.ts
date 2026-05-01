@@ -28,16 +28,16 @@ export interface CreateForm {
 }
 
 export interface FormListItem {
-  formKey: string;
-  title: string;
+  readonly formKey: string;
+  readonly title: string;
 }
 
 export interface FormDataDto {
-  id: number;
-  formKey: string;
-  data: Record<string, unknown>;
-  submittedAt: string;
-  submittedBy: string;
+  readonly id: number;
+  readonly formKey: string;
+  readonly data: Record<string, unknown>;
+  readonly submittedAt: string;
+  readonly submittedBy: string;
 }
 
 export type FormValues = Record<string, string | string[] | boolean>

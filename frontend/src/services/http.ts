@@ -67,6 +67,6 @@ export const http = {
       return response.json();
     }
 
-    return null as unknown as T;
+    throw new Error(`Expected JSON response, got ${contentType || 'unknown content type'}`);
   },
 };

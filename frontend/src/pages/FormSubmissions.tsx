@@ -35,7 +35,7 @@ export const FormSubmissions: React.FC = () => {
   if (error) {
     return (
       <Container className="mt-5">
-        <Alert variant="danger">{(error as Error).message}</Alert>
+        <Alert variant="danger">{error.message}</Alert>
       </Container>
     );
   }

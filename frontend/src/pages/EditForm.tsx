@@ -18,7 +18,7 @@ const FIELD_TYPES = [
   {value: 'select', label: 'Dropdown'},
   {value: 'radio', label: 'Radio Buttons'},
   {value: 'checkbox', label: 'Checkbox'},
-] as const;
+] as const satisfies ReadonlyArray<{readonly value: FormField['type']; readonly label: string}>;
 
 const createEmptyField = (): FormField => ({
   name: '',

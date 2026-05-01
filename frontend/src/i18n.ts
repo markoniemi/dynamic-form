@@ -27,7 +27,7 @@ i18n
             }).format(value);
           }
         }
-        return value;
+        return String(value);
       },
     },
     backend: {

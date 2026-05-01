@@ -9,6 +9,7 @@ import {formClient} from '../services/formClient';
 import {formDataClient} from '../services/formDataClient';
 import {DynamicForm} from '../components/DynamicForm.tsx';
 import {useTranslation} from 'react-i18next';
+import {FormValues} from '../types/Form';
 
 export const FormSubmission: React.FC = () => {
   const {formKey, id} = useParams<{ formKey: string; id?: string }>();
@@ -27,7 +28,7 @@ export const FormSubmission: React.FC = () => {
     setValue,
     setError,
     formState: {errors},
-  } = useForm();
+  } = useForm<FormValues>();
 
   const {
     data: form,
@@ -52,7 +53,7 @@ export const FormSubmission: React.FC = () => {
   useEffect(() => {
     if (submission && submission.data) {
       Object.entries(submission.data).forEach(([key, value]) => {
-        setValue(key, value);
+        setValue(key, value as string | boolean | string[]);
       });
     }
   }, [submission, setValue]);
@@ -118,7 +119,7 @@ export const FormSubmission: React.FC = () => {
   if (error) {
     return (
       <Container className="mt-5">
-        <Alert variant="danger">{(error as Error).message}</Alert>
+        <Alert variant="danger">{error.message}</Alert>
         <Button variant="secondary" onClick={() => navigate('/forms')}>
           {t('submissionDetail.back')}
         </Button>
@@ -144,7 +145,7 @@ export const FormSubmission: React.FC = () => {
           )}
 
           {mutation.error && (
-            <Alert variant="danger">{(mutation.error as Error).message}</Alert>
+            <Alert variant="danger">{mutation.error.message}</Alert>
           )}
 
           {!isAuthenticated && (

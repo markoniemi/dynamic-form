@@ -51,7 +51,7 @@ export const SubmissionDetail: React.FC = () => {
   if (error) {
     return (
       <Container className="mt-5">
-        <Alert variant="danger">{(error as Error).message}</Alert>
+        <Alert variant="danger">{error.message}</Alert>
         <Button variant="secondary" onClick={() => navigate('/submissions')}>
           {t('submissionDetail.back')}
         </Button>

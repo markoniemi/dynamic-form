@@ -19,7 +19,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
                                                           errors,
                                                         }) => {
   const renderField = (field: FormField) => {
-    const errorMessage = errors[field.name]?.message as string | undefined;
+    const msg = errors[field.name]?.message;
+    const errorMessage = typeof msg === 'string' ? msg : undefined;
 
     switch (field.type) {
       case 'text':
@@ -46,8 +47,11 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         return <CheckboxField key={field.name} field={field} register={register}
                               errorMessage={errorMessage}/>;
 
-      default:
+      default: {
+        const _exhaustive: never = field.type;
+        void _exhaustive;
         return null;
+      }
     }
   };
 
