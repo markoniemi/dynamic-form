@@ -1,4 +1,5 @@
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
+import {userEvent} from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {SubmissionDetail} from '../../src/pages/SubmissionDetail';
 import {useAuth} from 'react-oidc-context';
@@ -152,6 +153,7 @@ describe('SubmissionDetail Component', () => {
   });
 
   it('navigates back to submissions when back button is clicked', async () => {
+    const user = userEvent.setup();
     vi.mocked(formDataClient.getSubmissionById).mockResolvedValue(mockSubmission);
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
@@ -159,7 +161,7 @@ describe('SubmissionDetail Component', () => {
     await waitFor(() => screen.getByRole('button', {name: '← submissionDetail.back'}));
 
     const backButton = screen.getByRole('button', {name: '← submissionDetail.back'});
-    fireEvent.click(backButton);
+    await user.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/submissions');
   });
 

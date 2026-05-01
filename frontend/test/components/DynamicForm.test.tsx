@@ -4,6 +4,7 @@ import {FormField, FormValues} from '../../src/types/Form';
 import {describe, expect, it, vi} from 'vitest';
 import {UseFormRegister} from 'react-hook-form';
 
+// Mock; only the subset of register API exercised by DynamicForm is needed (name, onChange, onBlur, ref)
 const mockRegister = vi.fn((name) => ({
   name,
   onChange: vi.fn(),

@@ -28,3 +28,24 @@ This is a monolithic Spring Boot application with:
 **Validation** — Spring Validation Framework (`@Valid`, `@NotBlank`, etc.) on DTOs. Global exception handler extracts field errors and returns them in the `errors` extension of `ProblemDetail`.
 
 For detailed information about coding conventions, architecture patterns, and development practices, refer to the [Copilot Instructions](../.github/copilot-instructions.md).
+
+## Git Commit Messages
+
+Commit messages use a **one-line format with semicolons** to separate concerns:
+
+```
+Brief action; additional change; optional note
+```
+
+**Examples:**
+- `Add i18n for validation messages and form labels; replace 26 hardcoded strings in EditForm and FieldEditor with translation keys`
+- `Simplify service contracts: throw on non-JSON instead of returning null; remove nullable returns; simplify empty checks in components`
+- `Replace fireEvent with userEvent in 3 test files; modernize test patterns for better UX simulation`
+
+**Guidelines:**
+- One line only — concise and scannable in git log
+- Use semicolons to separate multiple logical changes
+- Use imperative mood: "add", "fix", "refactor" (not "added", "fixed")
+- Focus on **what changed and why**, not implementation details
+- Capitalize first word
+- No period at end

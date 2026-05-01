@@ -40,4 +40,16 @@ export interface FormDataDto {
   readonly submittedBy: string;
 }
 
-export type FormValues = Record<string, string | string[] | boolean>
+export type FormValues = Record<string, string | string[] | boolean>;
+
+export const FIELD_TYPES = [
+  {value: 'text', label: 'Text'},
+  {value: 'email', label: 'Email'},
+  {value: 'tel', label: 'Phone'},
+  {value: 'number', label: 'Number'},
+  {value: 'date', label: 'Date'},
+  {value: 'textarea', label: 'Text Area'},
+  {value: 'select', label: 'Dropdown'},
+  {value: 'radio', label: 'Radio Buttons'},
+  {value: 'checkbox', label: 'Checkbox'},
+] as const satisfies ReadonlyArray<{readonly value: FormField['type']; readonly label: string}>;

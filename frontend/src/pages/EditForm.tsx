@@ -5,20 +5,8 @@ import {useMutation} from '@tanstack/react-query';
 import {useAuth} from 'react-oidc-context';
 import {useTranslation} from 'react-i18next';
 import {formClient} from '../services/formClient';
-import {CreateForm, FormField} from '../types/Form';
+import {CreateForm, FormField, FIELD_TYPES} from '../types/Form';
 import {FieldEditor} from '../components/FieldEditor';
-
-const FIELD_TYPES = [
-  {value: 'text', label: 'Text'},
-  {value: 'email', label: 'Email'},
-  {value: 'tel', label: 'Phone'},
-  {value: 'number', label: 'Number'},
-  {value: 'date', label: 'Date'},
-  {value: 'textarea', label: 'Text Area'},
-  {value: 'select', label: 'Dropdown'},
-  {value: 'radio', label: 'Radio Buttons'},
-  {value: 'checkbox', label: 'Checkbox'},
-] as const satisfies ReadonlyArray<{readonly value: FormField['type']; readonly label: string}>;
 
 const createEmptyField = (): FormField => ({
   name: '',
@@ -131,6 +119,10 @@ export const EditForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
+    if (!token) {
+      setError(t('form.loginRequired'));
+      return;
+    }
 
     const form: CreateForm = {
       formKey,

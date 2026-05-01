@@ -1,4 +1,5 @@
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
+import {userEvent} from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {FormSubmissions} from '../../src/pages/FormSubmissions';
 import {useAuth} from 'react-oidc-context';
@@ -141,35 +142,38 @@ describe('FormSubmissions Component', () => {
   });
 
   it('navigates to the submission detail page when "View Details" is clicked', async () => {
+    const user = userEvent.setup();
     vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
 
     const detailButtons = screen.getAllByRole('button', {name: 'submissions.table.view'});
-    fireEvent.click(detailButtons[0]);
+    await user.click(detailButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/1');
   });
 
   it('navigates to the correct submission when second "View Details" is clicked', async () => {
+    const user = userEvent.setup();
     vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.view'}));
 
     const detailButtons = screen.getAllByRole('button', {name: 'submissions.table.view'});
-    fireEvent.click(detailButtons[1]);
+    await user.click(detailButtons[1]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/submissions/2');
   });
 
   it('navigates to the submission edit page when "Edit" is clicked', async () => {
+    const user = userEvent.setup();
     vi.mocked(formDataClient.getAllSubmissions).mockResolvedValue(mockSubmissions);
     renderFormSubmissions();
 
     await waitFor(() => screen.getAllByRole('button', {name: 'submissions.table.edit'}));
 
     const editButtons = screen.getAllByRole('button', {name: 'submissions.table.edit'});
-    fireEvent.click(editButtons[0]);
+    await user.click(editButtons[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/forms/contact/submissions/1/edit');
   });
 
