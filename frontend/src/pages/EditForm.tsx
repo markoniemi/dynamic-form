@@ -81,45 +81,45 @@ export const EditForm: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!formKey.trim()) {
-      setError('Form key is required');
+      setError(t('editForm.validation.formKeyRequired'));
       return false;
     }
     if (!/^[a-z0-9-]+$/.test(formKey)) {
-      setError('Form key must contain only lowercase letters, numbers, and hyphens');
+      setError(t('editForm.validation.formKeyFormat'));
       return false;
     }
     if (!title.trim()) {
-      setError('Title is required');
+      setError(t('editForm.validation.titleRequired'));
       return false;
     }
     if (fields.length === 0) {
-      setError('At least one field is required');
+      setError(t('editForm.validation.fieldsRequired'));
       return false;
     }
 
     const fieldNames = new Set<string>();
     for (const field of fields) {
       if (!field.name.trim()) {
-        setError('All fields must have a name');
+        setError(t('editForm.validation.fieldNameRequired'));
         return false;
       }
       if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(field.name)) {
-        setError(`Field name "${field.name}" must start with a letter and contain only alphanumeric characters`);
+        setError(t('editForm.validation.fieldNameFormat', {name: field.name}));
         return false;
       }
       if (fieldNames.has(field.name)) {
-        setError(`Duplicate field name: ${field.name}`);
+        setError(t('editForm.validation.fieldNameDuplicate', {name: field.name}));
         return false;
       }
       fieldNames.add(field.name);
 
       if (!field.label.trim()) {
-        setError('All fields must have a label');
+        setError(t('editForm.validation.fieldLabelRequired'));
         return false;
       }
 
       if ((field.type === 'select' || field.type === 'radio') && (!field.options || field.options.length === 0)) {
-        setError(`Field "${field.label}" requires at least one option`);
+        setError(t('editForm.validation.fieldOptionsRequired', {label: field.label}));
         return false;
       }
     }
@@ -162,7 +162,7 @@ export const EditForm: React.FC = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3" controlId="formKey">
-                  <Form.Label>Form Key <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>{t('editForm.label.formKey')} <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     placeholder={t('editForm.formKeyPlaceholder')}
@@ -170,13 +170,13 @@ export const EditForm: React.FC = () => {
                     onChange={(e) => setFormKey(e.target.value.toLowerCase())}
                   />
                   <Form.Text className="text-muted">
-                    Unique identifier (lowercase letters, numbers, hyphens only)
+                    {t('editForm.help.formKey')}
                   </Form.Text>
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3" controlId="title">
-                  <Form.Label>Title <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>{t('editForm.label.title')} <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     placeholder={t('editForm.titlePlaceholder')}
@@ -188,7 +188,7 @@ export const EditForm: React.FC = () => {
             </Row>
 
             <Form.Group className="mb-4" controlId="description">
-              <Form.Label>Description</Form.Label>
+              <Form.Label>{t('editForm.label.description')}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={2}

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Button, Card, Col, Form, Row} from 'react-bootstrap';
+import {useTranslation} from 'react-i18next';
 import {FieldOption, FormField} from '../types/Form';
 
 interface FieldTypeOption {
@@ -26,6 +27,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
                                                           onRemove,
                                                           onMove,
                                                         }) => {
+  const {t} = useTranslation();
   const needsOptions = field.type === 'select' || field.type === 'radio';
 
   const handleChange = (key: keyof FormField, value: string | boolean) => {
@@ -65,14 +67,14 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
   return (
     <Card className="mb-3 border-secondary">
       <Card.Header className="d-flex justify-content-between align-items-center bg-light">
-        <span>Field {index + 1}</span>
+        <span>{t('fieldEditor.fieldHeader', {number: index + 1})}</span>
         <div className="d-flex gap-1">
           <Button
             variant="outline-secondary"
             size="sm"
             onClick={() => onMove('up')}
             disabled={index === 0}
-            title="Move up"
+            title={t('fieldEditor.moveUp')}
           >
             ↑
           </Button>
@@ -81,7 +83,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
             size="sm"
             onClick={() => onMove('down')}
             disabled={index === totalFields - 1}
-            title="Move down"
+            title={t('fieldEditor.moveDown')}
           >
             ↓
           </Button>
@@ -90,7 +92,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
             size="sm"
             onClick={onRemove}
             disabled={totalFields === 1}
-            title="Remove field"
+            title={t('fieldEditor.removeField')}
           >
             ×
           </Button>
@@ -100,7 +102,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3" controlId={`field-${index}-name`}>
-              <Form.Label>Field Name <span className="text-danger">*</span></Form.Label>
+              <Form.Label>{t('fieldEditor.fieldName')} <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 placeholder="e.g., fullName"
@@ -111,7 +113,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3" controlId={`field-${index}-label`}>
-              <Form.Label>Label <span className="text-danger">*</span></Form.Label>
+              <Form.Label>{t('fieldEditor.label')} <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 placeholder="e.g., Full Name"
@@ -122,7 +124,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
           </Col>
           <Col md={4}>
             <Form.Group className="mb-3" controlId={`field-${index}-type`}>
-              <Form.Label>Type <span className="text-danger">*</span></Form.Label>
+              <Form.Label>{t('fieldEditor.type')} <span className="text-danger">*</span></Form.Label>
               <Form.Select
                 value={field.type}
                 onChange={(e) => handleChange('type', e.target.value)}
@@ -140,10 +142,10 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
         <Row>
           <Col md={6}>
             <Form.Group className="mb-3" controlId={`field-${index}-placeholder`}>
-              <Form.Label>Placeholder</Form.Label>
+              <Form.Label>{t('fieldEditor.placeholder')}</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Optional placeholder text"
+                placeholder={t('fieldEditor.placeholderHint')}
                 value={field.placeholder || ''}
                 onChange={(e) => handleChange('placeholder', e.target.value)}
               />
@@ -153,7 +155,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
             <Form.Check
               type="checkbox"
               id={`field-${index}-required`}
-              label="Required"
+              label={t('fieldEditor.required')}
               checked={field.required}
               onChange={(e) => handleChange('required', e.target.checked)}
             />
@@ -162,13 +164,13 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
 
         {needsOptions && (
           <div className="mt-3">
-            <h6>Options</h6>
+            <h6>{t('fieldEditor.options')}</h6>
             {(field.options || []).map((option, optionIndex) => (
               <Row key={optionIndex} className="mb-2 align-items-center">
                 <Col md={5}>
                   <Form.Control
                     type="text"
-                    placeholder="Value"
+                    placeholder={t('fieldEditor.optionValue')}
                     value={option.value}
                     onChange={(e) => handleOptionChange(optionIndex, 'value', e.target.value)}
                   />
@@ -176,7 +178,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
                 <Col md={5}>
                   <Form.Control
                     type="text"
-                    placeholder="Label"
+                    placeholder={t('fieldEditor.optionLabel')}
                     value={option.label}
                     onChange={(e) => handleOptionChange(optionIndex, 'label', e.target.value)}
                   />
@@ -194,7 +196,7 @@ export const FieldEditor: React.FC<FieldEditorProps> = ({
               </Row>
             ))}
             <Button variant="outline-secondary" size="sm" onClick={handleAddOption}>
-              + Add Option
+              {t('fieldEditor.addOption')}
             </Button>
           </div>
         )}

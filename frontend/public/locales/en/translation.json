@@ -71,13 +71,48 @@
     "submit": "Create Form",
     "formKeyPlaceholder": "e.g., contact-form",
     "titlePlaceholder": "e.g., Contact Form",
-    "descriptionPlaceholder": "Brief description of the form"
+    "descriptionPlaceholder": "Brief description of the form",
+    "label": {
+      "formKey": "Form Key",
+      "title": "Title",
+      "description": "Description"
+    },
+    "help": {
+      "formKey": "Unique identifier (lowercase letters, numbers, hyphens only)"
+    },
+    "validation": {
+      "formKeyRequired": "Form key is required",
+      "formKeyFormat": "Form key must contain only lowercase letters, numbers, and hyphens",
+      "titleRequired": "Title is required",
+      "fieldsRequired": "At least one field is required",
+      "fieldNameRequired": "All fields must have a name",
+      "fieldNameFormat": "Field name \"{{name}}\" must start with a letter and contain only alphanumeric characters",
+      "fieldNameDuplicate": "Duplicate field name: {{name}}",
+      "fieldLabelRequired": "All fields must have a label",
+      "fieldOptionsRequired": "Field \"{{label}}\" requires at least one option"
+    }
   },
   "content": {
     "authError": "Authentication Error",
     "tryAgain": "Try Again",
     "welcome": "Welcome",
     "pleaseLogIn": "Please log in."
+  },
+  "fieldEditor": {
+    "fieldHeader": "Field {{number}}",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "removeField": "Remove field",
+    "fieldName": "Field Name",
+    "label": "Label",
+    "type": "Type",
+    "placeholder": "Placeholder",
+    "placeholderHint": "Optional placeholder text",
+    "required": "Required",
+    "options": "Options",
+    "optionValue": "Value",
+    "optionLabel": "Label",
+    "addOption": "+ Add Option"
   },
   "common": {
     "loading": "Loading...",
