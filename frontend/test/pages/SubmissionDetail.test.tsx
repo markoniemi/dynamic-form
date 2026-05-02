@@ -158,9 +158,9 @@ describe('SubmissionDetail Component', () => {
     vi.mocked(formClient.getForm).mockResolvedValue(mockForm);
     renderSubmissionDetail();
 
-    await waitFor(() => screen.getByRole('button', {name: '← submissionDetail.back'}));
+    await waitFor(() => screen.getByRole('button', {name: 'submissionDetail.back'}));
 
-    const backButton = screen.getByRole('button', {name: '← submissionDetail.back'});
+    const backButton = screen.getByRole('button', {name: 'submissionDetail.back'});
     await user.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/submissions');
   });

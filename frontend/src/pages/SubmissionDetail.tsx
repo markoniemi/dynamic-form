@@ -74,7 +74,7 @@ export const SubmissionDetail: React.FC = () => {
     <Container className="mt-5">
       <Row className="mb-4">
         <Col>
-          <Button variant="outline-secondary" onClick={() => navigate('/submissions')}>
+          <Button variant="outline-secondary" onClick={() => navigate('/submissions')} aria-label={t('submissionDetail.back')}>
             ← {t('submissionDetail.back')}
           </Button>
         </Col>
