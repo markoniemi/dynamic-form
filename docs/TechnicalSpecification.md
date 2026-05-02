@@ -920,11 +920,118 @@ Spring Boot Actuator endpoints:
 9. **API Rate Limiting**: Prevent abuse
 10. **Real-time Collaboration**: Multiple users editing forms simultaneously
 
-## 15. References
+## 15. Type Safety & Error Handling Patterns
+
+### 15.1 Frontend Type Safety (TypeScript)
+
+**Exhaustive Type Checking**
+
+Switch statements on union types use TypeScript's `never` type to ensure all cases are covered:
+
+```typescript
+switch (field.type) {
+  case 'text': return <TextField ... />;
+  // ... all other cases ...
+  default: {
+    const _exhaustive: never = field.type;
+    return null;
+  }
+}
+```
+
+If a new field type is added to the `FormField['type']` union, the compiler will error until this switch is updated—no silent fallbacks.
+
+**Type Guards Over Casts**
+
+Instead of unsafe casts like `(value as string)`, use type guards:
+
+```typescript
+const msg = errors[field.name]?.message;
+const errorMessage = typeof msg === 'string' ? msg : undefined;
+```
+
+This proves the type is safe before use, rather than hoping.
+
+### 15.2 Error Handling Contract
+
+**Service Layer Throws, Never Returns Null**
+
+The `http.request<T>()` function throws on all errors (non-JSON response, validation failure, network error). It never returns `null` or `undefined`.
+
+This means:
+- Callers don't need `null` checks on the result if the request succeeds
+- Errors are always exceptions, making control flow explicit
+- React Query's `enabled` flag and guards are sufficient to prevent null access
+
+**API Validation Errors**
+
+When the backend returns HTTP 400 with a `ProblemDetail` payload that includes an `errors` array, the frontend throws a custom `ApiValidationError`:
+
+```typescript
+export class ApiValidationError extends Error {
+  constructor(
+    message: string,
+    public readonly validationErrors: ValidationError[]
+  ) { ... }
+}
+```
+
+Components catch this and wire field errors into react-hook-form via `setError`:
+
+```typescript
+catch (err) {
+  if (err instanceof ApiValidationError) {
+    err.validationErrors.forEach(({field, message}) => {
+      if (field) setError(field, {message});
+    });
+  }
+}
+```
+
+**React Query Integration**
+
+- `useQuery` with `enabled` guard prevents requests when data is missing: `enabled: !!token && !!id`
+- After the guard, TypeScript narrows `data` from `undefined | T` to `T`
+- After an `if (error)` check, `error` is narrowed from `Error | null` to `Error`, so `error.message` is safe without `as Error` cast
+
+### 15.3 i18n Type Safety
+
+The i18n interpolation format function returns a string:
+
+```typescript
+format: (value, format, lng) => {
+  if (value instanceof Date) {
+    // return formatted date
+    return new Intl.DateTimeFormat(...).format(value);
+  }
+  return String(value);  // Ensure return type is always string
+}
+```
+
+This prevents i18next from receiving `undefined` or `number` when a string is expected, which could cause hydration mismatches or render errors.
+
+### 15.4 Form Definition Constants
+
+Form field type definitions are validated at compile time:
+
+```typescript
+const FIELD_TYPES = [
+  {value: 'text', label: 'Text'},
+  // ...
+] as const satisfies ReadonlyArray<{
+  readonly value: FormField['type'];
+  readonly label: string;
+}>;
+```
+
+The `satisfies` keyword verifies that each `value` is a valid `FormField['type']`, without widening the type. If the union changes, this will error.
+
+## 16. References
 
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Effective TypeScript, 2nd Edition](https://effectivetypescript.com/) — readonly, type guards, never pattern
 - [PostgreSQL JSON Support](https://www.postgresql.org/docs/current/datatype-json.html)
 - [OAuth 2.0 RFC](https://oauth.net/2/)
 - [OpenAPI Specification](https://swagger.io/specification/)

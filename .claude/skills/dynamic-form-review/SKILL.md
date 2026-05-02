@@ -127,8 +127,6 @@ Use these references to justify findings and resolve ambiguity during TypeScript
 - *Programming TypeScript* by Boris Cherny (O'Reilly) — branded types, totality
 - *Effective TypeScript*, 2nd Edition (2024) — adds `satisfies`, template literals, 25+ new items
 
-**Note on readonly**: The "readonly-by-default" pattern applies to immutable, display-only data (e.g., read-only summaries, historical records). Form data being edited should be mutable — readonly creates friction without preventing real bugs in editing workflows.
-
 ### Style guides
 - Google TypeScript Style Guide (gts) — bans `enum`/`namespace`/`any`
 - Azure SDK Guidelines — rigorous public API rules
