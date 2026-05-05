@@ -12,27 +12,31 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
-      format: (value, format, lng) => {
-        if (value instanceof Date) {
-          if (format === 'short') {
-            return new Intl.DateTimeFormat(lng).format(value);
-          }
-          if (format === 'long') {
-            return new Intl.DateTimeFormat(lng, {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-            }).format(value);
-          }
-        }
-        return String(value);
-      },
     },
     backend: {
       loadPath: '/locales/{{lng}}/translation.json',
     },
   });
+
+// i18next v26: Use formatter.add() for custom formatters
+i18n.services.formatter?.add('date', (value: unknown, lng: string | undefined, options: { format?: 'short' | 'long' } | undefined) => {
+  if (!(value instanceof Date)) {
+    return String(value);
+  }
+  const language = lng || 'en';
+  if (options?.format === 'short') {
+    return new Intl.DateTimeFormat(language).format(value);
+  }
+  if (options?.format === 'long') {
+    return new Intl.DateTimeFormat(language, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(value);
+  }
+  return String(value);
+});
 
 export default i18n;

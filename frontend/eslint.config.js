@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'coverage'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strict, pluginReact.configs.flat['jsx-runtime']],
     files: ['**/*.{ts,tsx}'],
