@@ -7,7 +7,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
   security:
