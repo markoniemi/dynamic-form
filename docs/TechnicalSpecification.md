@@ -18,27 +18,30 @@ The **Dynamic Form Application** is a full-stack monolithic Spring Boot applicat
 | Component | Technology |
 |-----------|-----------|
 | Language | Java 21 |
-| Framework | Spring Boot |
+| Framework | Spring Boot 4.0.3 |
 | Build Tool | Maven |
 | Database (Production) | PostgreSQL |
 | Database (Dev/Test) | H2 |
-| ORM | Spring Data JPA |
-| Security | Spring Security OAuth2 |
+| ORM | Spring Data JPA / Hibernate 7.1 |
+| Security | Spring Security 7.0 / OAuth2 |
 | DTO Mapping | MapStruct |
 | Code Generation | Lombok |
 | Logging | SLF4J + Logback |
+| JSON Processing | Jackson 3 |
 
 **Spring Boot Dependencies**:
-- `spring-boot-starter-web` - REST API
+- `spring-boot-starter-webmvc` - REST API (Spring MVC)
 - `spring-boot-starter-data-jpa` - Database access
 - `spring-boot-starter-security` - Security framework
-- `spring-boot-starter-oauth2-resource-server` - JWT validation
+- `spring-boot-starter-security-oauth2-resource-server` - JWT validation
 - `spring-boot-starter-validation` - Bean validation
 
 **Testing Dependencies**:
 - JUnit 5 - Test framework
 - Mockito - Mocking
 - Spring Boot Test - Integration testing
+- `spring-boot-starter-webmvc-test` - WebMvc test annotations
+- `spring-boot-starter-data-jpa-test` - Data JPA test annotations
 - Testcontainers 2.0.3 - Container-based testing
 - H2 Database - In-memory testing
 - Selenium 4.31.0 - UI testing
