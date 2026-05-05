@@ -1,7 +1,7 @@
 # Dependency Upgrade Plan
 
 Generated: 2026-04-25  
-Current Status: Phase 2 Complete (2026-05-02)
+Current Status: Phase 3 Complete (2026-05-05) — Frontend dependency updates reviewed
 
 ---
 
@@ -61,47 +61,64 @@ Current Status: Phase 2 Complete (2026-05-02)
 
 ### Other Frontend Dependencies
 
-#### React Router 7.13.0 (Check for updates)
-**Priority:** Low-Medium  
-**Action:** Check npm for latest 7.x patch updates
+**Last checked:** 2026-05-05
 
-- [ ] Check latest 7.x version and update if needed
+#### Patch Updates (Safe, Low Risk)
+- `react-router-dom`: 7.14.2 → 7.15.0 (patch)
+- `@tanstack/react-query`: 5.100.6 → 5.100.9 (patch)
+- `zod`: 4.4.1 → 4.4.3 (patch)
+- `react-hook-form`: 7.74.0 → 7.75.0 (patch)
+- `@supabase/supabase-js`: 2.105.1 → 2.105.3 (patch)
+- `typescript-eslint`: 8.59.1 → 8.59.2 (patch)
+- `globals`: 17.5.0 → 17.6.0 (patch)
 
-#### @tanstack/react-query 5.90.20 (Check for updates)
-**Priority:** Low  
-**Action:** Check npm for latest 5.x patch updates
+**Status:** Ready to apply
+- [ ] Apply patch updates: `npm update`
 
-- [ ] Check latest 5.x version and update if needed
+#### Minor/Major Updates (Requires Breaking Change Review)
+- `i18next`: 25.10.10 → 26.0.8 (major version, needs testing)
+- `react-i18next`: 16.6.6 → 17.0.6 (major version, needs testing)
+- `i18next-http-backend`: 3.0.6 → 4.0.0 (major version, check breaking changes)
+- `lucide-react`: 0.563.0 → 1.14.0 (major version jump, check API changes)
+- `jsdom`: 28.1.0 → 29.1.1 (major version, check compatibility with vitest)
+- `@eslint/js`: 9.39.2 → 10.0.1 (major version)
+- `eslint`: 9.39.2 → 10.3.0 (major version)
 
-#### Zod 4.3.6 (Check for updates)
-**Priority:** Low  
-**Action:** Check npm for latest 4.x patch updates
-
-- [ ] Check latest 4.x version and update if needed
-
-#### Bootstrap 5.3.8 (Check for updates)
-**Priority:** Low  
-**Action:** Check npm for latest 5.3.x patch updates
-
-- [ ] Check latest 5.3.x version and update if needed
+**Status:** Review required before updating
+- [ ] Check i18next breaking changes between 25.x and 26.x
+- [ ] Check react-i18next compatibility with i18next 26
+- [ ] Review i18next-http-backend 4.0.0 breaking changes
+- [ ] Check lucide-react 1.x API changes
+- [ ] Verify jsdom 29 compatibility with vitest
+- [ ] Review ESLint 10 configuration requirements
 
 ---
 
 ## Testing & Linting
 
-### Vitest 4.0.18 (Check for updates)
+### Vitest 4.1.5 (Current)
+**Status:** Current version is stable  
+**Available:** 4.1.x (patch updates available via npm)  
 **Priority:** Low  
-**Action:** Check for latest 4.x or 5.x versions
+**Notes:** Vitest 4.1.5 is stable. Monitor for 5.x major release.
 
-- [ ] Check latest version and update if needed
+- [ ] Monitor for Vitest 5.x release
 
-### ESLint & TypeScript ESLint
-**Priority:** Low-Medium  
-**Notes:** Current setup uses ESLint 9.39.2 and typescript-eslint 8.54.0  
-**Action:** Check for compatibility and latest versions
+### ESLint 9.39.2 → 10.3.0 (Major Update)
+**Available:** 10.3.0  
+**Priority:** Medium (breaking changes likely)  
+**Notes:** Major version upgrade requires reviewing ESLint 10 configuration changes
 
-- [ ] Verify compatibility between ESLint and typescript-eslint versions
-- [ ] Update if needed
+- [ ] Review ESLint 10 migration guide
+- [ ] Test configuration compatibility
+- [ ] Update if breaking changes don't impact project
+
+### TypeScript ESLint 8.59.1 → 8.59.2 (Patch)
+**Available:** 8.59.2 (patch)  
+**Priority:** Low  
+**Status:** Ready to update
+
+- [ ] Update typescript-eslint to 8.59.2
 
 ---
 
