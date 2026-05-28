@@ -1,0 +1,21 @@
+users:
+  - username: testuser
+    password: password
+    roles:
+      - USER
+  - username: admin
+    password: password
+    roles:
+      - ADMIN
+      - USER
+
+clients:
+  - clientId: test-client
+    clientSecret: test-secret
+    redirectUris:
+      - http://localhost:8080/callback
+      - http://localhost:3000/callback
+    scopes:
+      - openid
+      - profile
+      - email
