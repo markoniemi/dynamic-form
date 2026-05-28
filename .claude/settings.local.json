@@ -10,7 +10,8 @@
       "WebFetch(domain:stevenpg.com)",
       "WebFetch(domain:docs.openrewrite.org)",
       "WebFetch(domain:ankurm.com)",
-      "WebFetch(domain:serdaralkancode.medium.com)"
+      "WebFetch(domain:serdaralkancode.medium.com)",
+      "PowerShell(git *)"
     ]
   }
 }
