@@ -11,7 +11,9 @@
       "WebFetch(domain:docs.openrewrite.org)",
       "WebFetch(domain:ankurm.com)",
       "WebFetch(domain:serdaralkancode.medium.com)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "Bash(Get-ChildItem -Recurse -Filter \"*oauth*\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

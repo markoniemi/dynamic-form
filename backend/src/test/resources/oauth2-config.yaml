@@ -1,21 +1,20 @@
 users:
-  - username: testuser
-    password: password
-    roles:
-      - USER
   - username: admin
-    password: password
+    password: admin
     roles:
       - ADMIN
       - USER
+  - username: user
+    password: user
+    roles:
+      - USER
 
 clients:
-  - clientId: test-client
-    clientSecret: test-secret
+  - clientId: frontend-client
+    clientSecret: frontend-secret
     redirectUris:
       - http://localhost:8080/callback
       - http://localhost:3000/callback
     scopes:
       - openid
       - profile
-      - email
