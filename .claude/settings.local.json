@@ -13,7 +13,9 @@
       "WebFetch(domain:serdaralkancode.medium.com)",
       "PowerShell(git *)",
       "Bash(Get-ChildItem -Recurse -Filter \"*oauth*\" -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(gh api *)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

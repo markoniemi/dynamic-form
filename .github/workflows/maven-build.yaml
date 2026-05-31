@@ -18,5 +18,5 @@ jobs:
           java-version: '21'
 
       - name: Build with Maven
-        run: mvn -B clean install
+        run: mvn -B clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         working-directory: ./
