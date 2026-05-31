@@ -9,6 +9,7 @@ import com.github.dockerjava.api.model.Ports;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -21,12 +22,11 @@ public class TestcontainersConfig {
   public OAuth2Container authorizationServerContainer() {
     OAuth2Container authorizationServer =
         new OAuth2Container()
-            .withConfigFile("oauth2-config.yaml")
             .withLogConsumer(new Slf4jLogConsumer(log))
             .withCreateContainerCmdModifier(getPortConfig());
     authorizationServer.start();
     return authorizationServer;
-  }
+    }
 
   private static @NonNull Consumer<CreateContainerCmd> getPortConfig() {
     return cmd ->
