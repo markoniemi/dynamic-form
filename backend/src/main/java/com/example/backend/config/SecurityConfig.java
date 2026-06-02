@@ -30,8 +30,6 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/config/**")
                     .permitAll()
-                    .requestMatchers("/api/forms/**")
-                    .permitAll()
                     .requestMatchers("/api/**")
                     .authenticated()
                     .anyRequest()
