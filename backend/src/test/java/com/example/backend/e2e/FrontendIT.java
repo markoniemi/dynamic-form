@@ -122,6 +122,7 @@ public class FrontendIT extends IntegrationTestBase {
     // 2. User logs in and tries to access admin's submission
     formsPage.clickLogin();
     loginPage.login("user", "user");
+    formsPage.waitForLoad();
     formsPage.clickFormSubmissions();
     formSubmissionsPage.waitForLoad();
 
