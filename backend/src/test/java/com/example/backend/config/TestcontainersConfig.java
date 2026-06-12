@@ -24,6 +24,7 @@ public class TestcontainersConfig {
     OAuth2Container authorizationServer =
         new OAuth2Container()
             .withUser("admin", "admin", "USER", "ADMIN")
+            .withUser("user", "user", "USER")
             .withOAuth2Client(new Client("frontend-client", "")
                 .withRedirectUris("http://localhost:8080", "http://localhost:5173")
                 .withScopes("openid", "profile", "email"))
