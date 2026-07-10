@@ -3,6 +3,8 @@ name: Maven Build
 on:
   push:
   pull_request:
+  repository_dispatch:
+    types: [oauth2-server-built]
 
 jobs:
   build:
