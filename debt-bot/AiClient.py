@@ -3,10 +3,11 @@
 AI client — calls Claude API to generate code based on task cards and source files.
 Requires ANTHROPIC_API_KEY environment variable.
 """
-import anthropic
+
 import os
-from typing import Optional
 from pathlib import Path
+
+import anthropic
 
 
 class AiClient:
@@ -23,7 +24,7 @@ class AiClient:
         task_card: str,
         source_file_content: str,
         style_reference_content: str,
-        prompt_template_path: Optional[Path] = None
+        prompt_template_path: Path | None = None,
     ) -> str:
         """
         Generate a test file based on task card, source file, and style reference.
@@ -51,24 +52,17 @@ Respond with ONLY the complete new test file content. Nothing else."""
         prompt = prompt_template.format(
             task_card=task_card,
             source_file_content=source_file_content,
-            style_reference_content=style_reference_content
+            style_reference_content=style_reference_content,
         )
 
         message = self.client.messages.create(
-            model=self.model,
-            max_tokens=4096,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            model=self.model, max_tokens=4096, messages=[{"role": "user", "content": prompt}]
         )
 
         return message.content[0].text
 
     def generate_refactor(
-        self,
-        task_card: str,
-        file_content: str,
-        prompt_template_path: Optional[Path] = None
+        self, task_card: str, file_content: str, prompt_template_path: Path | None = None
     ) -> str:
         """
         Generate refactored code based on task card and current file content.
@@ -90,26 +84,15 @@ Respond with ONLY the complete updated file content. Nothing else."""
             with open(prompt_template_path) as f:
                 prompt_template = f.read()
 
-        prompt = prompt_template.format(
-            task_card=task_card,
-            file_content=file_content
-        )
+        prompt = prompt_template.format(task_card=task_card, file_content=file_content)
 
         message = self.client.messages.create(
-            model=self.model,
-            max_tokens=4096,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            model=self.model, max_tokens=4096, messages=[{"role": "user", "content": prompt}]
         )
 
         return message.content[0].text
 
-    def analyze_coverage(
-        self,
-        analysis_prompt: str,
-        report_content: str
-    ) -> str:
+    def analyze_coverage(self, analysis_prompt: str, report_content: str) -> str:
         """
         Analyze test coverage reports and generate findings.
         """
@@ -121,11 +104,7 @@ REPORT:
 Respond with markdown findings, formatted as a bulleted list with scores."""
 
         message = self.client.messages.create(
-            model=self.model,
-            max_tokens=4096,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            model=self.model, max_tokens=4096, messages=[{"role": "user", "content": prompt}]
         )
 
         return message.content[0].text

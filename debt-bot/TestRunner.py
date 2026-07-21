@@ -3,12 +3,10 @@
 Test runner — detects pass/fail for Jest (frontend) and Maven/JUnit (backend).
 Returns exit code 0 on success, 1 on failure.
 """
+
 import subprocess
 import sys
-import json
 from pathlib import Path
-from typing import Tuple
-import re
 
 
 class TestRunner:
@@ -17,7 +15,7 @@ class TestRunner:
         self.backend_dir = self.project_root / "backend"
         self.frontend_dir = self.project_root / "frontend"
 
-    def run_backend_tests(self, test_pattern: str = None) -> Tuple[bool, str]:
+    def run_backend_tests(self, test_pattern: str = None) -> tuple[bool, str]:
         """
         Run Maven tests for backend. Returns (passed: bool, output: str).
         If test_pattern is provided, runs specific test class (e.g., "UserServiceTest").
@@ -29,11 +27,7 @@ class TestRunner:
 
             print(f"[TestRunner] Running backend tests: {' '.join(cmd)}")
             result = subprocess.run(
-                cmd,
-                cwd=self.backend_dir,
-                capture_output=True,
-                text=True,
-                timeout=300
+                cmd, cwd=self.backend_dir, capture_output=True, text=True, timeout=300
             )
 
             output = result.stdout + result.stderr
@@ -42,10 +36,11 @@ class TestRunner:
             if not passed:
                 # Extract failure summary from Maven output
                 failure_lines = [
-                    line for line in output.split('\n')
-                    if 'FAILURE' in line or 'ERROR' in line or 'Tests run:' in line
+                    line
+                    for line in output.split("\n")
+                    if "FAILURE" in line or "ERROR" in line or "Tests run:" in line
                 ]
-                error_msg = '\n'.join(failure_lines[-10:]) if failure_lines else output[-500:]
+                error_msg = "\n".join(failure_lines[-10:]) if failure_lines else output[-500:]
                 return False, error_msg
 
             return True, "Backend tests passed"
@@ -55,7 +50,7 @@ class TestRunner:
         except Exception as e:
             return False, f"Backend test error: {str(e)}"
 
-    def run_frontend_tests(self) -> Tuple[bool, str]:
+    def run_frontend_tests(self) -> tuple[bool, str]:
         """
         Run Vitest for frontend. Returns (passed: bool, output: str).
         """
@@ -69,7 +64,7 @@ class TestRunner:
                 capture_output=True,
                 text=True,
                 timeout=300,
-                env={**dict(subprocess.os.environ), "CI": "true"}
+                env={**dict(subprocess.os.environ), "CI": "true"},
             )
 
             output = result.stdout + result.stderr
@@ -78,10 +73,11 @@ class TestRunner:
             if not passed:
                 # Extract failure summary from Vitest output
                 failure_lines = [
-                    line for line in output.split('\n')
-                    if 'FAIL' in line or 'ERROR' in line or 'failed' in line
+                    line
+                    for line in output.split("\n")
+                    if "FAIL" in line or "ERROR" in line or "failed" in line
                 ]
-                error_msg = '\n'.join(failure_lines[-10:]) if failure_lines else output[-500:]
+                error_msg = "\n".join(failure_lines[-10:]) if failure_lines else output[-500:]
                 return False, error_msg
 
             return True, "Frontend tests passed"
@@ -91,7 +87,7 @@ class TestRunner:
         except Exception as e:
             return False, f"Frontend test error: {str(e)}"
 
-    def run_all_tests(self) -> Tuple[bool, str]:
+    def run_all_tests(self) -> tuple[bool, str]:
         """
         Run all tests (backend + frontend). Returns (all_passed: bool, summary: str).
         """
