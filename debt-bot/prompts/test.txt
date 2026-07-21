@@ -1,0 +1,14 @@
+You are an automated test writer. Create a test file for the scenario described.
+Match the style of the reference file exactly. Do not test anything not listed in the task.
+Do not modify any existing files.
+
+TASK:
+{task_card}
+
+SOURCE FILE CONTENT:
+{source_file_content}
+
+STYLE REFERENCE:
+{style_reference_content}
+
+Respond with ONLY the complete new test file content. Nothing else.
