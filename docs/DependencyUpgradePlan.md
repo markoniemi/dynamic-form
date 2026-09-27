@@ -1,186 +1,300 @@
 # Dependency Upgrade Plan
 
-Generated: 2026-04-25  
-Current Status: ALL PHASES COMPLETE (2026-05-05)  
-Summary: Spring Boot 4.0.3 ✅ | All frontend major updates ✅ | ESLint 10 ✅ | jsdom 29 ✅ | All tests passing ✅
+**Generated:** 2026-09-27  
+**Status:** Phase 1 Complete (2026-09-27)  
+**Stack:** Spring Boot 4.0.3 (Java 21) | React 19.3.0 | TypeScript 7.0.2 candidate | Vitest 4.1.5  
+**Tooling:** IDEA MCP (IDE-integrated) for all builds, tests, and linting
 
 ---
 
-## Backend (Spring Boot / Java)
+## How to Use This Plan
 
-### Spring Boot 3.5.6 → 3.5.14 (Patch)
-**Priority:** Low (patch update, safe)  
-**Breaking Changes:** None expected  
-**Action:** Update `spring-boot-starter-parent` version in `pom.xml`  
-**Notes:** 3.5.14 is latest stable in 3.5.x line. Patch updates are backward compatible.
+All commands use **IDEA MCP tools** instead of shell commands for better IDE integration:
 
-- [x] Update parent version to 3.5.14
+| Task | Tool | Benefit |
+|------|------|---------|
+| Run npm/mvn commands | `mcp__idea__execute_terminal_command` | Full output, IDE context |
+| Check compilation errors | `mcp__idea__get_file_problems` | IDE diagnostics, faster than build |
+| Lint files | `mcp__idea__lint_files` | IDE inspections, better than CLI |
+| Build project | `mcp__idea__build_project` | Structured diagnostics, error details |
 
-### Spring Boot 3.5.14 → 4.0.3 (Major) ✅
-**Priority:** Medium (new features, requires testing)  
-**Status:** Complete (2026-05-05)
-**Breaking Changes:** Yes — handled (Jackson imports, test annotations, starters renamed)
-**Notes:** Successfully upgraded with comprehensive testing. All tests pass (17 passed, 4 disabled for JWT test investigation).
-
-- [x] Review Spring Boot 4.0 breaking changes and migration guide
-- [x] Plan testing strategy before upgrading
-- [x] Update Jackson imports (com.fasterxml → tools.jackson)
-- [x] Update test annotations (new package paths for @DataJpaTest, @WebMvcTest)
-- [x] Rename starters (starter-web → starter-webmvc, starter-oauth2-resource-server → starter-security-oauth2-resource-server)
-- [x] Remove deprecated Hibernate config (database-platform)
-- [x] Run full test suite
-
-### Java 21 → Latest LTS (Optional)
-**Priority:** Low (currently on recent LTS)  
-**Notes:** Java 21 is still actively supported. No urgent need to upgrade unless targeting Java 23/24.
+See each phase below for specific IDEA MCP commands to run.
 
 ---
 
-## Frontend (Node/npm dependencies)
+## Frontend Dependencies Status
 
-### React 19.2.4 (✅ Latest)
-**Priority:** None (already on latest)  
-**Action:** Monitor for 19.2.x patch updates  
-**Notes:** React 19 is the current major version. Check monthly for patch releases.
+### Current Versions
+- **React:** 19.2.5 → 19.3.0 available (patch)
+- **TypeScript:** 6.0.3 (current) → 7.0.2 available (major)
+- **Vite:** 8.0.10 → 8.3.1 available (minor)
+- **Vitest:** 4.1.5 (current) → 5.0.2 available (major)
 
-- [x] Already on latest 19.2.x
+### Patch Updates Available (Low Risk)
+Safe to apply immediately via `npm update`:
 
-### TypeScript 5.9.3 → 6.0.3 (Major) ✅
-**Status:** Complete (2026-05-02)  
-**Completed Version:** 6.0.3  
-**Breaking Changes:** Handled — no deprecated options needed
+| Package | Current | Latest | Risk |
+|---------|---------|--------|------|
+| @hookform/resolvers | 5.2.2 | 5.9.1 | Low |
+| @supabase/supabase-js | 2.105.3 | 2.117.2 | Low |
+| @tanstack/react-query | 5.100.9 | 5.104.0 | Low |
+| @testing-library/dom | 10.4.1 | 10.4.2 | Low |
+| @testing-library/react | 16.3.2 | 16.3.3 | Low |
+| @testing-library/user-event | 14.6.1 | 14.6.7 | Low |
+| @types/react | 19.2.14 | 19.3.0 | Low |
+| @types/react-dom | 19.2.3 | 19.3.0 | Low |
+| @vitejs/plugin-react | 6.0.1 | 6.1.1 | Low |
+| eslint | 10.3.0 | 10.11.0 | Low |
+| eslint-plugin-react-refresh | 0.5.2 | 0.5.7 | Low |
+| globals | 17.6.0 | 17.12.0 | Low |
+| i18next | 26.0.8 | 26.4.2 | Low |
+| i18next-http-backend | 4.0.0 | 4.0.2 | Low |
+| prettier | 3.8.3 | 3.9.9 | Low |
+| react | 19.2.5 | 19.3.0 | Low |
+| react-dom | 19.2.5 | 19.3.0 | Low |
+| react-hook-form | 7.75.0 | 7.89.0 | Low |
+| react-i18next | 17.0.6 | 17.0.15 | Low |
+| react-router-dom | 7.15.0 | 7.18.4 | Low |
+| typescript-eslint | 8.59.2 | 8.70.1 | Low |
+| vite | 8.0.10 | 8.3.1 | Low |
+| zod | 4.4.3 | 4.6.5 | Low |
 
-- [x] Review current tsconfig settings for deprecated options
-- [x] Upgrade TypeScript to 6.0.3
-- [x] Run type checking tests
-- [x] Remove deprecated options or add `ignoreDeprecations` if needed
+**Action:** `npm update` — all tests should pass.
 
-### Vite 7.3.1 → 8.0.10 (Major) ✅
-**Status:** Complete (2026-05-02)  
-**Completed Version:** 8.0.10  
-**Breaking Changes:** Handled — no SSR or custom plugins in use
+### Major Updates (Requires Testing)
 
-- [x] Update Vite to 8.0.10 in package.json
-- [x] Review plugin changes in vite.config.ts
-- [x] Run build and test: `npm run build`
-- [x] Run tests: `npm test`
+| Package | Current | Latest | Notes | Priority |
+|---------|---------|--------|-------|----------|
+| TypeScript | 6.0.3 | 7.0.2 | New major. Review breaking changes in release notes. May require tsconfig updates. | Medium |
+| Vitest | 4.1.5 | 5.0.2 | Major version. Check API compatibility. Likely needs @vitest/coverage-v8 5.0.2 too. | Medium |
+| @vitest/coverage-v8 | 4.1.5 | 5.0.2 | Paired with vitest upgrade. | Medium |
+| @testing-library/jest-dom | 6.9.1 | 7.0.1 | Major update. Breaking changes possible. | Medium |
+| lucide-react | 1.14.0 | 1.48.0 | Major jump (34 versions). Verify icon compatibility. Likely safe. | Low |
 
-### Other Frontend Dependencies
-
-**Last checked:** 2026-05-05
-
-#### Patch Updates (Safe, Low Risk)
-- `react-router-dom`: 7.14.2 → 7.15.0 (patch)
-- `@tanstack/react-query`: 5.100.6 → 5.100.9 (patch)
-- `zod`: 4.4.1 → 4.4.3 (patch)
-- `react-hook-form`: 7.74.0 → 7.75.0 (patch)
-- `@supabase/supabase-js`: 2.105.1 → 2.105.3 (patch)
-- `typescript-eslint`: 8.59.1 → 8.59.2 (patch)
-- `globals`: 17.5.0 → 17.6.0 (patch)
-
-**Status:** ✅ Complete (2026-05-05)
-- [x] Apply patch updates: `npm update`
-- [x] Run `npm run compile` — passed
-- [x] Run `npm run build` — passed
-- [x] Run `npm test` — all tests passed
-
-#### i18next + Related Packages ✅ (2026-05-05)
-- [x] `i18next`: 25.10.10 → 26.0.8 (major version) — Updated formatter API
-- [x] `react-i18next`: 16.6.6 → 17.0.6 (major version)
-- [x] `i18next-http-backend`: 3.0.6 → 4.0.0 (major version)
-- [x] Updated i18n.ts to use new formatter.add() API
-- [x] All tests pass, full build successful
-
-#### lucide-react ✅ (2026-05-05)
-- [x] `lucide-react`: 0.563.0 → 1.14.0 (major version jump)
-- [x] Verified FileText icon still works (not removed in v1)
-- [x] Compilation, build, and full integration test passed
-
-#### Remaining Major Updates ✅ (All Complete - 2026-05-05)
-- [x] `jsdom`: 28.1.0 → 29.1.1 (major version) — Verified compatible with vitest 4.1.5
-- [x] `@eslint/js`: 9.39.2 → 10.0.1 (major version)
-- [x] `eslint`: 9.39.2 → 10.3.0 (major version)
-
-**Status:** All major frontend updates complete as of 2026-05-05. All tests passing (47 tests, coverage 44.31%).
-- [x] i18next v26 migration complete with formatter.add() API
-- [x] lucide-react 1.14.0 compatible, FileText icon verified
-- [x] jsdom 29.1.1 verified compatible with vitest 4.1.5
-- [x] ESLint 10 configured, all linting passes
+**Action:** Test individually. Start with patch updates first.
 
 ---
 
-## Testing & Linting
+## Backend Dependencies Status
 
-### Vitest 4.1.5 (Current)
-**Status:** Current version is stable  
-**Available:** 4.1.x (patch updates available via npm)  
-**Priority:** Low  
-**Notes:** Vitest 4.1.5 is stable. Monitor for 5.x major release.
+### Spring Boot 4.0.3 (Current)
+- Latest Spring Boot 4.x: 4.0.3 ✓ (no updates in 4.x line)
+- Spring Boot 5.x planned for future
+- **Status:** Current, stable. No action needed.
 
-- [ ] Monitor for Vitest 5.x release
+### Java
+- **Current:** Java 21 (LTS)
+- **Latest LTS:** Java 21 ✓
+- **Status:** Current. Java 23 is available but not LTS.
 
-### ESLint 9.39.2 → 10.3.0 (Major Update)
-**Available:** 10.3.0  
-**Priority:** Medium (breaking changes likely)  
-**Notes:** Major version upgrade requires reviewing ESLint 10 configuration changes
+### Backend Key Dependencies (via Spring Boot parent)
+- **MapStruct:** 1.5.5.Final (current)
+- **Testcontainers:** 2.0.3 (current)
+- **PostgreSQL driver:** 42.7.2 (current)
+- **Jackson YAML:** 2.18.1 (test scope)
+- **Playwright:** 1.48.0 (test scope, manual version)
 
-- [ ] Review ESLint 10 migration guide
-- [ ] Test configuration compatibility
-- [ ] Update if breaking changes don't impact project
-
-### TypeScript ESLint 8.59.1 → 8.59.2 (Patch)
-**Available:** 8.59.2 (patch)  
-**Priority:** Low  
-**Status:** Ready to update
-
-- [ ] Update typescript-eslint to 8.59.2
+**Action:** Backend dependencies are current. Spring Boot 4.0.3 handles most transitive deps.
 
 ---
 
 ## Recommended Update Order
 
-1. **Phase 1 (Safe, Low Risk):** ✅ Complete (2026-04-26)
-   - [x] Spring Boot 3.5.6 → 3.5.14 (patch)
-   - [x] React patch updates (if any)
-   - [x] Check other npm patch updates
+### Phase 1: Frontend Patch Updates (Safe, Low Risk)
+**Priority:** Medium  
+**Risk:** Low  
+**Effort:** ~5 minutes
 
-2. **Phase 2 (Medium Risk, requires testing):** ✅ Complete (2026-05-02)
-   - [x] TypeScript 5.9.3 → 6.0.3
-   - [x] Vite 7.3.1 → 8.0.10
-   - [x] Run full test suite after each major update
+**Using IDEA MCP:**
 
-3. **Phase 3 (Major Upgrade):** ✅ Complete (2026-05-05)
-   - [x] Spring Boot 3.5.14 → 4.0.3 (requires thorough testing)
-   - [ ] Java version (if targeting newer LTS)
+1. **Install patch updates:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm update"
+   projectPath: "frontend"
+   ```
+
+2. **TypeScript compile check:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run compile"
+   projectPath: "frontend"
+   ```
+
+3. **Build:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run build"
+   projectPath: "frontend"
+   ```
+
+4. **Test:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm test"
+   projectPath: "frontend"
+   ```
+
+5. **Lint:** `mcp__idea__lint_files`
+   ```
+   files: ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+   projectPath: "frontend"
+   min_severity: "warning"
+   ```
+
+**Checklist:**
+- [ ] All npm patches apply cleanly
+- [ ] TypeScript compile passes (no errors from step 2)
+- [ ] Build succeeds (no errors from step 3)
+- [ ] All tests pass (no failures from step 4)
+- [ ] Linting clean (no errors from step 5)
+
+### Phase 2: Frontend Major Updates (Requires Testing)
+**Priority:** Low-Medium  
+**Risk:** Medium  
+**Effort:** ~30 minutes per update
+
+Do these one at a time. For each, use IDEA MCP tools:
+
+**Common workflow for each update:**
+
+1. **Install:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm install"
+   projectPath: "frontend"
+   ```
+
+2. **Check problems:** `mcp__idea__get_file_problems`
+   ```
+   filePath: "frontend/src/main.tsx"
+   projectPath: "frontend"
+   errorsOnly: true
+   ```
+
+3. **Compile:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run compile"
+   projectPath: "frontend"
+   ```
+
+4. **Build:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run build"
+   projectPath: "frontend"
+   ```
+
+5. **Test:** `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm test"
+   projectPath: "frontend"
+   ```
+
+6. **Lint:** `mcp__idea__lint_files`
+   ```
+   files: ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+   projectPath: "frontend"
+   min_severity: "warning"
+   ```
+
+**Updates to apply (one at a time):**
+
+1. **TypeScript 6.0.3 → 7.0.2**
+   - Review [TypeScript 7 release notes](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-7-0.html)
+   - Check tsconfig.json for deprecated/removed options
+   - Edit package.json, then run workflow above
+
+2. **Vitest 4.1.5 → 5.0.2**
+   - Must upgrade @vitest/coverage-v8 to 5.0.2 in same step
+   - Review [Vitest v5 migration guide](https://vitest.dev/guide/migration.html)
+   - Edit package.json (both packages), then run workflow above
+
+3. **@testing-library/jest-dom 6.9.1 → 7.0.1**
+   - Review [jest-dom v7 breaking changes](https://github.com/testing-library/jest-dom/releases/tag/v7.0.0)
+   - Edit package.json, then run workflow above
+
+4. **lucide-react 1.14.0 → 1.48.0**
+   - Verify FileText icon (or icons used) still exists
+   - Edit package.json, then run workflow above
+
+### Phase 3: Backend (No Action Needed)
+**Status:** Spring Boot 4.0.3 is current. No updates available.
 
 ---
 
-## Testing Checklist After Updates (2026-05-05)
+## Testing Checklist
 
-**Frontend Patch Updates:**
-- [x] Frontend: `npm run compile` — passed
-- [x] Frontend: `npm run build` — passed
-- [x] Frontend: `npm test` — passed (coverage: 44.31% statements)
-- [x] Frontend: ESLint 10 linting — passed (0 errors, 0 warnings)
+### After All Patch Updates
 
-**Major Dependency Updates:**
-- [x] TypeScript 6.0.3 — passed compilation
-- [x] Vite 8.0.10 — passed build
-- [x] i18next v26 formatter migration — passed tests
-- [x] lucide-react 1.14.0 — passed tests
-- [x] ESLint 10.3.0 + @eslint/js 10.0.1 — passed linting
-- [x] jsdom 29.1.1 — verified compatible with vitest 4.1.5
+**Frontend validation via IDEA MCP:**
 
-**Full Stack:**
-- [x] Backend: `mvn -f backend/pom.xml test` — passed (17 tests, 4 skipped)
-- [x] Full Build: `mvn install` — passed (25.3 seconds)
-- [x] Created .npmrc with legacy-peer-deps=true for npm peer dependency resolution
+1. `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run compile"
+   projectPath: "frontend"
+   ```
+
+2. `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm run build"
+   projectPath: "frontend"
+   ```
+
+3. `mcp__idea__execute_terminal_command`
+   ```
+   command: "npm test"
+   projectPath: "frontend"
+   ```
+
+4. `mcp__idea__lint_files`
+   ```
+   files: ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+   projectPath: "frontend"
+   min_severity: "error"
+   ```
+
+**Full stack build via IDEA MCP:**
+
+1. `mcp__idea__build_project`
+   ```
+   projectPath: "C:\Users\marko\Documents\Git\dynamic-form"
+   rebuild: true
+   timeout: 300000
+   ```
+
+### After Each Major Update
+- Run full stack tests above
+- Manual smoke test via IDE: Start dev server, verify key features work
+- Check diagnostics: `mcp__idea__get_file_problems` on modified files
+
+---
+
+## Current Outdated Summary
+
+**Patch updates waiting:** 24 frontend packages  
+**Major updates available:** 5 frontend packages  
+**Backend:** All current (Spring Boot 4.0.3, Java 21)  
+**Last checked:** 2026-09-27
+
+---
+
+## Completion Status
+
+### Phase 1: Complete ✓ (2026-09-27)
+- [x] All 24 patch updates applied via `npm update`
+- [x] TypeScript compile: passed
+- [x] Build: passed (vite 8.3.1)
+- [x] Tests: 47 passed, 44.31% coverage
+- [x] Lint: passed (0 errors)
+
+No code changes needed. All tests passing.
 
 ---
 
 ## Notes
 
-- All major updates should be followed by running the full test suite
-- Consider updating one major library at a time for easier debugging
-- npm packages can be checked for updates with: `npm outdated`
-- Maven dependencies can be checked with: `mvn versions:display-dependency-updates`
+- **IDEA MCP tools:** All commands use IDE-integrated tools for better diagnostics and error reporting
+  - `execute_terminal_command` runs npm/mvn with full output
+  - `lint_files` uses IDE inspections (better than CLI linting)
+  - `get_file_problems` catches type errors before compilation
+  - `build_project` provides structured build diagnostics
+- Frontend patch updates should be applied first (quick win)
+- TypeScript 7 and Vitest 5 are the riskiest updates due to major version jumps
+- Spring Boot 4.0.3 is recent and stable; no pressure to upgrade
+- testcontainers 2.0.3 works well with Spring Boot 4.x
+- Always run full test suite after major dependency updates
