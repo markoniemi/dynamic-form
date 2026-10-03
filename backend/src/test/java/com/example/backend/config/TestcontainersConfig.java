@@ -27,7 +27,9 @@ public class TestcontainersConfig {
             .withUser("user", "user", "USER")
             .withOAuth2Client(new Client("frontend-client", "")
                 .withRedirectUris("http://localhost:8080", "http://localhost:5173")
-                .withScopes("openid", "profile", "email"))
+                .withScopes("openid", "profile", "email")
+                .withRequireProofKey(true)
+            )
             .withLogConsumer(new Slf4jLogConsumer(log))
             .withCreateContainerCmdModifier(getPortConfig());
     authorizationServer.start();

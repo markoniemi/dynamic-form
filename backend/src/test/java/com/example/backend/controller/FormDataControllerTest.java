@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,7 +44,6 @@ class FormDataControllerTest {
   @MockitoBean private FormDataMapper formDataMapper;
 
   @Test
-  @Disabled("Requires Spring Boot 4 / Spring Security 7 JWT test setup investigation")
   void submitForm() throws Exception {
     Map<String, Object> data = Map.of("field1", "value1");
     FormData formData = new FormData("form1", data, "testuser");
@@ -70,7 +68,6 @@ class FormDataControllerTest {
   }
 
   @Test
-  @Disabled("Requires Spring Boot 4 / Spring Security 7 JWT test setup investigation")
   void getSubmissions() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
@@ -89,7 +86,6 @@ class FormDataControllerTest {
   }
 
   @Test
-  @Disabled("Requires Spring Boot 4 / Spring Security 7 JWT test setup investigation")
   void getSubmissionById() throws Exception {
     FormData formData = new FormData("form1", Map.of(), "username");
     FormDataDto formDataDto =
@@ -109,7 +105,6 @@ class FormDataControllerTest {
   }
 
   @Test
-  @Disabled("Requires Spring Boot 4 / Spring Security 7 JWT test setup investigation")
   void deleteSubmission() throws Exception {
     JwtAuthenticationToken jwtAuth = createJwtAuth("testuser", Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
