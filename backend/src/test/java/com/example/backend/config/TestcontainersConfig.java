@@ -7,6 +7,7 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
+import java.time.Duration;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,10 @@ public class TestcontainersConfig {
             .withUser("user", "user", "USER")
             .withOAuth2Client(new Client("frontend-client", "")
                 .withRedirectUris("http://localhost:8080", "http://localhost:5173")
+                .withPostLogoutRedirectUris("http://localhost:8080", "http://localhost:5173")
                 .withScopes("openid", "profile", "email")
                 .withRequireProofKey(true)
+                .withAccessTokenTimeToLive(Duration.ofHours(1))
             )
             .withLogConsumer(new Slf4jLogConsumer(log))
             .withCreateContainerCmdModifier(getPortConfig());
