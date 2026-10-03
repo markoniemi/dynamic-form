@@ -3,11 +3,20 @@ services:
     image: ghcr.io/markoniemi/oauth2-server:latest
     ports:
       - "9000:9000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/.well-known/openid-configuration"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+    # No healthcheck: the image is distroless (no shell or curl). The app does not need the
+    # auth server at startup because it fetches signing keys lazily via jwk-set-uri.
+    environment:
+      # The browser reaches the server as localhost:9000, so tokens must carry that issuer even
+      # when the app talks to the server as auth:9000 inside the compose network
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER: http://localhost:9000
+      # Demo users (the server has none by default); frontend-client is registered by default
+      APP_SECURITY_USERS_0_USERNAME: admin
+      APP_SECURITY_USERS_0_PASSWORD: admin
+      APP_SECURITY_USERS_0_ROLES_0: USER
+      APP_SECURITY_USERS_0_ROLES_1: ADMIN
+      APP_SECURITY_USERS_1_USERNAME: user
+      APP_SECURITY_USERS_1_PASSWORD: user
+      APP_SECURITY_USERS_1_ROLES_0: USER
 
   db:
     image: postgres:16-alpine
@@ -17,8 +26,11 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"   # 5433 to avoid clashing with a locally running postgres
-    depends_on:
-      - auth
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dynamicform"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   app:
     image: dynamic-form:1.0.0-SNAPSHOT
@@ -29,9 +41,13 @@ services:
       DB_URL: jdbc:postgresql://db:5432/dynamicform
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      OAUTH2_ISSUER_URI: http://auth:9000
+      # Issuer as seen by the browser (also returned by /api/config/oauth2-issuer-uri) and
+      # validated against the token's iss claim
+      OAUTH2_ISSUER_URI: http://localhost:9000
+      # Signing keys are fetched over the compose network; no issuer discovery at startup
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth:9000/oauth2/jwks
     depends_on:
       auth:
-        condition: service_healthy
-      db:
         condition: service_started
+      db:
+        condition: service_healthy

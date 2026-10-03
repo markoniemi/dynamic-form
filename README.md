@@ -87,6 +87,8 @@ docker compose up
 - OAuth2 server runs on `http://localhost:9000` (for authentication)
 - PostgreSQL runs on `localhost:5433` (port 5433 to avoid conflicts)
 - Uses `SPRING_PROFILES_ACTIVE=prod` with environment variables (PostgreSQL, RDS-like config)
+- Log in as `admin`/`admin` or `user`/`user` (demo users configured on the `auth` service)
+- Tokens are issued for `http://localhost:9000` (what the browser sees); the backend fetches signing keys from `http://auth:9000/oauth2/jwks` inside the compose network
 
 Stop with `Ctrl+C`, tear down with `docker compose down`.
 
