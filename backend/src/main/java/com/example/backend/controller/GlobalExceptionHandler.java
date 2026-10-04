@@ -3,21 +3,24 @@ package com.example.backend.controller;
 import com.example.backend.dto.ValidationErrorDto;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ProblemDetail> handleIllegalArgumentException(IllegalArgumentException ex) {
     log.warn("IllegalArgumentException: {}", ex.getMessage());
@@ -25,14 +28,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(pd);
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ProblemDetail> handleValidationException(MethodArgumentNotValidException ex) {
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request) {
     log.warn("Validation failed: {}", ex.getMessage());
     List<ValidationErrorDto> errors = ex.getBindingResult().getFieldErrors().stream()
-        .map(fe -> new ValidationErrorDto(
-            fe.getField(),
-            fe.getDefaultMessage(),
-            firstCode(fe.getCodes())))
+        .map(fe -> new ValidationErrorDto(fe.getField(), fe.getDefaultMessage(), fe.getCode()))
         .toList();
     ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
     pd.setProperty("errors", errors);
@@ -52,12 +56,6 @@ public class GlobalExceptionHandler {
     ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
     pd.setProperty("errors", errors);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(pd);
-  }
-
-  @ExceptionHandler(NoResourceFoundException.class)
-  public ResponseEntity<ProblemDetail> handleNoResourceFoundException(NoResourceFoundException ex) {
-    ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
   }
 
   @ExceptionHandler(NoSuchElementException.class)
@@ -93,13 +91,6 @@ public class GlobalExceptionHandler {
     ProblemDetail pd = ProblemDetail.forStatusAndDetail(
         HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
-  }
-
-  private String firstCode(String[] codes) {
-    if (codes == null || codes.length == 0) return "ValidationError";
-    String code = codes[0];
-    int lastDot = code.lastIndexOf('.');
-    return lastDot >= 0 ? code.substring(0, lastDot) : code;
   }
 
   private String leafPath(jakarta.validation.Path path) {
