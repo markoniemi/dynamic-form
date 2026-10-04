@@ -40,10 +40,15 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import(SecurityConfig.class)
 class FormControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  private final MockMvc mockMvc;
   @MockitoBean private FormService formService;
   @MockitoBean private FormMapper formMapper;
   @MockitoBean private JwtDecoder jwtDecoder;
+
+  @Autowired
+  FormControllerTest(MockMvc mockMvc) {
+    this.mockMvc = mockMvc;
+  }
 
   private static final String VALID_FORM_JSON =
       """

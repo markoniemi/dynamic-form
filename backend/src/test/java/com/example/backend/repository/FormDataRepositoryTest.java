@@ -14,7 +14,12 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class FormDataRepositoryTest {
 
-  @Autowired private FormDataRepository formDataRepository;
+  private final FormDataRepository formDataRepository;
+
+  @Autowired
+  FormDataRepositoryTest(FormDataRepository formDataRepository) {
+    this.formDataRepository = formDataRepository;
+  }
 
   @Test
   void findBySubmittedByOrderBySubmittedAtDesc() {

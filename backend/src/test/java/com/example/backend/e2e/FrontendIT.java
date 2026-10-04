@@ -6,21 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.example.backend.IntegrationTestBase;
 import com.example.backend.e2e.pages.*;
 import com.microsoft.playwright.Page;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FrontendIT extends IntegrationTestBase {
 
-  @Autowired private Page page;
-  private LoginPage loginPage;
-  private FormsPage formsPage;
-  private FormSubmissionPage formSubmissionPage;
-  private FormSubmissionsPage formSubmissionsPage;
-  private SubmissionDetailPage submissionDetailPage;
+  private final Page page;
+  private final LoginPage loginPage;
+  private final FormsPage formsPage;
+  private final FormSubmissionPage formSubmissionPage;
+  private final FormSubmissionsPage formSubmissionsPage;
+  private final SubmissionDetailPage submissionDetailPage;
 
-  @BeforeEach
-  void setup() {
+  // Page is a prototype bean: each test instance gets its own browser context, shared by all page
+  // objects of that test.
+  @Autowired
+  FrontendIT(Page page) {
+    this.page = page;
     loginPage = new LoginPage(page);
     formsPage = new FormsPage(page);
     formSubmissionPage = new FormSubmissionPage(page);

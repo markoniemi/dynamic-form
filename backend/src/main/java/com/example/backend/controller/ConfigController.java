@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/config")
 public class ConfigController {
 
-  @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-  private String oauth2IssuerUri;
+  private final String oauth2IssuerUri;
+
+  public ConfigController(
+      @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String oauth2IssuerUri) {
+    this.oauth2IssuerUri = oauth2IssuerUri;
+  }
 
   @GetMapping("/oauth2-issuer-uri")
   public String getOauth2IssuerUri() {
