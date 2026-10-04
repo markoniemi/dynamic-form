@@ -26,9 +26,9 @@ public class FormDataService {
 
   @InterfaceLog
   @Transactional
-  public FormData createFormSubmission(@NotNull String formKey, @Valid FormData formData) {
+  public FormData create(@NotNull String formKey, @Valid FormData formData) {
     // Validate that the form exists
-    formService.getForm(formKey);
+    formService.get(formKey);
 
     // Set the form key
     formData.setFormKey(formKey);
@@ -39,8 +39,8 @@ public class FormDataService {
 
   @InterfaceLog
   @Transactional
-  public FormData updateFormSubmission(@NotNull Long id, @NotNull Map<String, Object> data, String username) {
-    FormData existing = getFormSubmissionById(id);
+  public FormData update(@NotNull Long id, @NotNull Map<String, Object> data, String username) {
+    FormData existing = get(id);
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to update this submission");
@@ -52,26 +52,26 @@ public class FormDataService {
   }
 
   @InterfaceLog
-  public FormData getFormSubmissionById(@NotNull Long id) {
+  public FormData get(@NotNull Long id) {
     return formDataRepository
         .findById(id)
         .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
   }
 
   @InterfaceLog
-  public List<FormData> getFormSubmissions() {
+  public List<FormData> getAll() {
     return formDataRepository.findAll();
   }
 
   @InterfaceLog
-  public List<FormData> getFormSubmissionsByOwner(@NotNull String username) {
+  public List<FormData> getByOwner(@NotNull String username) {
     return formDataRepository.findBySubmittedByOrderBySubmittedAtDesc(username);
   }
 
   @InterfaceLog
   @Transactional
-  public void deleteFormSubmission(@NotNull Long id, @NotNull String username) {
-    FormData existing = getFormSubmissionById(id);
+  public void delete(@NotNull Long id, @NotNull String username) {
+    FormData existing = get(id);
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to delete this submission");

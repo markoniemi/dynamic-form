@@ -36,7 +36,7 @@ public class FormDataController {
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
     FormData formData = new FormData(key, data, getUsername(jwt));
-    return formDataMapper.toDto(formDataService.createFormSubmission(key, formData));
+    return formDataMapper.toDto(formDataService.create(key, formData));
   }
 
   @PutMapping("/submission/{id}")
@@ -47,7 +47,7 @@ public class FormDataController {
       @RequestBody Map<String, Object> data,
       @AuthenticationPrincipal Jwt jwt) {
     String username = getUsername(jwt);
-    return formDataMapper.toDto(formDataService.updateFormSubmission(id, data, username));
+    return formDataMapper.toDto(formDataService.update(id, data, username));
   }
 
   @GetMapping
@@ -56,9 +56,9 @@ public class FormDataController {
   public List<FormDataDto> getSubmissions(
       @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     if (isAdmin(authentication)) {
-      return formDataMapper.mapList(formDataService.getFormSubmissions());
+      return formDataMapper.mapList(formDataService.getAll());
     } else {
-      return formDataMapper.mapList(formDataService.getFormSubmissionsByOwner(getUsername(jwt)));
+      return formDataMapper.mapList(formDataService.getByOwner(getUsername(jwt)));
     }
   }
 
@@ -68,7 +68,7 @@ public class FormDataController {
   public FormDataDto getSubmissionById(
       @PathVariable Long id, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
-    FormData submission = formDataService.getFormSubmissionById(id);
+    FormData submission = formDataService.get(id);
     if (!submission.getSubmittedBy().equals(username) && !isAdmin(authentication)) {
       throw new SecurityException("You are not authorized to view this submission");
     }
@@ -79,6 +79,6 @@ public class FormDataController {
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public void deleteSubmission(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-    formDataService.deleteFormSubmission(id, getUsername(jwt));
+    formDataService.delete(id, getUsername(jwt));
   }
 }

@@ -33,7 +33,7 @@ class FormServiceTest {
     Form contact = contact();
     when(formRepository.findAll()).thenReturn(List.of(simple, contact));
 
-    assertEquals(List.of(listItem(simple), listItem(contact)), formService.getForms());
+    assertEquals(List.of(listItem(simple), listItem(contact)), formService.getAll());
   }
 
   @Test
@@ -41,21 +41,21 @@ class FormServiceTest {
     Form contact = contact();
     when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(contact));
 
-    assertEquals(contact, formService.getForm("contact"));
+    assertEquals(contact, formService.get("contact"));
   }
 
   @Test
   void getFormWithNotFoundThrowsException() {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class, () -> formService.getForm("unknown"));
+    assertThrows(NoSuchElementException.class, () -> formService.get("unknown"));
   }
 
   @Test
   void updateFormWithNotFoundThrowsException() {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class, () -> formService.updateForm("unknown", simple()));
+    assertThrows(NoSuchElementException.class, () -> formService.update("unknown", simple()));
     verify(formRepository, never()).save(any());
   }
 
@@ -66,7 +66,7 @@ class FormServiceTest {
     when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(existing));
     when(formRepository.save(existing)).thenReturn(existing);
 
-    Form result = formService.updateForm("contact", update);
+    Form result = formService.update("contact", update);
 
     assertEquals(contact().getId(), result.getId());
     assertEquals("contact", result.getFormKey());
@@ -81,7 +81,7 @@ class FormServiceTest {
     Form existing = contact();
     when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(existing));
 
-    formService.deleteForm("contact");
+    formService.delete("contact");
 
     verify(formRepository).delete(existing);
   }
@@ -90,7 +90,7 @@ class FormServiceTest {
   void deleteFormWithNotFoundThrowsException() {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class, () -> formService.deleteForm("unknown"));
+    assertThrows(NoSuchElementException.class, () -> formService.delete("unknown"));
     verify(formRepository, never()).delete(any());
   }
 
@@ -99,7 +99,7 @@ class FormServiceTest {
     Form form = simple();
     when(formRepository.save(form)).thenReturn(form);
 
-    assertEquals(form, formService.saveForm(form));
+    assertEquals(form, formService.save(form));
     verify(formRepository).save(form);
   }
 
@@ -108,7 +108,7 @@ class FormServiceTest {
     when(formRepository.existsByFormKey("contact")).thenReturn(true);
     when(formRepository.existsByFormKey("unknown")).thenReturn(false);
 
-    assertTrue(formService.existsByFormKey("contact"));
-    assertFalse(formService.existsByFormKey("unknown"));
+    assertTrue(formService.exists("contact"));
+    assertFalse(formService.exists("unknown"));
   }
 }

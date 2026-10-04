@@ -67,13 +67,13 @@ class FormControllerTest {
   void deleteFormAsNonAdminReturnsForbidden() throws Exception {
     mockMvc.perform(delete("/api/forms/contact").with(user())).andExpect(status().isForbidden());
 
-    verify(formService, never()).deleteForm(any());
+    verify(formService, never()).delete(any());
   }
 
   @Test
   void getFormsReturnsListItems() throws Exception {
     Form contact = contact();
-    when(formService.getForms()).thenReturn(List.of(listItem(contact)));
+    when(formService.getAll()).thenReturn(List.of(listItem(contact)));
 
     mockMvc
         .perform(get("/api/forms").with(user()))
@@ -89,7 +89,7 @@ class FormControllerTest {
 
   @Test
   void getFormMissingReturnsNotFound() throws Exception {
-    when(formService.getForm("missing"))
+    when(formService.get("missing"))
         .thenThrow(new NoSuchElementException("Form not found: missing"));
 
     mockMvc
@@ -100,7 +100,7 @@ class FormControllerTest {
 
   @Test
   void createFormWithExistingKeyReturnsBadRequest() throws Exception {
-    when(formService.existsByFormKey("contact")).thenReturn(true);
+    when(formService.exists("contact")).thenReturn(true);
 
     mockMvc
         .perform(
@@ -111,13 +111,13 @@ class FormControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.detail").value("Form with key 'contact' already exists"));
 
-    verify(formService, never()).saveForm(any());
+    verify(formService, never()).save(any());
   }
 
   @Test
   void updateFormAsAdminReturnsUpdatedForm() throws Exception {
     Form form = stubMapperWithContact();
-    when(formService.updateForm("contact", form)).thenReturn(form);
+    when(formService.update("contact", form)).thenReturn(form);
 
     mockMvc
         .perform(
@@ -135,14 +135,14 @@ class FormControllerTest {
         .perform(delete("/api/forms/contact").with(admin()))
         .andExpect(status().isNoContent());
 
-    verify(formService).deleteForm("contact");
+    verify(formService).delete("contact");
   }
 
   @Test
   void createFormWithValidBodyReturnsCreated() throws Exception {
     Form form = stubMapperWithContact();
-    when(formService.existsByFormKey("contact")).thenReturn(false);
-    when(formService.saveForm(form)).thenReturn(form);
+    when(formService.exists("contact")).thenReturn(false);
+    when(formService.save(form)).thenReturn(form);
 
     mockMvc
         .perform(
@@ -174,7 +174,7 @@ class FormControllerTest {
         .andExpect(jsonPath("$.errors[?(@.field == 'formKey')].code").value("Pattern"))
         .andExpect(jsonPath("$.errors[?(@.field == 'title')].code").value("NotBlank"));
 
-    verify(formService, never()).saveForm(any());
+    verify(formService, never()).save(any());
   }
 
   @Test
@@ -185,7 +185,7 @@ class FormControllerTest {
           {"name":"name","label":"Name","type":"text"}]}
         """;
     Form form = stubMapperWithContact();
-    when(formService.saveForm(form)).thenReturn(form);
+    when(formService.save(form)).thenReturn(form);
 
     mockMvc
         .perform(
@@ -202,7 +202,7 @@ class FormControllerTest {
 
   @Test
   void getForm() throws Exception {
-    when(formService.getForm("contact")).thenReturn(contact());
+    when(formService.get("contact")).thenReturn(contact());
     when(formMapper.toDto(any(Form.class))).thenReturn(contactDto());
 
     mockMvc

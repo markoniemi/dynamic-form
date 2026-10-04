@@ -63,7 +63,7 @@ class FormDataControllerTest {
   @Test
   void submitForm() throws Exception {
     FormData saved = contact(1L, USER);
-    when(formDataService.createFormSubmission(eq("contact"), any(FormData.class)))
+    when(formDataService.create(eq("contact"), any(FormData.class)))
         .thenReturn(saved);
     stubToDto(saved);
 
@@ -79,13 +79,13 @@ class FormDataControllerTest {
         .andExpect(jsonPath("$.formKey").value("contact"));
 
     verify(formDataService)
-        .createFormSubmission(eq("contact"), argThat(f -> USER.equals(f.getSubmittedBy())));
+        .create(eq("contact"), argThat(f -> USER.equals(f.getSubmittedBy())));
   }
 
   @Test
   void getSubmissions() throws Exception {
     List<FormData> submissions = List.of(contact(1L, USER));
-    when(formDataService.getFormSubmissions()).thenReturn(submissions);
+    when(formDataService.getAll()).thenReturn(submissions);
     when(formDataMapper.mapList(submissions)).thenReturn(List.of(toDto(submissions.getFirst())));
 
     mockMvc
@@ -97,7 +97,7 @@ class FormDataControllerTest {
   @Test
   void getSubmissionById() throws Exception {
     FormData formData = contact(1L, USER);
-    when(formDataService.getFormSubmissionById(1L)).thenReturn(formData);
+    when(formDataService.get(1L)).thenReturn(formData);
     stubToDto(formData);
 
     mockMvc
@@ -112,13 +112,13 @@ class FormDataControllerTest {
         .perform(delete("/api/form-data/submission/1").with(csrf()).with(admin()))
         .andExpect(status().isOk());
 
-    verify(formDataService).deleteFormSubmission(1L, ADMIN);
+    verify(formDataService).delete(1L, ADMIN);
   }
 
   @Test
   void getSubmissionsAsUserReturnsOnlyOwnSubmissions() throws Exception {
     List<FormData> submissions = List.of(contact(1L, USER));
-    when(formDataService.getFormSubmissionsByOwner(USER)).thenReturn(submissions);
+    when(formDataService.getByOwner(USER)).thenReturn(submissions);
     when(formDataMapper.mapList(submissions)).thenReturn(List.of(toDto(submissions.getFirst())));
 
     mockMvc
@@ -126,19 +126,19 @@ class FormDataControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].submittedBy").value(USER));
 
-    verify(formDataService, never()).getFormSubmissions();
+    verify(formDataService, never()).getAll();
   }
 
   @Test
   void getSubmissionByIdOfOtherUserReturnsForbidden() throws Exception {
-    when(formDataService.getFormSubmissionById(1L)).thenReturn(contact(1L, ADMIN));
+    when(formDataService.get(1L)).thenReturn(contact(1L, ADMIN));
 
     mockMvc.perform(get("/api/form-data/submission/1").with(user())).andExpect(status().isForbidden());
   }
 
   @Test
   void getSubmissionByIdMissingReturnsNotFound() throws Exception {
-    when(formDataService.getFormSubmissionById(99L))
+    when(formDataService.get(99L))
         .thenThrow(new NoSuchElementException("Form submission not found: 99"));
 
     mockMvc
@@ -152,7 +152,7 @@ class FormDataControllerTest {
     Map<String, Object> data = Map.of("name", "Updated User");
     FormData updated = contact(1L, USER);
     updated.setData(data);
-    when(formDataService.updateFormSubmission(1L, data, USER)).thenReturn(updated);
+    when(formDataService.update(1L, data, USER)).thenReturn(updated);
     stubToDto(updated);
 
     mockMvc
@@ -171,6 +171,6 @@ class FormDataControllerTest {
         .perform(delete("/api/form-data/submission/1").with(user()))
         .andExpect(status().isForbidden());
 
-    verify(formDataService, never()).deleteFormSubmission(any(), any());
+    verify(formDataService, never()).delete(any(), any());
   }
 }

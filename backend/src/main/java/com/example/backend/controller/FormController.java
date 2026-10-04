@@ -27,14 +27,14 @@ public class FormController {
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
   public List<FormListItemDto> getForms() {
-    return formService.getForms();
+    return formService.getAll();
   }
 
   @GetMapping("/{key}")
   @InterfaceLog
   @PreAuthorize("isAuthenticated()")
   public FormDto getForm(@PathVariable String key) {
-    return formMapper.toDto(formService.getForm(key));
+    return formMapper.toDto(formService.get(key));
   }
 
   @PostMapping
@@ -42,17 +42,17 @@ public class FormController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto createForm(@Valid @RequestBody FormDto dto) {
-    if (formService.existsByFormKey(dto.getFormKey())) {
+    if (formService.exists(dto.getFormKey())) {
       throw new IllegalArgumentException("Form with key '" + dto.getFormKey() + "' already exists");
     }
-    return formMapper.toDto(formService.saveForm(formMapper.toEntity(dto)));
+    return formMapper.toDto(formService.save(formMapper.toEntity(dto)));
   }
 
   @PutMapping("/{key}")
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public FormDto updateForm(@PathVariable String key, @Valid @RequestBody FormDto dto) {
-    return formMapper.toDto(formService.updateForm(key, formMapper.toEntity(dto)));
+    return formMapper.toDto(formService.update(key, formMapper.toEntity(dto)));
   }
 
   @DeleteMapping("/{key}")
@@ -60,6 +60,6 @@ public class FormController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public void deleteForm(@PathVariable String key) {
-    formService.deleteForm(key);
+    formService.delete(key);
   }
 }

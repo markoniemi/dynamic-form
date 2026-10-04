@@ -29,10 +29,10 @@ class FormDataServiceTest {
   @Test
   void createFormSubmission() {
     FormData formData = contact(USER);
-    when(formService.getForm("contact")).thenReturn(TestForms.contact());
+    when(formService.get("contact")).thenReturn(TestForms.contact());
     when(formDataRepository.save(formData)).thenReturn(formData);
 
-    FormData result = formDataService.createFormSubmission("contact", formData);
+    FormData result = formDataService.create("contact", formData);
 
     assertEquals("contact", result.getFormKey());
     verify(formDataRepository).save(formData);
@@ -43,7 +43,7 @@ class FormDataServiceTest {
     FormData formData = contact(1L, USER);
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(formData));
 
-    assertEquals(formData, formDataService.getFormSubmissionById(1L));
+    assertEquals(formData, formDataService.get(1L));
   }
 
   @Test
@@ -52,7 +52,7 @@ class FormDataServiceTest {
 
     NoSuchElementException exception =
         assertThrows(
-            NoSuchElementException.class, () -> formDataService.getFormSubmissionById(99L));
+            NoSuchElementException.class, () -> formDataService.get(99L));
     assertEquals("Form submission not found: 99", exception.getMessage());
   }
 
@@ -61,26 +61,26 @@ class FormDataServiceTest {
     List<FormData> submissions = List.of(contact(1L, USER), contact(2L, ADMIN));
     when(formDataRepository.findAll()).thenReturn(submissions);
 
-    assertEquals(submissions, formDataService.getFormSubmissions());
+    assertEquals(submissions, formDataService.getAll());
   }
 
   @Test
   void deleteFormSubmission() {
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, USER)));
 
-    formDataService.deleteFormSubmission(1L, USER);
+    formDataService.delete(1L, USER);
 
     verify(formDataRepository).deleteById(1L);
   }
 
   @Test
   void createFormSubmissionWithUnknownFormThrowsAndDoesNotSave() {
-    when(formService.getForm("unknown"))
+    when(formService.get("unknown"))
         .thenThrow(new NoSuchElementException("Form not found: unknown"));
 
     assertThrows(
         NoSuchElementException.class,
-        () -> formDataService.createFormSubmission("unknown", contact(USER)));
+        () -> formDataService.create("unknown", contact(USER)));
     verify(formDataRepository, never()).save(any());
   }
 
@@ -91,7 +91,7 @@ class FormDataServiceTest {
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(existing));
     when(formDataRepository.save(existing)).thenReturn(existing);
 
-    FormData result = formDataService.updateFormSubmission(1L, newData, USER);
+    FormData result = formDataService.update(1L, newData, USER);
 
     assertEquals(newData, result.getData());
     verify(formDataRepository).save(existing);
@@ -103,7 +103,7 @@ class FormDataServiceTest {
 
     assertThrows(
         SecurityException.class,
-        () -> formDataService.updateFormSubmission(1L, Map.of(), USER));
+        () -> formDataService.update(1L, Map.of(), USER));
     verify(formDataRepository, never()).save(any());
   }
 
@@ -112,7 +112,7 @@ class FormDataServiceTest {
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, ADMIN)));
 
     assertThrows(
-        SecurityException.class, () -> formDataService.deleteFormSubmission(1L, USER));
+        SecurityException.class, () -> formDataService.delete(1L, USER));
     verify(formDataRepository, never()).deleteById(any());
   }
 
@@ -122,7 +122,7 @@ class FormDataServiceTest {
     when(formDataRepository.findBySubmittedByOrderBySubmittedAtDesc(USER))
         .thenReturn(submissions);
 
-    assertEquals(submissions, formDataService.getFormSubmissionsByOwner(USER));
+    assertEquals(submissions, formDataService.getByOwner(USER));
   }
 
   @Test
@@ -131,7 +131,7 @@ class FormDataServiceTest {
 
     assertThrows(
         NoSuchElementException.class,
-        () -> formDataService.updateFormSubmission(99L, Map.of(), USER));
+        () -> formDataService.update(99L, Map.of(), USER));
     verify(formDataRepository, never()).save(any());
   }
 
@@ -140,7 +140,7 @@ class FormDataServiceTest {
     when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThrows(
-        NoSuchElementException.class, () -> formDataService.deleteFormSubmission(99L, USER));
+        NoSuchElementException.class, () -> formDataService.delete(99L, USER));
     verify(formDataRepository, never()).deleteById(any());
   }
 }
