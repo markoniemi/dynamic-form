@@ -27,7 +27,7 @@ import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -97,7 +97,7 @@ class FormDataControllerTest {
   @Test
   void getSubmissionById() throws Exception {
     FormData formData = contact(1L, USER);
-    when(formDataService.getFormSubmissionById(1L)).thenReturn(Optional.of(formData));
+    when(formDataService.getFormSubmissionById(1L)).thenReturn(formData);
     stubToDto(formData);
 
     mockMvc
@@ -131,15 +131,15 @@ class FormDataControllerTest {
 
   @Test
   void getSubmissionByIdOfOtherUserReturnsForbidden() throws Exception {
-    when(formDataService.getFormSubmissionById(1L))
-        .thenReturn(Optional.of(contact(1L, ADMIN)));
+    when(formDataService.getFormSubmissionById(1L)).thenReturn(contact(1L, ADMIN));
 
     mockMvc.perform(get("/api/form-data/submission/1").with(user())).andExpect(status().isForbidden());
   }
 
   @Test
   void getSubmissionByIdMissingReturnsNotFound() throws Exception {
-    when(formDataService.getFormSubmissionById(99L)).thenReturn(Optional.empty());
+    when(formDataService.getFormSubmissionById(99L))
+        .thenThrow(new NoSuchElementException("Form submission not found: 99"));
 
     mockMvc
         .perform(get("/api/form-data/submission/99").with(user()))

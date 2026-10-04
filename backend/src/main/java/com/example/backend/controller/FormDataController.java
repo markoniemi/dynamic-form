@@ -9,7 +9,6 @@ import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -69,10 +68,7 @@ public class FormDataController {
   public FormDataDto getSubmissionById(
       @PathVariable Long id, @AuthenticationPrincipal Jwt jwt, Authentication authentication) {
     String username = getUsername(jwt);
-    FormData submission =
-        formDataService
-            .getFormSubmissionById(id)
-            .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
+    FormData submission = formDataService.getFormSubmissionById(id);
     if (!submission.getSubmittedBy().equals(username) && !isAdmin(authentication)) {
       throw new SecurityException("You are not authorized to view this submission");
     }

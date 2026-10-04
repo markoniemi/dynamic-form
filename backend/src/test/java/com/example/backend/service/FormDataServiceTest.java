@@ -43,7 +43,17 @@ class FormDataServiceTest {
     FormData formData = contact(1L, USER);
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(formData));
 
-    assertEquals(Optional.of(formData), formDataService.getFormSubmissionById(1L));
+    assertEquals(formData, formDataService.getFormSubmissionById(1L));
+  }
+
+  @Test
+  void getFormSubmissionByIdWithNotFoundThrowsException() {
+    when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
+
+    NoSuchElementException exception =
+        assertThrows(
+            NoSuchElementException.class, () -> formDataService.getFormSubmissionById(99L));
+    assertEquals("Form submission not found: 99", exception.getMessage());
   }
 
   @Test

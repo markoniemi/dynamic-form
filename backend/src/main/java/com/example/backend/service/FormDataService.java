@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.log.InterfaceLog;
@@ -41,8 +40,7 @@ public class FormDataService {
   @InterfaceLog
   @Transactional
   public FormData updateFormSubmission(@NotNull Long id, @NotNull Map<String, Object> data, String username) {
-    FormData existing = formDataRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("Submission not found: " + id));
+    FormData existing = getFormSubmissionById(id);
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to update this submission");
@@ -54,8 +52,10 @@ public class FormDataService {
   }
 
   @InterfaceLog
-  public Optional<FormData> getFormSubmissionById(@NotNull Long id) {
-    return formDataRepository.findById(id);
+  public FormData getFormSubmissionById(@NotNull Long id) {
+    return formDataRepository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Form submission not found: " + id));
   }
 
   @InterfaceLog
@@ -71,8 +71,7 @@ public class FormDataService {
   @InterfaceLog
   @Transactional
   public void deleteFormSubmission(@NotNull Long id, @NotNull String username) {
-    FormData existing = formDataRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("Submission not found: " + id));
+    FormData existing = getFormSubmissionById(id);
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to delete this submission");
