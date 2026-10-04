@@ -1,45 +1,39 @@
 package com.example.backend.mapper;
 
+import static com.example.backend.testdata.TestSubmissions.SUBMITTED_AT;
+import static com.example.backend.testdata.TestSubmissions.contact;
+import static com.example.backend.testdata.TestSubmissions.contactData;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.backend.dto.FormDataDto;
 import com.example.backend.entity.FormData;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 class FormDataMapperTest {
 
-  private static final LocalDateTime SUBMITTED_AT = LocalDateTime.of(2026, 1, 2, 3, 4);
-
   private final FormDataMapper formDataMapper = Mappers.getMapper(FormDataMapper.class);
 
   @Test
   void toDtoCopiesAllFields() {
-    FormData entity = new FormData(5L, "form1", Map.of("field", "value"), SUBMITTED_AT, "user");
+    FormData entity = contact(5L, "user");
 
     assertEquals(
-        new FormDataDto(5L, "form1", Map.of("field", "value"), SUBMITTED_AT, "user"),
+        new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, "user"),
         formDataMapper.toDto(entity));
   }
 
   @Test
   void toEntityCopiesAllFields() {
-    FormDataDto dto = new FormDataDto(5L, "form1", Map.of("field", "value"), SUBMITTED_AT, "user");
+    FormDataDto dto = new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, "user");
 
-    assertEquals(
-        new FormData(5L, "form1", Map.of("field", "value"), SUBMITTED_AT, "user"),
-        formDataMapper.toEntity(dto));
+    assertEquals(contact(5L, "user"), formDataMapper.toEntity(dto));
   }
 
   @Test
   void mapListMapsEachElementInOrder() {
-    List<FormData> entities =
-        List.of(
-            new FormData(1L, "form1", Map.of(), SUBMITTED_AT, "user"),
-            new FormData(2L, "form2", Map.of(), SUBMITTED_AT, "user"));
+    List<FormData> entities = List.of(contact(1L, "user"), contact(2L, "user"));
 
     List<FormDataDto> result = formDataMapper.mapList(entities);
 

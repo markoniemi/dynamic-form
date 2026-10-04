@@ -1,5 +1,8 @@
 package com.example.backend.controller;
 
+import static com.example.backend.testdata.TestSubmissions.contact;
+import static com.example.backend.testdata.TestSubmissions.contactData;
+import static com.example.backend.testdata.TestSubmissions.toDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -15,12 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.backend.config.SecurityConfig;
-import com.example.backend.dto.FormDataDto;
 import com.example.backend.entity.FormData;
 import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,11 @@ import tools.jackson.databind.ObjectMapper;
 @Import(SecurityConfig.class)
 class FormDataControllerTest {
 
+  private static final Collection<SimpleGrantedAuthority> USER =
+      Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+  private static final Collection<SimpleGrantedAuthority> ADMIN =
+      Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
   private final MockMvc mockMvc;
   private final ObjectMapper objectMapper;
 
@@ -56,91 +62,72 @@ class FormDataControllerTest {
     this.objectMapper = objectMapper;
   }
 
+  /** Makes the mocked mapper map the given submission like the real mapper does. */
+  private void stubToDto(FormData formData) {
+    when(formDataMapper.toDto(formData)).thenReturn(toDto(formData));
+  }
+
   @Test
   void submitForm() throws Exception {
-    Map<String, Object> data = Map.of("field1", "value1");
-    FormData formData = new FormData("form1", data, "testuser");
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "testuser");
-
-    when(formDataService.createFormSubmission(eq("form1"), any(FormData.class)))
-        .thenReturn(formData);
-    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
-
-    JwtAuthenticationToken jwtAuth = createJwtAuth("testuser", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+    FormData saved = contact(1L, "testuser");
+    when(formDataService.createFormSubmission(eq("contact"), any(FormData.class)))
+        .thenReturn(saved);
+    stubToDto(saved);
 
     mockMvc
         .perform(
-            post("/api/form-data/form1")
+            post("/api/form-data/contact")
                 .with(csrf())
-                .with(authentication(jwtAuth))
+                .with(authentication(createJwtAuth("testuser", USER)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(data)))
+                .content(objectMapper.writeValueAsString(contactData())))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L))
-        .andExpect(jsonPath("$.formKey").value("form1"));
+        .andExpect(jsonPath("$.formKey").value("contact"));
   }
 
   @Test
   void getSubmissions() throws Exception {
-    FormData formData = new FormData("form1", Map.of(), "username");
-    FormDataDto formDataDto =
-        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
-
-    when(formDataService.getFormSubmissions()).thenReturn(Collections.singletonList(formData));
-    when(formDataMapper.mapList(any(List.class))).thenReturn(Collections.singletonList(formDataDto));
-
-    JwtAuthenticationToken jwtAuth = createJwtAuth("admin", Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    List<FormData> submissions = List.of(contact(1L, "username"));
+    when(formDataService.getFormSubmissions()).thenReturn(submissions);
+    when(formDataMapper.mapList(submissions)).thenReturn(List.of(toDto(submissions.getFirst())));
 
     mockMvc
-        .perform(
-            get("/api/form-data").with(authentication(jwtAuth)))
+        .perform(get("/api/form-data").with(authentication(createJwtAuth("admin", ADMIN))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1L));
   }
 
   @Test
   void getSubmissionById() throws Exception {
-    FormData formData = new FormData("form1", Map.of(), "username");
-    FormDataDto formDataDto =
-        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "username");
-
+    FormData formData = contact(1L, "username");
     when(formDataService.getFormSubmissionById(1L)).thenReturn(Optional.of(formData));
-    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
-
-    JwtAuthenticationToken jwtAuth = createJwtAuth("admin", Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    stubToDto(formData);
 
     mockMvc
         .perform(
-            get("/api/form-data/submission/1")
-                .with(authentication(jwtAuth)))
+            get("/api/form-data/submission/1").with(authentication(createJwtAuth("admin", ADMIN))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1L));
   }
 
   @Test
   void deleteSubmission() throws Exception {
-    JwtAuthenticationToken jwtAuth = createJwtAuth("testuser", Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
-
     mockMvc
         .perform(
             delete("/api/form-data/submission/1")
                 .with(csrf())
-                .with(authentication(jwtAuth)))
+                .with(authentication(createJwtAuth("testuser", ADMIN))))
         .andExpect(status().isOk());
 
     verify(formDataService).deleteFormSubmission(1L, "testuser");
   }
 
-  private static final Collection<SimpleGrantedAuthority> USER =
-      Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
-
   @Test
   void getSubmissionsAsUserReturnsOnlyOwnSubmissions() throws Exception {
-    FormData formData = new FormData("form1", Map.of(), "testuser");
-    FormDataDto formDataDto =
-        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "testuser");
-    when(formDataService.getFormSubmissionsByOwner("testuser")).thenReturn(List.of(formData));
-    when(formDataMapper.mapList(List.of(formData))).thenReturn(List.of(formDataDto));
+    List<FormData> submissions = List.of(contact(1L, "testuser"));
+    when(formDataService.getFormSubmissionsByOwner("testuser")).thenReturn(submissions);
+    when(formDataMapper.mapList(submissions)).thenReturn(List.of(toDto(submissions.getFirst())));
 
     mockMvc
         .perform(get("/api/form-data").with(authentication(createJwtAuth("testuser", USER))))
@@ -152,8 +139,7 @@ class FormDataControllerTest {
 
   @Test
   void getSubmissionByIdOfOtherUserReturnsForbidden() throws Exception {
-    when(formDataService.getFormSubmissionById(1L))
-        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+    when(formDataService.getFormSubmissionById(1L)).thenReturn(Optional.of(contact(1L, "owner")));
 
     mockMvc
         .perform(
@@ -176,11 +162,11 @@ class FormDataControllerTest {
 
   @Test
   void updateSubmissionPassesCallerAsUsername() throws Exception {
-    Map<String, Object> data = Map.of("field1", "new");
-    FormData formData = new FormData("form1", data, "testuser");
-    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "testuser");
-    when(formDataService.updateFormSubmission(1L, data, "testuser")).thenReturn(formData);
-    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
+    Map<String, Object> data = Map.of("name", "Updated User");
+    FormData updated = contact(1L, "testuser");
+    updated.setData(data);
+    when(formDataService.updateFormSubmission(1L, data, "testuser")).thenReturn(updated);
+    stubToDto(updated);
 
     mockMvc
         .perform(
@@ -189,7 +175,7 @@ class FormDataControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(data)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data.field1").value("new"));
+        .andExpect(jsonPath("$.data.name").value("Updated User"));
   }
 
   @Test
@@ -203,13 +189,15 @@ class FormDataControllerTest {
     verify(formDataService, never()).deleteFormSubmission(any(), any());
   }
 
-  private JwtAuthenticationToken createJwtAuth(String subject, Collection<SimpleGrantedAuthority> authorities) {
-    Jwt jwt = Jwt.withTokenValue("token")
-        .header("alg", "none")
-        .claim("sub", subject)
-        .issuedAt(Instant.now())
-        .expiresAt(Instant.now().plusSeconds(3600))
-        .build();
+  private JwtAuthenticationToken createJwtAuth(
+      String subject, Collection<SimpleGrantedAuthority> authorities) {
+    Jwt jwt =
+        Jwt.withTokenValue("token")
+            .header("alg", "none")
+            .claim("sub", subject)
+            .issuedAt(Instant.now())
+            .expiresAt(Instant.now().plusSeconds(3600))
+            .build();
     return new JwtAuthenticationToken(jwt, authorities);
   }
 }

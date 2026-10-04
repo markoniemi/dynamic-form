@@ -1,12 +1,12 @@
 package com.example.backend.service;
 
+import static com.example.backend.testdata.TestSubmissions.contact;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.example.backend.entity.Form;
 import com.example.backend.entity.FormData;
 import com.example.backend.repository.FormDataRepository;
-import java.util.Collections;
+import com.example.backend.testdata.TestForms;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,68 +26,56 @@ class FormDataServiceTest {
 
   @Test
   void createFormSubmission() {
-    String formKey = "form1";
-    FormData formData = new FormData(formKey, Map.of("field", "value"), "username");
-    Form mockDefinition = Form.builder().formKey(formKey).build();
-
-    when(formService.getForm(formKey)).thenReturn(mockDefinition);
+    FormData formData = contact("username");
+    when(formService.getForm("contact")).thenReturn(TestForms.contact());
     when(formDataRepository.save(formData)).thenReturn(formData);
 
-    FormData result = formDataService.createFormSubmission(formKey, formData);
+    FormData result = formDataService.createFormSubmission("contact", formData);
 
-    assertNotNull(result);
-    assertEquals(formKey, result.getFormKey());
+    assertEquals("contact", result.getFormKey());
     verify(formDataRepository).save(formData);
   }
 
   @Test
   void getFormSubmissionById() {
-    Long id = 1L;
-    FormData formData = new FormData("form1", Map.of(), "username");
-    when(formDataRepository.findById(id)).thenReturn(Optional.of(formData));
+    FormData formData = contact(1L, "username");
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(formData));
 
-    Optional<FormData> result = formDataService.getFormSubmissionById(id);
-
-    assertTrue(result.isPresent());
-    assertEquals(formData, result.get());
+    assertEquals(Optional.of(formData), formDataService.getFormSubmissionById(1L));
   }
 
   @Test
   void getFormSubmissions() {
-    FormData formData = new FormData("form1", Map.of(), "username");
-    when(formDataRepository.findAll()).thenReturn(Collections.singletonList(formData));
+    List<FormData> submissions = List.of(contact(1L, "username"), contact(2L, "other"));
+    when(formDataRepository.findAll()).thenReturn(submissions);
 
-    List<FormData> result = formDataService.getFormSubmissions();
-
-    assertEquals(1, result.size());
-    assertEquals(formData, result.getFirst());
+    assertEquals(submissions, formDataService.getFormSubmissions());
   }
 
   @Test
   void deleteFormSubmission() {
-    Long id = 1L;
-    FormData formData = new FormData("form1", Map.of(), "username");
-    when(formDataRepository.findById(id)).thenReturn(Optional.of(formData));
-    formDataService.deleteFormSubmission(id, "username");
-    verify(formDataRepository).deleteById(id);
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, "username")));
+
+    formDataService.deleteFormSubmission(1L, "username");
+
+    verify(formDataRepository).deleteById(1L);
   }
 
   @Test
   void createFormSubmissionWithUnknownFormThrowsAndDoesNotSave() {
-    FormData formData = new FormData("unknown", Map.of(), "username");
     when(formService.getForm("unknown"))
         .thenThrow(new NoSuchElementException("Form not found: unknown"));
 
     assertThrows(
         NoSuchElementException.class,
-        () -> formDataService.createFormSubmission("unknown", formData));
+        () -> formDataService.createFormSubmission("unknown", contact("username")));
     verify(formDataRepository, never()).save(any());
   }
 
   @Test
   void updateFormSubmissionByOwnerReplacesData() {
-    FormData existing = new FormData("form1", Map.of("field", "old"), "username");
-    Map<String, Object> newData = Map.of("field", "new");
+    FormData existing = contact(1L, "username");
+    Map<String, Object> newData = Map.of("name", "Updated User");
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(existing));
     when(formDataRepository.save(existing)).thenReturn(existing);
 
@@ -99,8 +87,7 @@ class FormDataServiceTest {
 
   @Test
   void updateFormSubmissionByOtherUserThrowsAndDoesNotSave() {
-    when(formDataRepository.findById(1L))
-        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, "owner")));
 
     assertThrows(
         SecurityException.class,
@@ -110,8 +97,7 @@ class FormDataServiceTest {
 
   @Test
   void deleteFormSubmissionByOtherUserThrowsAndDoesNotDelete() {
-    when(formDataRepository.findById(1L))
-        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, "owner")));
 
     assertThrows(
         SecurityException.class, () -> formDataService.deleteFormSubmission(1L, "intruder"));
@@ -120,11 +106,11 @@ class FormDataServiceTest {
 
   @Test
   void getFormSubmissionsByOwnerReturnsOwnersSubmissions() {
-    FormData formData = new FormData("form1", Map.of(), "username");
+    List<FormData> submissions = List.of(contact(1L, "username"));
     when(formDataRepository.findBySubmittedByOrderBySubmittedAtDesc("username"))
-        .thenReturn(List.of(formData));
+        .thenReturn(submissions);
 
-    assertEquals(List.of(formData), formDataService.getFormSubmissionsByOwner("username"));
+    assertEquals(submissions, formDataService.getFormSubmissionsByOwner("username"));
   }
 
   @Test

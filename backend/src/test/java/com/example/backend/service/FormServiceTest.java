@@ -1,10 +1,11 @@
 package com.example.backend.service;
 
+import static com.example.backend.testdata.TestForms.contact;
+import static com.example.backend.testdata.TestForms.listItem;
+import static com.example.backend.testdata.TestForms.simple;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.example.backend.dto.FormListItemDto;
-import com.example.backend.entity.Field;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormListItemMapper;
 import com.example.backend.repository.FormRepository;
@@ -13,8 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,34 +29,19 @@ class FormServiceTest {
 
   @Test
   void getFormsReturnsListItems() {
-    when(formRepository.findAll())
-        .thenReturn(
-            List.of(
-                Form.builder().formKey("form1").title("Form 1").build(),
-                Form.builder().formKey("form2").title("Form 2").build()));
+    Form simple = simple();
+    Form contact = contact();
+    when(formRepository.findAll()).thenReturn(List.of(simple, contact));
 
-    List<FormListItemDto> result = formService.getForms();
-
-    assertEquals(
-        List.of(new FormListItemDto("form1", "Form 1"), new FormListItemDto("form2", "Form 2")),
-        result);
+    assertEquals(List.of(listItem(simple), listItem(contact)), formService.getForms());
   }
 
   @Test
   void getFormWithValidKeyReturnsForm() {
-    Form mockForm =
-        Form.builder()
-            .id(1L)
-            .formKey("form1")
-            .title("Test Form")
-            .fields(List.of(Field.builder().name("field1").type("text").build()))
-            .build();
-    when(formRepository.findByFormKey("form1")).thenReturn(Optional.of(mockForm));
+    Form contact = contact();
+    when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(contact));
 
-    Form result = formService.getForm("form1");
-
-    assertEquals(mockForm, result);
-    assertEquals("Test Form", result.getTitle());
+    assertEquals(contact, formService.getForm("contact"));
   }
 
   @Test
@@ -69,49 +55,33 @@ class FormServiceTest {
   void updateFormWithNotFoundThrowsException() {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
-    assertThrows(
-        NoSuchElementException.class,
-        () -> formService.updateForm("unknown", Form.builder().title("New").build()));
+    assertThrows(NoSuchElementException.class, () -> formService.updateForm("unknown", simple()));
     verify(formRepository, never()).save(any());
   }
 
   @Test
   void updateFormCopiesEditableFieldsAndKeepsKey() {
-    Form existing =
-        Form.builder()
-            .id(1L)
-            .formKey("form1")
-            .title("Old")
-            .description("Old description")
-            .fields(List.of())
-            .build();
-    List<Field> newFields = List.of(Field.builder().name("field1").type("text").build());
-    Form update =
-        Form.builder()
-            .formKey("other-key")
-            .title("New")
-            .description("New description")
-            .fields(newFields)
-            .build();
-    when(formRepository.findByFormKey("form1")).thenReturn(Optional.of(existing));
+    Form existing = contact();
+    Form update = simple();
+    when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(existing));
     when(formRepository.save(existing)).thenReturn(existing);
 
-    Form result = formService.updateForm("form1", update);
+    Form result = formService.updateForm("contact", update);
 
-    assertEquals(1L, result.getId());
-    assertEquals("form1", result.getFormKey());
-    assertEquals("New", result.getTitle());
-    assertEquals("New description", result.getDescription());
-    assertEquals(newFields, result.getFields());
+    assertEquals(contact().getId(), result.getId());
+    assertEquals("contact", result.getFormKey());
+    assertEquals(update.getTitle(), result.getTitle());
+    assertEquals(update.getDescription(), result.getDescription());
+    assertEquals(update.getFields(), result.getFields());
     verify(formRepository).save(existing);
   }
 
   @Test
   void deleteFormDeletesExistingForm() {
-    Form existing = Form.builder().id(1L).formKey("form1").build();
-    when(formRepository.findByFormKey("form1")).thenReturn(Optional.of(existing));
+    Form existing = contact();
+    when(formRepository.findByFormKey("contact")).thenReturn(Optional.of(existing));
 
-    formService.deleteForm("form1");
+    formService.deleteForm("contact");
 
     verify(formRepository).delete(existing);
   }
@@ -125,22 +95,20 @@ class FormServiceTest {
   }
 
   @Test
-  void saveFormPersistsFormData() {
-    Form newForm = Form.builder().formKey("new-form").title("New Form").fields(List.of()).build();
-    when(formRepository.save(newForm)).thenReturn(newForm);
+  void saveFormPersistsForm() {
+    Form form = simple();
+    when(formRepository.save(form)).thenReturn(form);
 
-    Form result = formService.saveForm(newForm);
-
-    assertEquals("new-form", result.getFormKey());
-    verify(formRepository).save(newForm);
+    assertEquals(form, formService.saveForm(form));
+    verify(formRepository).save(form);
   }
 
   @Test
   void existsByFormKeyReturnsTrueForExistingKey() {
-    when(formRepository.existsByFormKey("form1")).thenReturn(true);
+    when(formRepository.existsByFormKey("contact")).thenReturn(true);
     when(formRepository.existsByFormKey("unknown")).thenReturn(false);
 
-    assertTrue(formService.existsByFormKey("form1"));
+    assertTrue(formService.existsByFormKey("contact"));
     assertFalse(formService.existsByFormKey("unknown"));
   }
 }

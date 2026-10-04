@@ -1,5 +1,8 @@
 package com.example.backend.controller;
 
+import static com.example.backend.testdata.TestForms.contact;
+import static com.example.backend.testdata.TestForms.contactDto;
+import static com.example.backend.testdata.TestForms.listItem;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -10,14 +13,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.backend.config.SecurityConfig;
-import com.example.backend.dto.FieldDto;
 import com.example.backend.dto.FormDto;
-import com.example.backend.dto.FormListItemDto;
-import com.example.backend.entity.Field;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
@@ -35,47 +35,57 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(FormController.class)
 @Import(SecurityConfig.class)
 class FormControllerTest {
 
   private final MockMvc mockMvc;
+  private final ObjectMapper objectMapper;
   @MockitoBean private FormService formService;
   @MockitoBean private FormMapper formMapper;
   @MockitoBean private JwtDecoder jwtDecoder;
 
   @Autowired
-  FormControllerTest(MockMvc mockMvc) {
+  FormControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
     this.mockMvc = mockMvc;
+    this.objectMapper = objectMapper;
   }
-
-  private static final String VALID_FORM_JSON =
-      """
-      {"formKey":"form1","title":"Test Form","fields":[
-        {"name":"field1","label":"Field 1","type":"text","required":true}]}
-      """;
 
   private static SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor adminJwt() {
     return jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
   }
 
+  private String contactJson() {
+    return objectMapper.writeValueAsString(contactDto());
+  }
+
+  /** Makes the mocked mapper round-trip any request body to the contact form. */
+  private Form stubMapperWithContact() {
+    Form form = contact();
+    when(formMapper.toEntity(any(FormDto.class))).thenReturn(form);
+    when(formMapper.toDto(form)).thenReturn(contactDto());
+    return form;
+  }
+
   @Test
   void deleteFormAsNonAdminReturnsForbidden() throws Exception {
-    mockMvc.perform(delete("/api/forms/form1").with(jwt())).andExpect(status().isForbidden());
+    mockMvc.perform(delete("/api/forms/contact").with(jwt())).andExpect(status().isForbidden());
 
     verify(formService, never()).deleteForm(any());
   }
 
   @Test
   void getFormsReturnsListItems() throws Exception {
-    when(formService.getForms()).thenReturn(List.of(new FormListItemDto("form1", "Form 1")));
+    Form contact = contact();
+    when(formService.getForms()).thenReturn(List.of(listItem(contact)));
 
     mockMvc
         .perform(get("/api/forms").with(jwt()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].formKey").value("form1"))
-        .andExpect(jsonPath("$[0].title").value("Form 1"));
+        .andExpect(jsonPath("$[0].formKey").value(contact.getFormKey()))
+        .andExpect(jsonPath("$[0].title").value(contact.getTitle()));
   }
 
   @Test
@@ -96,62 +106,59 @@ class FormControllerTest {
 
   @Test
   void createFormWithExistingKeyReturnsBadRequest() throws Exception {
-    when(formService.existsByFormKey("form1")).thenReturn(true);
+    when(formService.existsByFormKey("contact")).thenReturn(true);
 
     mockMvc
         .perform(
             post("/api/forms")
                 .with(adminJwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(VALID_FORM_JSON))
+                .content(contactJson()))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.detail").value("Form with key 'form1' already exists"));
+        .andExpect(jsonPath("$.detail").value("Form with key 'contact' already exists"));
 
     verify(formService, never()).saveForm(any());
   }
 
   @Test
   void updateFormAsAdminReturnsUpdatedForm() throws Exception {
-    Form form = Form.builder().formKey("form1").title("Test Form").build();
-    when(formMapper.toEntity(any(FormDto.class))).thenReturn(form);
-    when(formService.updateForm("form1", form)).thenReturn(form);
-    when(formMapper.toDto(form)).thenReturn(FormDto.builder().formKey("form1").build());
+    Form form = stubMapperWithContact();
+    when(formService.updateForm("contact", form)).thenReturn(form);
 
     mockMvc
         .perform(
-            put("/api/forms/form1")
+            put("/api/forms/contact")
                 .with(adminJwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(VALID_FORM_JSON))
+                .content(contactJson()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.formKey").value("form1"));
+        .andExpect(jsonPath("$.formKey").value("contact"));
   }
 
   @Test
   void deleteFormAsAdminReturnsNoContent() throws Exception {
     mockMvc
-        .perform(delete("/api/forms/form1").with(adminJwt()))
+        .perform(delete("/api/forms/contact").with(adminJwt()))
         .andExpect(status().isNoContent());
 
-    verify(formService).deleteForm("form1");
+    verify(formService).deleteForm("contact");
   }
 
   @Test
   void createFormWithValidBodyReturnsCreated() throws Exception {
-    Form form = Form.builder().formKey("form1").title("Test Form").build();
-    when(formService.existsByFormKey("form1")).thenReturn(false);
-    when(formMapper.toEntity(any(FormDto.class))).thenReturn(form);
+    Form form = stubMapperWithContact();
+    when(formService.existsByFormKey("contact")).thenReturn(false);
     when(formService.saveForm(form)).thenReturn(form);
-    when(formMapper.toDto(form)).thenReturn(FormDto.builder().formKey("form1").build());
 
     mockMvc
         .perform(
             post("/api/forms")
                 .with(adminJwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(VALID_FORM_JSON))
+                .content(contactJson()))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.formKey").value("form1"));
+        .andExpect(jsonPath("$.formKey").value("contact"))
+        .andExpect(jsonPath("$.fields.length()").value(contact().getFields().size()));
   }
 
   @Test
@@ -180,13 +187,11 @@ class FormControllerTest {
   void createFormWithoutRequiredDefaultsToFalse() throws Exception {
     String body =
         """
-        {"formKey":"form1","title":"Test Form","fields":[
-          {"name":"field1","label":"Field 1","type":"text"}]}
+        {"formKey":"simple","title":"Simple Form","fields":[
+          {"name":"name","label":"Name","type":"text"}]}
         """;
-    Form form = Form.builder().formKey("form1").title("Test Form").build();
-    when(formMapper.toEntity(any(FormDto.class))).thenReturn(form);
+    Form form = stubMapperWithContact();
     when(formService.saveForm(form)).thenReturn(form);
-    when(formMapper.toDto(form)).thenReturn(FormDto.builder().formKey("form1").build());
 
     mockMvc
         .perform(
@@ -204,44 +209,12 @@ class FormControllerTest {
   @Test
   @WithMockUser
   void getForm() throws Exception {
-    Form mockForm =
-        Form.builder()
-            .id(1L)
-            .formKey("form1")
-            .title("Test Form")
-            .description("A test form")
-            .fields(
-                List.of(
-                    Field.builder()
-                        .name("testField")
-                        .label("Test Field")
-                        .type("text")
-                        .required(true)
-                        .build()))
-            .build();
-
-    FormDto mockDto =
-        FormDto.builder()
-            .id(1L)
-            .formKey("form1")
-            .title("Test Form")
-            .description("A test form")
-            .fields(
-                List.of(
-                    FieldDto.builder()
-                        .name("testField")
-                        .label("Test Field")
-                        .type("text")
-                        .required(true)
-                        .build()))
-            .build();
-
-    when(formService.getForm("form1")).thenReturn(mockForm);
-    when(formMapper.toDto(any(Form.class))).thenReturn(mockDto);
+    when(formService.getForm("contact")).thenReturn(contact());
+    when(formMapper.toDto(any(Form.class))).thenReturn(contactDto());
 
     mockMvc
-        .perform(get("/api/forms/form1").accept(MediaType.APPLICATION_JSON))
+        .perform(get("/api/forms/contact").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.title").value("Test Form"));
+        .andExpect(jsonPath("$.title").value(contact().getTitle()));
   }
 }
