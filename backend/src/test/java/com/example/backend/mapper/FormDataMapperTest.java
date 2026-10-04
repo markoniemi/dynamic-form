@@ -3,6 +3,7 @@ package com.example.backend.mapper;
 import static com.example.backend.testdata.TestSubmissions.SUBMITTED_AT;
 import static com.example.backend.testdata.TestSubmissions.contact;
 import static com.example.backend.testdata.TestSubmissions.contactData;
+import static com.example.backend.testdata.TestUsers.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.backend.dto.FormDataDto;
@@ -17,23 +18,23 @@ class FormDataMapperTest {
 
   @Test
   void toDtoCopiesAllFields() {
-    FormData entity = contact(5L, "user");
+    FormData entity = contact(5L, USER);
 
     assertEquals(
-        new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, "user"),
+        new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, USER),
         formDataMapper.toDto(entity));
   }
 
   @Test
   void toEntityCopiesAllFields() {
-    FormDataDto dto = new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, "user");
+    FormDataDto dto = new FormDataDto(5L, "contact", contactData(), SUBMITTED_AT, USER);
 
-    assertEquals(contact(5L, "user"), formDataMapper.toEntity(dto));
+    assertEquals(contact(5L, USER), formDataMapper.toEntity(dto));
   }
 
   @Test
   void mapListMapsEachElementInOrder() {
-    List<FormData> entities = List.of(contact(1L, "user"), contact(2L, "user"));
+    List<FormData> entities = List.of(contact(1L, USER), contact(2L, USER));
 
     List<FormDataDto> result = formDataMapper.mapList(entities);
 

@@ -1,6 +1,8 @@
 package com.example.backend.repository;
 
 import static com.example.backend.testdata.TestSubmissions.contact;
+import static com.example.backend.testdata.TestUsers.ADMIN;
+import static com.example.backend.testdata.TestUsers.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.backend.entity.FormData;
@@ -23,13 +25,13 @@ class FormDataRepositoryTest {
 
   @Test
   void findBySubmittedByOrderBySubmittedAtDesc() {
-    formDataRepository.save(contact("username"));
-    formDataRepository.save(contact("username"));
-    formDataRepository.save(contact("otheruser"));
+    formDataRepository.save(contact(USER));
+    formDataRepository.save(contact(USER));
+    formDataRepository.save(contact(ADMIN));
 
-    List<FormData> result = formDataRepository.findBySubmittedByOrderBySubmittedAtDesc("username");
+    List<FormData> result = formDataRepository.findBySubmittedByOrderBySubmittedAtDesc(USER);
 
     assertEquals(2, result.size());
-    assertTrue(result.stream().allMatch(f -> f.getSubmittedBy().equals("username")));
+    assertTrue(result.stream().allMatch(f -> f.getSubmittedBy().equals(USER)));
   }
 }

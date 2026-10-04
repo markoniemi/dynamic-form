@@ -3,12 +3,13 @@ package com.example.backend.controller;
 import static com.example.backend.testdata.TestForms.contact;
 import static com.example.backend.testdata.TestForms.contactDto;
 import static com.example.backend.testdata.TestForms.listItem;
+import static com.example.backend.testdata.TestUsers.admin;
+import static com.example.backend.testdata.TestUsers.user;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
@@ -53,10 +51,6 @@ class FormControllerTest {
     this.objectMapper = objectMapper;
   }
 
-  private static SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor adminJwt() {
-    return jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
-  }
-
   private String contactJson() {
     return objectMapper.writeValueAsString(contactDto());
   }
@@ -71,7 +65,7 @@ class FormControllerTest {
 
   @Test
   void deleteFormAsNonAdminReturnsForbidden() throws Exception {
-    mockMvc.perform(delete("/api/forms/contact").with(jwt())).andExpect(status().isForbidden());
+    mockMvc.perform(delete("/api/forms/contact").with(user())).andExpect(status().isForbidden());
 
     verify(formService, never()).deleteForm(any());
   }
@@ -82,7 +76,7 @@ class FormControllerTest {
     when(formService.getForms()).thenReturn(List.of(listItem(contact)));
 
     mockMvc
-        .perform(get("/api/forms").with(jwt()))
+        .perform(get("/api/forms").with(user()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].formKey").value(contact.getFormKey()))
         .andExpect(jsonPath("$[0].title").value(contact.getTitle()));
@@ -99,7 +93,7 @@ class FormControllerTest {
         .thenThrow(new NoSuchElementException("Form not found: missing"));
 
     mockMvc
-        .perform(get("/api/forms/missing").with(jwt()))
+        .perform(get("/api/forms/missing").with(user()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.detail").value("Form not found: missing"));
   }
@@ -111,7 +105,7 @@ class FormControllerTest {
     mockMvc
         .perform(
             post("/api/forms")
-                .with(adminJwt())
+                .with(admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contactJson()))
         .andExpect(status().isBadRequest())
@@ -128,7 +122,7 @@ class FormControllerTest {
     mockMvc
         .perform(
             put("/api/forms/contact")
-                .with(adminJwt())
+                .with(admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contactJson()))
         .andExpect(status().isOk())
@@ -138,7 +132,7 @@ class FormControllerTest {
   @Test
   void deleteFormAsAdminReturnsNoContent() throws Exception {
     mockMvc
-        .perform(delete("/api/forms/contact").with(adminJwt()))
+        .perform(delete("/api/forms/contact").with(admin()))
         .andExpect(status().isNoContent());
 
     verify(formService).deleteForm("contact");
@@ -153,7 +147,7 @@ class FormControllerTest {
     mockMvc
         .perform(
             post("/api/forms")
-                .with(adminJwt())
+                .with(admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contactJson()))
         .andExpect(status().isCreated())
@@ -172,7 +166,7 @@ class FormControllerTest {
     mockMvc
         .perform(
             post("/api/forms")
-                .with(adminJwt())
+                .with(admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
         .andExpect(status().isBadRequest())
@@ -196,7 +190,7 @@ class FormControllerTest {
     mockMvc
         .perform(
             post("/api/forms")
-                .with(adminJwt())
+                .with(admin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
         .andExpect(status().isCreated());
@@ -207,13 +201,12 @@ class FormControllerTest {
   }
 
   @Test
-  @WithMockUser
   void getForm() throws Exception {
     when(formService.getForm("contact")).thenReturn(contact());
     when(formMapper.toDto(any(Form.class))).thenReturn(contactDto());
 
     mockMvc
-        .perform(get("/api/forms/contact").accept(MediaType.APPLICATION_JSON))
+        .perform(get("/api/forms/contact").with(user()).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.title").value(contact().getTitle()));
   }
