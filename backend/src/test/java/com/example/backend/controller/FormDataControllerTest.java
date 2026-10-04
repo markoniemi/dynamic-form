@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -9,6 +10,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -121,6 +123,78 @@ class FormDataControllerTest {
         .andExpect(status().isOk());
 
     verify(formDataService).deleteFormSubmission(1L, "testuser");
+  }
+
+  private static final Collection<SimpleGrantedAuthority> USER =
+      Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+
+  @Test
+  void getSubmissionsAsUserReturnsOnlyOwnSubmissions() throws Exception {
+    FormData formData = new FormData("form1", Map.of(), "testuser");
+    FormDataDto formDataDto =
+        new FormDataDto(1L, "form1", Map.of(), LocalDateTime.now(), "testuser");
+    when(formDataService.getFormSubmissionsByOwner("testuser")).thenReturn(List.of(formData));
+    when(formDataMapper.mapList(List.of(formData))).thenReturn(List.of(formDataDto));
+
+    mockMvc
+        .perform(get("/api/form-data").with(authentication(createJwtAuth("testuser", USER))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].submittedBy").value("testuser"));
+
+    verify(formDataService, never()).getFormSubmissions();
+  }
+
+  @Test
+  void getSubmissionByIdOfOtherUserReturnsForbidden() throws Exception {
+    when(formDataService.getFormSubmissionById(1L))
+        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+
+    mockMvc
+        .perform(
+            get("/api/form-data/submission/1")
+                .with(authentication(createJwtAuth("intruder", USER))))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void getSubmissionByIdMissingReturnsNotFound() throws Exception {
+    when(formDataService.getFormSubmissionById(99L)).thenReturn(Optional.empty());
+
+    mockMvc
+        .perform(
+            get("/api/form-data/submission/99")
+                .with(authentication(createJwtAuth("testuser", USER))))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.detail").value("Form submission not found: 99"));
+  }
+
+  @Test
+  void updateSubmissionPassesCallerAsUsername() throws Exception {
+    Map<String, Object> data = Map.of("field1", "new");
+    FormData formData = new FormData("form1", data, "testuser");
+    FormDataDto formDataDto = new FormDataDto(1L, "form1", data, LocalDateTime.now(), "testuser");
+    when(formDataService.updateFormSubmission(1L, data, "testuser")).thenReturn(formData);
+    when(formDataMapper.toDto(formData)).thenReturn(formDataDto);
+
+    mockMvc
+        .perform(
+            put("/api/form-data/submission/1")
+                .with(authentication(createJwtAuth("testuser", USER)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(data)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.field1").value("new"));
+  }
+
+  @Test
+  void deleteSubmissionAsNonAdminReturnsForbidden() throws Exception {
+    mockMvc
+        .perform(
+            delete("/api/form-data/submission/1")
+                .with(authentication(createJwtAuth("testuser", USER))))
+        .andExpect(status().isForbidden());
+
+    verify(formDataService, never()).deleteFormSubmission(any(), any());
   }
 
   private JwtAuthenticationToken createJwtAuth(String subject, Collection<SimpleGrantedAuthority> authorities) {
