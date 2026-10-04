@@ -9,17 +9,20 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.example.backend.config.SecurityConfig;
 import com.example.backend.dto.FieldDto;
 import com.example.backend.dto.FormDto;
+import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Field;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,75 @@ class FormControllerTest {
     mockMvc.perform(delete("/api/forms/form1").with(jwt())).andExpect(status().isForbidden());
 
     verify(formService, never()).deleteForm(any());
+  }
+
+  @Test
+  void getFormsReturnsListItems() throws Exception {
+    when(formService.getForms()).thenReturn(List.of(new FormListItemDto("form1", "Form 1")));
+
+    mockMvc
+        .perform(get("/api/forms").with(jwt()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].formKey").value("form1"))
+        .andExpect(jsonPath("$[0].title").value("Form 1"));
+  }
+
+  @Test
+  void getFormsWithoutAuthenticationReturnsUnauthorized() throws Exception {
+    mockMvc.perform(get("/api/forms")).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void getFormMissingReturnsNotFound() throws Exception {
+    when(formService.getForm("missing"))
+        .thenThrow(new NoSuchElementException("Form not found: missing"));
+
+    mockMvc
+        .perform(get("/api/forms/missing").with(jwt()))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.detail").value("Form not found: missing"));
+  }
+
+  @Test
+  void createFormWithExistingKeyReturnsBadRequest() throws Exception {
+    when(formService.existsByFormKey("form1")).thenReturn(true);
+
+    mockMvc
+        .perform(
+            post("/api/forms")
+                .with(adminJwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_FORM_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value("Form with key 'form1' already exists"));
+
+    verify(formService, never()).saveForm(any());
+  }
+
+  @Test
+  void updateFormAsAdminReturnsUpdatedForm() throws Exception {
+    Form form = Form.builder().formKey("form1").title("Test Form").build();
+    when(formMapper.toEntity(any(FormDto.class))).thenReturn(form);
+    when(formService.updateForm("form1", form)).thenReturn(form);
+    when(formMapper.toDto(form)).thenReturn(FormDto.builder().formKey("form1").build());
+
+    mockMvc
+        .perform(
+            put("/api/forms/form1")
+                .with(adminJwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_FORM_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.formKey").value("form1"));
+  }
+
+  @Test
+  void deleteFormAsAdminReturnsNoContent() throws Exception {
+    mockMvc
+        .perform(delete("/api/forms/form1").with(adminJwt()))
+        .andExpect(status().isNoContent());
+
+    verify(formService).deleteForm("form1");
   }
 
   @Test
