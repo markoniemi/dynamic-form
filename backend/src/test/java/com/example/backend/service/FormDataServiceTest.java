@@ -9,6 +9,7 @@ import com.example.backend.repository.FormDataRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,5 +70,24 @@ class FormDataServiceTest {
     when(formDataRepository.findById(id)).thenReturn(Optional.of(formData));
     formDataService.deleteFormSubmission(id, "username");
     verify(formDataRepository).deleteById(id);
+  }
+
+  @Test
+  void updateFormSubmissionWithNotFoundThrowsException() {
+    when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NoSuchElementException.class,
+        () -> formDataService.updateFormSubmission(99L, Map.of(), "username"));
+    verify(formDataRepository, never()).save(any());
+  }
+
+  @Test
+  void deleteFormSubmissionWithNotFoundThrowsException() {
+    when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NoSuchElementException.class, () -> formDataService.deleteFormSubmission(99L, "username"));
+    verify(formDataRepository, never()).deleteById(any());
   }
 }

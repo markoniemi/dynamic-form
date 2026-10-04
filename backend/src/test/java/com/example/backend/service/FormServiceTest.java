@@ -3,8 +3,10 @@ package com.example.backend.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.backend.dto.FormListItemDto;
 import com.example.backend.entity.Field;
 import com.example.backend.entity.Form;
+import com.example.backend.mapper.FormListItemMapper;
 import com.example.backend.repository.FormRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,14 +14,32 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class FormServiceTest {
 
   @Mock private FormRepository formRepository;
+  @Spy private FormListItemMapper formListItemMapper = Mappers.getMapper(FormListItemMapper.class);
   @InjectMocks private FormService formService;
+
+  @Test
+  void getFormsReturnsListItems() {
+    when(formRepository.findAll())
+        .thenReturn(
+            List.of(
+                Form.builder().formKey("form1").title("Form 1").build(),
+                Form.builder().formKey("form2").title("Form 2").build()));
+
+    List<FormListItemDto> result = formService.getForms();
+
+    assertEquals(
+        List.of(new FormListItemDto("form1", "Form 1"), new FormListItemDto("form2", "Form 2")),
+        result);
+  }
 
   @Test
   void getFormWithValidKeyReturnsForm() {
@@ -43,6 +63,24 @@ class FormServiceTest {
     when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
 
     assertThrows(NoSuchElementException.class, () -> formService.getForm("unknown"));
+  }
+
+  @Test
+  void updateFormWithNotFoundThrowsException() {
+    when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
+
+    assertThrows(
+        NoSuchElementException.class,
+        () -> formService.updateForm("unknown", Form.builder().title("New").build()));
+    verify(formRepository, never()).save(any());
+  }
+
+  @Test
+  void deleteFormWithNotFoundThrowsException() {
+    when(formRepository.findByFormKey("unknown")).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class, () -> formService.deleteForm("unknown"));
+    verify(formRepository, never()).delete(any());
   }
 
   @Test
