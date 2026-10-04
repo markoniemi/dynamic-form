@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class FormDataService {
   @Transactional
   public FormData updateFormSubmission(@NotNull Long id, @NotNull Map<String, Object> data, String username) {
     FormData existing = formDataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Submission not found: " + id));
+        .orElseThrow(() -> new NoSuchElementException("Submission not found: " + id));
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to update this submission");
@@ -71,7 +72,7 @@ public class FormDataService {
   @Transactional
   public void deleteFormSubmission(@NotNull Long id, @NotNull String username) {
     FormData existing = formDataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Submission not found: " + id));
+        .orElseThrow(() -> new NoSuchElementException("Submission not found: " + id));
 
     if (!existing.getSubmittedBy().equals(username)) {
       throw new SecurityException("You are not authorized to delete this submission");

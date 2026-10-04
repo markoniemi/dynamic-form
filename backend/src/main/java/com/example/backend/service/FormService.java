@@ -23,9 +23,7 @@ public class FormService {
 
   @InterfaceLog
   public List<FormListItemDto> getForms() {
-    return formRepository.findAll().stream()
-        .map(formListItemMapper::toListItemDto)
-        .toList();
+    return formListItemMapper.mapList(formRepository.findAll());
   }
 
   @InterfaceLog
@@ -45,10 +43,7 @@ public class FormService {
   @InterfaceLog
   @Transactional
   public Form updateForm(String formKey, Form updatedDefinition) {
-    Form existing =
-        formRepository
-            .findByFormKey(formKey)
-            .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
+    Form existing = getForm(formKey);
 
     existing.setTitle(updatedDefinition.getTitle());
     existing.setDescription(updatedDefinition.getDescription());
@@ -61,11 +56,7 @@ public class FormService {
   @InterfaceLog
   @Transactional
   public void deleteForm(String formKey) {
-    Form existing =
-        formRepository
-            .findByFormKey(formKey)
-            .orElseThrow(() -> new NoSuchElementException("Form not found: " + formKey));
-    formRepository.delete(existing);
+    formRepository.delete(getForm(formKey));
     log.info("Deleted form definition: {}", formKey);
   }
 
