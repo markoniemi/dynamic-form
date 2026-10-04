@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.backend.config.SecurityConfig;
 import com.example.backend.dto.FormDataDto;
 import com.example.backend.entity.FormData;
 import com.example.backend.mapper.FormDataMapper;
@@ -26,15 +27,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(FormDataController.class)
+@Import(SecurityConfig.class)
 class FormDataControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -42,6 +46,7 @@ class FormDataControllerTest {
 
   @MockitoBean private FormDataService formDataService;
   @MockitoBean private FormDataMapper formDataMapper;
+  @MockitoBean private JwtDecoder jwtDecoder;
 
   @Test
   void submitForm() throws Exception {

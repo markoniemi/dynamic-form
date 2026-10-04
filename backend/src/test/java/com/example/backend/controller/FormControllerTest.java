@@ -1,11 +1,16 @@
 package com.example.backend.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import com.example.backend.config.SecurityConfig;
 import com.example.backend.dto.FieldDto;
 import com.example.backend.dto.FormDto;
 import com.example.backend.entity.Field;
@@ -16,17 +21,28 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(FormController.class)
+@Import(SecurityConfig.class)
 class FormControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @MockitoBean private FormService formService;
   @MockitoBean private FormMapper formMapper;
+  @MockitoBean private JwtDecoder jwtDecoder;
+
+  @Test
+  void deleteFormAsNonAdminReturnsForbidden() throws Exception {
+    mockMvc.perform(delete("/api/forms/form1").with(jwt())).andExpect(status().isForbidden());
+
+    verify(formService, never()).deleteForm(any());
+  }
 
   @Test
   @WithMockUser
