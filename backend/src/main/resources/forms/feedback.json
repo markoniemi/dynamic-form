@@ -1,4 +1,5 @@
 {
+  "formKey": "feedback",
   "title": "Product Feedback Form",
   "description": "Share your thoughts about our product",
   "fields": [

@@ -12,6 +12,14 @@ This document provides development guidelines for this project. For detailed Cop
 - **RequirementsSpecification.md**: Outlines project requirements and features
 - **copilot-instructions.md**: Complete coding standards and guidelines for all team members
 
+## Integration with OAuth2 Server Project
+
+Authentication is provided by the [oauth2-server](../../oauth2-server) project. Tests use `OAuth2Container` from its `auth-server-testcontainers` library, and docker-compose runs its auth server image. When changing anything that depends on the auth server, verify against it, especially:
+- JWT claims, scopes and roles consumed by the resource server
+- OIDC discovery and JWKS endpoints (issuer URL, key fetching)
+- Client registrations (redirect URIs, PKCE, token TTL) in `TestcontainersConfig` and docker-compose
+- Demo users and their roles
+
 ## IntelliJ MCP Tool Preferences
 
 When working with this project, prefer IntelliJ IDE MCP tools (`mcp__idea__*`) over generic alternatives:
@@ -63,3 +71,11 @@ Brief action; additional change; optional note
 - Focus on **what changed and why**, not implementation details
 - Capitalize first word
 - No period at end
+
+## Implementation Tasks
+
+During implementation tasks (planning, coding, testing):
+- **Do not commit** unless explicitly asked
+- Work iteratively and validate completeness before committing
+- Use feature branches for significant work
+- Plan all changes upfront before execution
