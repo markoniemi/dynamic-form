@@ -73,6 +73,61 @@ class FormDataServiceTest {
   }
 
   @Test
+  void createFormSubmissionWithUnknownFormThrowsAndDoesNotSave() {
+    FormData formData = new FormData("unknown", Map.of(), "username");
+    when(formService.getForm("unknown"))
+        .thenThrow(new NoSuchElementException("Form not found: unknown"));
+
+    assertThrows(
+        NoSuchElementException.class,
+        () -> formDataService.createFormSubmission("unknown", formData));
+    verify(formDataRepository, never()).save(any());
+  }
+
+  @Test
+  void updateFormSubmissionByOwnerReplacesData() {
+    FormData existing = new FormData("form1", Map.of("field", "old"), "username");
+    Map<String, Object> newData = Map.of("field", "new");
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(existing));
+    when(formDataRepository.save(existing)).thenReturn(existing);
+
+    FormData result = formDataService.updateFormSubmission(1L, newData, "username");
+
+    assertEquals(newData, result.getData());
+    verify(formDataRepository).save(existing);
+  }
+
+  @Test
+  void updateFormSubmissionByOtherUserThrowsAndDoesNotSave() {
+    when(formDataRepository.findById(1L))
+        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+
+    assertThrows(
+        SecurityException.class,
+        () -> formDataService.updateFormSubmission(1L, Map.of(), "intruder"));
+    verify(formDataRepository, never()).save(any());
+  }
+
+  @Test
+  void deleteFormSubmissionByOtherUserThrowsAndDoesNotDelete() {
+    when(formDataRepository.findById(1L))
+        .thenReturn(Optional.of(new FormData("form1", Map.of(), "owner")));
+
+    assertThrows(
+        SecurityException.class, () -> formDataService.deleteFormSubmission(1L, "intruder"));
+    verify(formDataRepository, never()).deleteById(any());
+  }
+
+  @Test
+  void getFormSubmissionsByOwnerReturnsOwnersSubmissions() {
+    FormData formData = new FormData("form1", Map.of(), "username");
+    when(formDataRepository.findBySubmittedByOrderBySubmittedAtDesc("username"))
+        .thenReturn(List.of(formData));
+
+    assertEquals(List.of(formData), formDataService.getFormSubmissionsByOwner("username"));
+  }
+
+  @Test
   void updateFormSubmissionWithNotFoundThrowsException() {
     when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
 
