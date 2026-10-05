@@ -3,6 +3,7 @@ import {DynamicForm} from '../../src/components/DynamicForm';
 import {FormField, FormValues} from '../../src/types/Form';
 import {describe, expect, it, vi} from 'vitest';
 import {UseFormRegister} from 'react-hook-form';
+import {TestFields} from '../testdata/TestFields';
 
 // Mock; only the subset of register API exercised by DynamicForm is needed (name, onChange, onBlur, ref)
 const mockRegister = vi.fn((name) => ({
@@ -27,127 +28,60 @@ function renderDynamicForm(fields: FormField[], errors = mockErrors) {
 describe('DynamicForm', () => {
 
   it('renders text input correctly', () => {
-    const fields: FormField[] = [
-      {
-        name: 'username',
-        label: 'Username',
-        type: 'text',
-        required: true,
-        placeholder: 'Enter username',
-      },
-    ];
+    const field = TestFields.text;
+    renderDynamicForm([field]);
 
-    renderDynamicForm(fields);
-
-    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Enter username')).toBeInTheDocument();
+    expect(screen.getByLabelText(field.label, {exact: false})).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(field.placeholder)).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toHaveAttribute('type', 'text');
   });
 
   it('renders select input correctly', () => {
-    const fields: FormField[] = [
-      {
-        name: 'role',
-        label: 'Role',
-        type: 'select',
-        required: true,
-        options: [
-          {value: 'admin', label: 'Admin'},
-          {value: 'user', label: 'User'},
-        ],
-      },
-    ];
+    const field = TestFields.select;
+    renderDynamicForm([field]);
 
-    renderDynamicForm(fields);
-
-    expect(screen.getByLabelText(/Role/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(field.label, {exact: false})).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toBeInTheDocument();
-    expect(screen.getByText('Admin')).toBeInTheDocument();
-    expect(screen.getByText('User')).toBeInTheDocument();
+    field.options.forEach(({label}) => expect(screen.getByText(label)).toBeInTheDocument());
   });
 
   it('renders textarea correctly', () => {
-    const fields: FormField[] = [
-      {
-        name: 'description',
-        label: 'Description',
-        type: 'textarea',
-        required: false,
-        placeholder: 'Enter description',
-      },
-    ];
+    const field = TestFields.textarea;
+    renderDynamicForm([field]);
 
-    renderDynamicForm(fields);
-
-    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Enter description')).toBeInTheDocument();
+    expect(screen.getByLabelText(field.label, {exact: false})).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(field.placeholder)).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('renders radio buttons correctly', () => {
-    const fields: FormField[] = [
-      {
-        name: 'gender',
-        label: 'Gender',
-        type: 'radio',
-        required: true,
-        options: [
-          {value: 'male', label: 'Male'},
-          {value: 'female', label: 'Female'},
-        ],
-      },
-    ];
+    const field = TestFields.radio;
+    renderDynamicForm([field]);
 
-    renderDynamicForm(fields);
-
-    expect(screen.getByLabelText('Male')).toBeInTheDocument();
-    expect(screen.getByLabelText('Female')).toBeInTheDocument();
-    const radios = screen.getAllByRole('radio');
-    expect(radios).toHaveLength(2);
+    field.options.forEach(({label}) => expect(screen.getByLabelText(label)).toBeInTheDocument());
+    expect(screen.getAllByRole('radio')).toHaveLength(field.options.length);
   });
 
   it('renders checkboxes correctly', () => {
-    const fields: FormField[] = [
-      {
-        name: 'interests',
-        label: 'Interests',
-        type: 'checkbox',
-        required: false,
-        options: [
-          {value: 'coding', label: 'Coding'},
-          {value: 'music', label: 'Music'},
-        ],
-      },
-    ];
+    const field = TestFields.checkboxGroup;
+    renderDynamicForm([field]);
 
-    renderDynamicForm(fields);
-
-    expect(screen.getByLabelText('Coding')).toBeInTheDocument();
-    expect(screen.getByLabelText('Music')).toBeInTheDocument();
-    const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes).toHaveLength(2);
+    field.options.forEach(({label}) => expect(screen.getByLabelText(label)).toBeInTheDocument());
+    expect(screen.getAllByRole('checkbox')).toHaveLength(field.options.length);
   });
 
   it('displays error message when present', () => {
-    const fields: FormField[] = [
-      {
-        name: 'username',
-        label: 'Username',
-        type: 'text',
-        required: true,
-      },
-    ];
-
+    const field = TestFields.text;
     const errors = {
-      username: {
+      [field.name]: {
         type: 'required',
-        message: 'Username is required',
+        message: 'Full name is required',
       },
     };
 
-    renderDynamicForm(fields, errors);
+    renderDynamicForm([field], errors);
 
-    expect(screen.getByText('Username is required')).toBeInTheDocument();
+    expect(screen.getByText('Full name is required')).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toHaveClass('is-invalid');
   });
 });
