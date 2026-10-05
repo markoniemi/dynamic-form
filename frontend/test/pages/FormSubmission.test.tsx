@@ -27,7 +27,6 @@ vi.mock('../../src/services/formDataClient', () => ({
 }));
 
 const mockNavigate = vi.fn();
-const mockSigninRedirect = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -89,9 +88,7 @@ describe('FormSubmission Component', () => {
     queryClient.clear();
     vi.mocked(useParams).mockReturnValue({formKey: 'contact'});
     vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
       user: mockUser,
-      signinRedirect: mockSigninRedirect,
     } as unknown as AuthContextProps);
   });
 

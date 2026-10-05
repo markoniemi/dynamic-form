@@ -34,9 +34,10 @@ describe('App', () => {
       expect(fetch).toHaveBeenCalledWith('/api/config/oauth2-issuer-uri');
     });
 
-    // Verify the app renders with loaded config (check for nav or content)
+    // Unauthenticated user is redirected to the login page
     await waitFor(() => {
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'navigation.login' })).toBeInTheDocument();
     });
+    expect(window.location.pathname).toBe('/login');
   });
 });

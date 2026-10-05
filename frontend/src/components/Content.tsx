@@ -1,5 +1,5 @@
 import React from 'react';
-import {Navigate, Route, Routes} from 'react-router-dom';
+import {Navigate, Outlet, Route, Routes} from 'react-router-dom';
 import {useAuth} from 'react-oidc-context';
 import {useTranslation} from 'react-i18next';
 import {Button, Card, Col, Container, Row, Spinner} from 'react-bootstrap';
@@ -9,9 +9,25 @@ import {FormSubmission} from '../pages/FormSubmission';
 import {FormSubmissions} from '../pages/FormSubmissions';
 import {SubmissionDetail} from '../pages/SubmissionDetail';
 import {EditForm} from '../pages/EditForm.tsx';
+import {Login} from '../pages/Login';
+
+const RequireAuth: React.FC = () => {
+  const {isAuthenticated} = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace/>;
+  }
+
+  return (
+    <>
+      <Navigation/>
+      <Outlet/>
+    </>
+  );
+};
 
 export const Content: React.FC = () => {
-  const {isAuthenticated, isLoading, error, signinRedirect} = useAuth();
+  const {isLoading, error, signinRedirect} = useAuth();
   const {t} = useTranslation();
 
   if (isLoading) {
@@ -48,48 +64,18 @@ export const Content: React.FC = () => {
   }
 
   return (
-    <>
-      <Navigation/>
-      <Routes>
-        {/* Public routes - Forms can be viewed by anyone */}
-
-        {/* Protected routes - Require authentication */}
-        {isAuthenticated ? (
-          <>
-            <Route path="/forms" element={<Forms/>}/>
-            <Route path="/forms/:formKey" element={<FormSubmission/>}/>
-            <Route path="/forms/:formKey/submissions/:id/edit" element={<FormSubmission/>}/>
-            <Route path="/forms/submissions/:id" element={<SubmissionDetail/>}/>
-            <Route path="/create-form" element={<EditForm/>}/>
-            <Route path="/" element={<Forms/>}/>
-            <Route path="/submissions" element={<FormSubmissions/>}/>
-          </>
-        ) : (
-          <Route
-            path="/"
-            element={
-              <Container className="mt-5">
-                <Row>
-                  <Col md={6} className="mx-auto text-center">
-                    <Card>
-                      <Card.Body>
-                        <Card.Title>{t('content.welcome')}</Card.Title>
-                        <Card.Text>{t('content.pleaseLogIn')}</Card.Text>
-                        <Button variant="primary" onClick={() => signinRedirect()}>
-                          {t('navigation.login')}
-                        </Button>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
-              </Container>
-            }
-          />
-        )}
-
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" replace/>}/>
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/login" element={<Login/>}/>
+      <Route element={<RequireAuth/>}>
+        <Route path="/" element={<Forms/>}/>
+        <Route path="/forms" element={<Forms/>}/>
+        <Route path="/forms/:formKey" element={<FormSubmission/>}/>
+        <Route path="/forms/:formKey/submissions/:id/edit" element={<FormSubmission/>}/>
+        <Route path="/forms/submissions/:id" element={<SubmissionDetail/>}/>
+        <Route path="/create-form" element={<EditForm/>}/>
+        <Route path="/submissions" element={<FormSubmissions/>}/>
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace/>}/>
+    </Routes>
   );
 };

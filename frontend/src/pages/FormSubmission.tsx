@@ -14,7 +14,7 @@ import {FormValues} from '../types/Form';
 export const FormSubmission: React.FC = () => {
   const {formKey, id} = useParams<{ formKey: string; id?: string }>();
   const navigate = useNavigate();
-  const {user, isAuthenticated, signinRedirect} = useAuth();
+  const {user} = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
   const token = user?.access_token;
   const {t} = useTranslation();
@@ -60,7 +60,7 @@ export const FormSubmission: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) => {
-      if (!isAuthenticated || !token) {
+      if (!token) {
         return Promise.reject(new Error('You must be logged in to submit a form'));
       }
       if (isEditMode) {
@@ -96,10 +96,6 @@ export const FormSubmission: React.FC = () => {
   });
 
   const onSubmit = (data: Record<string, unknown>) => {
-    if (!isAuthenticated) {
-      signinRedirect();
-      return;
-    }
     mutation.mutate(data);
   };
 
@@ -148,13 +144,6 @@ export const FormSubmission: React.FC = () => {
             <Alert variant="danger">{mutation.error.message}</Alert>
           )}
 
-          {!isAuthenticated && (
-            <Alert variant="warning">
-              {t('form.loginRequired')}{' '}
-              <Alert.Link onClick={() => signinRedirect()}>{t('navigation.login')}</Alert.Link>
-            </Alert>
-          )}
-
           <Form onSubmit={handleSubmit(onSubmit)}>
             <DynamicForm
               fields={form.fields}
@@ -166,7 +155,7 @@ export const FormSubmission: React.FC = () => {
               <Button
                 variant="primary"
                 type="submit"
-                disabled={mutation.isPending || !isAuthenticated}
+                disabled={mutation.isPending}
               >
                 {mutation.isPending ? t('form.submitting') : t('form.submit')}
               </Button>

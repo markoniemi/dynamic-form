@@ -6,7 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {useQueryClient} from '@tanstack/react-query';
 
 export const Navigation: React.FC = () => {
-  const {isAuthenticated, signinRedirect, signoutRedirect} = useAuth();
+  const {signoutRedirect} = useAuth();
   const {t, i18n} = useTranslation();
   const queryClient = useQueryClient();
 
@@ -15,8 +15,8 @@ export const Navigation: React.FC = () => {
     signoutRedirect();
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const changeLanguage = (language: string) => {
+    i18n.changeLanguage(language);
   };
 
   return (
@@ -28,18 +28,14 @@ export const Navigation: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {isAuthenticated && (
-              <>
-                <Nav.Link as={Link} to="/submissions">
-                  {t('navigation.submissions')}
-                </Nav.Link>
-                <Nav.Link as={Link} to="/create-form">
-                  {t('navigation.createForm')}
-                </Nav.Link>
-              </>
-            )}
             <Nav.Link as={Link} to="/forms">
               {t('navigation.forms')}
+            </Nav.Link>
+            <Nav.Link as={Link} to="/submissions">
+              {t('navigation.submissions')}
+            </Nav.Link>
+            <Nav.Link as={Link} to="/create-form">
+              {t('navigation.createForm')}
             </Nav.Link>
           </Nav>
           <Nav>
@@ -48,15 +44,9 @@ export const Navigation: React.FC = () => {
               {/* Add more languages here */}
             </NavDropdown>
             <div className="d-flex align-items-center ms-2">
-            {isAuthenticated ? (
               <Button variant="danger" size="sm" onClick={handleLogout}>
                 {t('navigation.logout')}
               </Button>
-            ) : (
-              <Button variant="primary" size="sm" onClick={() => signinRedirect()}>
-                {t('navigation.login')}
-              </Button>
-            )}
             </div>
           </Nav>
         </Navbar.Collapse>
