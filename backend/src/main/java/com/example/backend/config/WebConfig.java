@@ -5,25 +5,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
+/**
+ * The frontend jar puts its build output in classpath:/static/, which Spring Boot serves
+ * automatically, including index.html at "/". This only adds the client-side route fallback.
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+    // Replaces Spring Boot's default "/**" static handler, so it keeps the same location
     registry
         .addResourceHandler("/**")
-        .addResourceLocations("classpath:/META-INF/resources/webjars/frontend/1.0.0-SNAPSHOT/")
+        .addResourceLocations("classpath:/static/")
         .resourceChain(true)
         .addResolver(new SpaFallbackResourceResolver());
-  }
-
-  @Override
-  public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-    registry.addViewController("/").setViewName("forward:/index.html");
   }
 
   /**

@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-The **Dynamic Form Application** is a full-stack monolithic Spring Boot application that enables users to create, manage, and submit dynamic forms. The application follows a modern architecture with a React frontend packaged as a WebJar and served by a Spring Boot backend.
+The **Dynamic Form Application** is a full-stack monolithic Spring Boot application that enables users to create, manage, and submit dynamic forms. The application follows a modern architecture with a React frontend packaged as a jar of static files and served by a Spring Boot backend.
 
 ### Key Characteristics
 
@@ -83,9 +83,9 @@ The **Dynamic Form Application** is a full-stack monolithic Spring Boot applicat
 - **Frontend Build**: Maven Frontend Plugin
   - Downloads Node.js 24.13.0
   - Runs npm install and build
-  - Packages as WebJar in `META-INF/resources/webjars/frontend/1.0.0/`
+  - Packages build output as a jar with files in `static/`
 - **Backend Build**: Maven
-  - Includes frontend WebJar as dependency
+  - Includes frontend jar as dependency; Spring Boot serves `classpath:/static/` automatically
   - Creates executable JAR with embedded Tomcat
   - Final artifact: `backend-1.0.0.jar`
 
@@ -103,8 +103,8 @@ The **Dynamic Form Application** is a full-stack monolithic Spring Boot applicat
 ┌──────────────────▼──────────────────────┐
 │         Spring Boot Application         │
 │  ┌───────────────────────────────────┐  │
-│  │   React Frontend (WebJar)         │  │
-│  │   - Static files in /webjars/     │  │
+│  │   React Frontend (static jar)     │  │
+│  │   - Static files in /static/      │  │
 │  └───────────────────────────────────┘  │
 │  ┌───────────────────────────────────┐  │
 │  │   REST API Layer                  │  │
@@ -168,7 +168,7 @@ dynamic-form/                    (parent POM)
     │   └── locales/             (i18n translations)
     ├── package.json
     ├── vite.config.ts
-    └── pom.xml                  (WebJar packaging)
+    └── pom.xml                  (static jar packaging)
 ```
 
 ### 3.3 Backend Architecture
@@ -648,7 +648,7 @@ DELETE /api/form-data/submission/{id}
 
 **Public Endpoints**:
 - `GET /api/forms` - List available forms
-- `/`, `/index.html`, `/webjars/**` - Frontend static files
+- `/`, `/index.html`, `/assets/**` - Frontend static files; other non-API paths fall back to `index.html` for client-side routes
 - `/h2-console/**` - H2 console (dev only)
 
 **Authenticated Endpoints**:
@@ -731,8 +731,8 @@ mvn clean install
 **Build Process**:
 1. Frontend Maven plugin downloads Node.js
 2. Runs `npm run ci` (install, build, test)
-3. Packages frontend as WebJar
-4. Backend includes WebJar as dependency
+3. Packages frontend build output as a jar with files in `static/`
+4. Backend includes frontend jar as dependency
 5. Creates executable JAR with embedded Tomcat
 
 **Output**: `backend/target/backend-1.0.0.jar`
