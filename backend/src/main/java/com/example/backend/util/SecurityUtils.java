@@ -19,14 +19,10 @@ public class SecurityUtils {
   }
 
   public static boolean isAdmin(Authentication authentication) {
-    if (authentication == null) {
+    if (authentication == null || authentication.getAuthorities() == null) {
       return false;
     }
-    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-    if (authorities == null) {
-      return false;
-    }
-    return authorities.stream()
+    return authentication.getAuthorities().stream()
         .map(GrantedAuthority::getAuthority)
         .anyMatch(a -> a.equals("ROLE_ADMIN"));
   }

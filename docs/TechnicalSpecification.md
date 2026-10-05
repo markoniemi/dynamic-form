@@ -788,14 +788,14 @@ Currently, backend does not implement i18n. All error messages and responses are
 **Framework**: react-i18next with i18next
 
 **Configuration** (`src/i18n.ts`):
-- Backend: HTTP backend loading from `/locales/{lng}/translation.json`
+- Backend: HTTP backend loading from `/locales/{language}/translation.json`
 - Language detection: Browser language
 - Fallback language: English (en)
 - Interpolation: Enabled
 
 **Translation Files**:
 - `frontend/public/locales/en/translation.json` - English translations
-- Additional languages can be added in `public/locales/{lng}/translation.json`
+- Additional languages can be added in `public/locales/{language}/translation.json`
 
 **Usage**:
 ```typescript
@@ -864,7 +864,7 @@ function Component() {
 ### 11.2 Adding New Languages
 
 **Frontend**:
-1. Create translation file: `frontend/public/locales/{lng}/translation.json`
+1. Create translation file: `frontend/public/locales/{language}/translation.json`
 2. Copy structure from `en/translation.json`
 3. Translate all values
 4. i18next will auto-detect and load
@@ -1002,7 +1002,7 @@ catch (err) {
 The i18n interpolation format function returns a string:
 
 ```typescript
-format: (value, format, lng) => {
+format: (value, format, language) => {
   if (value instanceof Date) {
     // return formatted date
     return new Intl.DateTimeFormat(...).format(value);
