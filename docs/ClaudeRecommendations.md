@@ -115,7 +115,7 @@ name: pr-check
 description: Review staged/uncommitted changes against project coding conventions before opening a PR
 ---
 
-Review all changed files against the project's conventions in .github/copilot-instructions.md:
+Review all changed files against the project's conventions in the dynamic-form-review skill:
 
 1. Java: Google Java Style, Lombok used, constructor injection, no ResponseStatusException in services
 2. TypeScript: no `any`, PascalCase components, useQuery for API calls, Zod+react-hook-form for validation
