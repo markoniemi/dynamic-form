@@ -57,7 +57,7 @@
     "success": "Form submitted successfully!",
     "updateSuccess": "Form updated successfully!",
     "error": "An error occurred while submitting the form.",
-    "required": "is required",
+    "required": "{{label}} is required",
     "selectOption": "Select an option...",
     "editTitle": "Edit: {{title}}",
     "loginRequired": "You must be logged in to submit this form."

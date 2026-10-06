@@ -1,22 +1,15 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
 import {useTranslation} from 'react-i18next';
-import {UseFormRegister} from 'react-hook-form';
-import {FormField, FormValues} from '../types/Form';
 import {FieldWrapper} from './FieldWrapper';
-
-interface FieldProps {
-  field: FormField;
-  register: UseFormRegister<FormValues>;
-  errorMessage?: string;
-}
+import {FieldProps, requiredRule} from './FieldProps';
 
 export const SelectField: React.FC<FieldProps> = ({field, register, errorMessage}) => {
   const {t} = useTranslation();
   return (
     <FieldWrapper label={field.label} required={field.required} controlId={field.name}>
       <Form.Select
-        {...register(field.name, {required: field.required ? `${field.label} is required` : false})}
+        {...register(field.name, requiredRule(field, t))}
         isInvalid={!!errorMessage}
       >
         <option value="">{t('form.selectOption')}</option>
