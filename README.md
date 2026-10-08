@@ -156,7 +156,7 @@ mvn -pl backend jib:build \
   -Djib.to.image=<AWS_ACCOUNT_ID>.dkr.ecr.eu-north-1.amazonaws.com/dynamic-form:${project.version}
 ```
 
-Or use the GitHub Actions workflow in [docs/AWSDeployPlan.md](docs/AWSDeployPlan.md), which automates this.
+Or run `bash deploy.sh postgres`, which automates this (see [DEPLOY.md](DEPLOY.md)).
 
 > Requires AWS credentials configured (`aws configure` or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` environment variables).
 
@@ -201,11 +201,7 @@ Config files:
 
 ### AWS
 
-For a complete guide to deploying this application to AWS (ECS Fargate, RDS, CloudFront, etc.), see [docs/AWSDeployPlan.md](docs/AWSDeployPlan.md). The plan includes:
-- Phased implementation with checkpoints
-- Terraform IaC for all infrastructure
-- GitHub Actions CI/CD
-- Smoke tests and tear-down drills
+For a complete guide to deploying this application to AWS (ECS Fargate, ALB, RDS, ECR, Cognito), see [DEPLOY.md](DEPLOY.md). Infrastructure is defined in [terraform/](terraform/) and the frontend is served by the Spring Boot app itself.
 
 ## License
 

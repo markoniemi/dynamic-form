@@ -35,7 +35,7 @@ This script will:
 
 ### **Step 2: Prepare Application (Phase 0)**
 
-Complete Phase 0 from [AWSDeployPlan.md](docs/AWSDeployPlan.md):
+Make sure the application is ready for deployment:
 - Restructure Spring Boot configuration (application.yaml, profiles)
 - Add Flyway database migrations
 - Add Maven Jib plugin
@@ -354,5 +354,5 @@ bash deploy.sh postgres
 
 ## See Also
 
-- [AWSDeployPlan.md](docs/AWSDeployPlan.md) — Detailed Phase 1–8 breakdown
+- [terraform/](terraform/) — Infrastructure as code (ECS, ALB, RDS, ECR, IAM, Cognito)
 - [aws-architecture.puml](docs/aws-architecture.puml) — Architecture diagram
