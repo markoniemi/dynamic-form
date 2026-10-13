@@ -59,7 +59,7 @@ class FormDataServiceTest {
   @Test
   void getFormSubmissions() {
     List<FormData> submissions = List.of(contact(1L, USER), contact(2L, ADMIN));
-    when(formDataRepository.findAll()).thenReturn(submissions);
+    when(formDataRepository.findAllByOrderBySubmittedAtDesc()).thenReturn(submissions);
 
     assertEquals(submissions, formDataService.getAll());
   }

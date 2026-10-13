@@ -34,4 +34,15 @@ class FormDataRepositoryTest {
     assertEquals(2, result.size());
     assertTrue(result.stream().allMatch(f -> f.getSubmittedBy().equals(USER)));
   }
+
+  @Test
+  void findAllByOrderBySubmittedAtDescReturnsNewestFirst() throws InterruptedException {
+    FormData oldest = formDataRepository.saveAndFlush(contact(USER));
+    Thread.sleep(10);
+    FormData newest = formDataRepository.saveAndFlush(contact(ADMIN));
+
+    List<FormData> result = formDataRepository.findAllByOrderBySubmittedAtDesc();
+
+    assertEquals(List.of(newest.getId(), oldest.getId()), result.stream().map(FormData::getId).toList());
+  }
 }

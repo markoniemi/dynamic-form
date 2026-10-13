@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FormDataRepository extends JpaRepository<FormData, Long> {
   List<FormData> findBySubmittedByOrderBySubmittedAtDesc(String submittedBy);
+
+  List<FormData> findAllByOrderBySubmittedAtDesc();
 }

@@ -60,7 +60,7 @@ public class FormDataService {
 
   @InterfaceLog
   public List<FormData> getAll() {
-    return formDataRepository.findAll();
+    return formDataRepository.findAllByOrderBySubmittedAtDesc();
   }
 
   @InterfaceLog
