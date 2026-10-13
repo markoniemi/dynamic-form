@@ -78,7 +78,7 @@ public class FormDataController {
   @DeleteMapping("/submission/{id}")
   @InterfaceLog
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  public void deleteSubmission(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-    formDataService.delete(id, getUsername(jwt));
+  public void deleteSubmission(@PathVariable Long id) {
+    formDataService.delete(id);
   }
 }

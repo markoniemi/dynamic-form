@@ -68,7 +68,7 @@ class FormDataServiceTest {
   void deleteFormSubmission() {
     when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, USER)));
 
-    formDataService.delete(1L, USER);
+    formDataService.delete(1L);
 
     verify(formDataRepository).deleteById(1L);
   }
@@ -108,12 +108,12 @@ class FormDataServiceTest {
   }
 
   @Test
-  void deleteFormSubmissionByOtherUserThrowsAndDoesNotDelete() {
-    when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, ADMIN)));
+  void deleteFormSubmissionOwnedByOtherUserSucceeds() {
+    when(formDataRepository.findById(1L)).thenReturn(Optional.of(contact(1L, USER)));
 
-    assertThrows(
-        SecurityException.class, () -> formDataService.delete(1L, USER));
-    verify(formDataRepository, never()).deleteById(any());
+    formDataService.delete(1L);
+
+    verify(formDataRepository).deleteById(1L);
   }
 
   @Test
@@ -140,7 +140,7 @@ class FormDataServiceTest {
     when(formDataRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThrows(
-        NoSuchElementException.class, () -> formDataService.delete(99L, USER));
+        NoSuchElementException.class, () -> formDataService.delete(99L));
     verify(formDataRepository, never()).deleteById(any());
   }
 }

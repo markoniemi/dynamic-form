@@ -112,7 +112,7 @@ class FormDataControllerTest {
         .perform(delete("/api/form-data/submission/1").with(csrf()).with(admin()))
         .andExpect(status().isOk());
 
-    verify(formDataService).delete(1L, ADMIN);
+    verify(formDataService).delete(1L);
   }
 
   @Test
@@ -171,6 +171,6 @@ class FormDataControllerTest {
         .perform(delete("/api/form-data/submission/1").with(user()))
         .andExpect(status().isForbidden());
 
-    verify(formDataService, never()).delete(any(), any());
+    verify(formDataService, never()).delete(any());
   }
 }

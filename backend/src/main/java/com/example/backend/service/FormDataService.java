@@ -70,13 +70,9 @@ public class FormDataService {
 
   @InterfaceLog
   @Transactional
-  public void delete(@NotNull Long id, @NotNull String username) {
-    FormData existing = get(id);
-
-    if (!existing.getSubmittedBy().equals(username)) {
-      throw new SecurityException("You are not authorized to delete this submission");
-    }
-
+  public void delete(@NotNull Long id) {
+    // Only the admin-only endpoint calls this, so no owner check
+    get(id);
     formDataRepository.deleteById(id);
   }
 }
