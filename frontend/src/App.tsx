@@ -1,6 +1,5 @@
 import {BrowserRouter as Router} from 'react-router-dom';
 import {AuthProvider} from 'react-oidc-context';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {useQuery} from '@tanstack/react-query';
 import {loadOidcConfig} from './services/configClient';
 

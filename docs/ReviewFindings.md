@@ -109,21 +109,21 @@ Ponytail audit of the whole repo, 2026-10-13. Read-only: nothing was built or ru
 ## Nice to have
 
 ### 15. Delete unused dependencies (`frontend/package.json`, `backend/pom.xml`)
-- [ ] Done
+- [x] Done
 - **What this is:** `@supabase/supabase-js`, `zod` and `@hookform/resolvers` have no import in `frontend/src` or `frontend/test`. `spring-boot-starter-webflux` has no `WebClient` or reactive use in `backend/src`.
 - **Problem:** Each is code to patch and download. WebFlux also pulls in Reactor and Netty beside Tomcat.
 - **Fix:** Remove all four.
 - **If we skip it:** More attack surface and slower builds.
 
 ### 16. Source maps ship in production (`vite.config.ts:25`)
-- [ ] Done
+- [x] Done
 - **What this is:** `sourcemap: true` goes into the jar, served from `/assets`.
 - **Problem:** Anyone can read the original source.
 - **Fix:** Set it to `false` or `'hidden'`.
 - **If we skip it:** Source exposure. Low risk, source is not secret here.
 
 ### 17. Bootstrap CSS imported twice (`main.tsx:6`, `App.tsx:3`)
-- [ ] Done
+- [x] Done
 - **What this is:** Both files import `bootstrap.min.css`.
 - **Fix:** Delete one line.
 
