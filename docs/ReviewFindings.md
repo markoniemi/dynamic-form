@@ -133,7 +133,7 @@ Ponytail audit of the whole repo, 2026-10-13. Read-only: nothing was built or ru
 - **Fix:** Delete both (keep `cognito_user_pool_id` only if something else uses it).
 
 ### 19. Floating tool versions (`.mcp.json`, `docker-compose.yaml`)
-- [ ] Done
+- [x] Done
 - **What this is:** `@playwright/mcp@latest` and `oauth2-server:latest`.
 - **Fix:** Pin both. A bad upstream release otherwise breaks the build or dev environment with no change in this repo.
 
