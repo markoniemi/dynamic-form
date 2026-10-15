@@ -51,7 +51,7 @@ Ponytail audit of the whole repo, 2026-10-13. Read-only: nothing was built or ru
 ## Should fix
 
 ### 7. No test covers real JWT to role mapping (`backend/src/test`)
-- [ ] Done
+- [x] Done
 - **What this is:** All controller tests inject a fake `JwtAuthenticationToken` with hand-made authorities (`TestUsers.java:45`).
 - **Problem:** That is why finding 1 went unnoticed. The Playwright test logs in as a real user, but no admin-only action was seen asserted.
 - **Fix:** One integration test using `OAuth2Container` that logs in as `admin` and calls `POST /api/forms`.
