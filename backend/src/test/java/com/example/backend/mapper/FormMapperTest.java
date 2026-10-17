@@ -3,8 +3,8 @@ package com.example.backend.mapper;
 import static com.example.backend.testdata.TestForms.contact;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.backend.dto.FieldDto;
-import com.example.backend.dto.FormDto;
+import com.example.dynamicform.api.FieldDto;
+import com.example.dynamicform.api.FormDto;
 import com.example.backend.entity.Field;
 import com.example.backend.entity.Form;
 import org.junit.jupiter.api.Test;

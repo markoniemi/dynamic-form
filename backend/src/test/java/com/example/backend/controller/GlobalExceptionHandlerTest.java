@@ -2,9 +2,9 @@ package com.example.backend.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.backend.dto.FieldDto;
-import com.example.backend.dto.FormDto;
-import com.example.backend.dto.ValidationErrorDto;
+import com.example.dynamicform.api.FieldDto;
+import com.example.dynamicform.api.FormDto;
+import com.example.dynamicform.api.ValidationErrorDto;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

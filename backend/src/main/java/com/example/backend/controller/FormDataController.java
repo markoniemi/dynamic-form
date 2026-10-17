@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import static com.example.backend.util.SecurityUtils.getUsername;
 import static com.example.backend.util.SecurityUtils.isAdmin;
 
-import com.example.backend.dto.FormDataDto;
+import com.example.dynamicform.api.FormDataDto;
 import com.example.backend.entity.FormData;
 import com.example.backend.mapper.FormDataMapper;
 import com.example.backend.service.FormDataService;

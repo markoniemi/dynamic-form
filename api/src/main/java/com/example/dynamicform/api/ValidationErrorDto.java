@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.dynamicform.api;
 
 import lombok.Value;
 

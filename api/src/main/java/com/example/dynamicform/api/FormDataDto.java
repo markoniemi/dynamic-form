@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.dynamicform.api;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

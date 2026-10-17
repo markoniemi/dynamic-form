@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.backend.config.SecurityConfig;
-import com.example.backend.dto.FormDto;
+import com.example.dynamicform.api.FormDto;
 import com.example.backend.entity.Form;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;

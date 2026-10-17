@@ -274,7 +274,7 @@ Notes
 
 ## 6. Open questions
 
-- Package name for the api jar: keep `com.example.backend.dto` or rename to `com.example.dynamicform.api`?
+- Package name for the api jar: decided, `com.example.dynamicform.api`.
 - Snapshots or real releases on Repsy?
 - Does anything in `deploy.sh`/Terraform rely on the local image name?
 - Is Postgres required in the stack, or is the H2 `test` profile enough for client tests?

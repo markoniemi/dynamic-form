@@ -1,7 +1,7 @@
 package com.example.backend.testdata;
 
-import com.example.backend.dto.FormDto;
-import com.example.backend.dto.FormListItemDto;
+import com.example.dynamicform.api.FormDto;
+import com.example.dynamicform.api.FormListItemDto;
 import com.example.backend.entity.Field;
 import com.example.backend.entity.FieldOption;
 import com.example.backend.entity.Form;

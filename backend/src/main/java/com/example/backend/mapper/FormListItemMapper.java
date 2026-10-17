@@ -1,6 +1,6 @@
 package com.example.backend.mapper;
 
-import com.example.backend.dto.FormListItemDto;
+import com.example.dynamicform.api.FormListItemDto;
 import com.example.backend.entity.Form;
 import java.util.List;
 import org.mapstruct.Mapper;

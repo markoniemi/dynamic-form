@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.FormDto;
-import com.example.backend.dto.FormListItemDto;
+import com.example.dynamicform.api.FormDto;
+import com.example.dynamicform.api.FormListItemDto;
 import com.example.backend.mapper.FormMapper;
 import com.example.backend.service.FormService;
 import jakarta.validation.Valid;

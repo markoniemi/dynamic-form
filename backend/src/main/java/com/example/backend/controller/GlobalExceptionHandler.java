@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.ValidationErrorDto;
+import com.example.dynamicform.api.ValidationErrorDto;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

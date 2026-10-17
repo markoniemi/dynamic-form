@@ -2,7 +2,7 @@ package com.example.backend.mapper;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-import com.example.backend.dto.FormDto;
+import com.example.dynamicform.api.FormDto;
 import com.example.backend.entity.Form;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

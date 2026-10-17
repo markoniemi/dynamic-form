@@ -6,7 +6,7 @@ import static com.example.backend.testdata.TestSubmissions.contactData;
 import static com.example.backend.testdata.TestUsers.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.backend.dto.FormDataDto;
+import com.example.dynamicform.api.FormDataDto;
 import com.example.backend.entity.FormData;
 import java.util.List;
 import org.junit.jupiter.api.Test;
