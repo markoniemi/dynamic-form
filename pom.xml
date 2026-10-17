@@ -36,6 +36,13 @@
         <start-class>com.example.backend.BackendApplication</start-class>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>repsy</id>
+            <url>https://repo.repsy.io/mvn/markoniemi/maven</url>
+        </repository>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

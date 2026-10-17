@@ -17,6 +17,10 @@
   <name>backend</name>
   <description>Backend module with Spring Boot API and OAuth2 Resource Server</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.example</groupId>

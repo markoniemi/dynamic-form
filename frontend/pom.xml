@@ -17,6 +17,10 @@
     <name>frontend</name>
     <description>Frontend module with React and Vite</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
