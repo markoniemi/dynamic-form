@@ -276,5 +276,5 @@ Notes
 
 - Package name for the api jar: decided, `com.example.dynamicform.api`.
 - Snapshots or real releases on Repsy?
-- Does anything in `deploy.sh`/Terraform rely on the local image name?
+- Does anything in `deploy.sh`/Terraform rely on the local image name? No: both override it with `-Djib.to.image` to ECR.
 - Is Postgres required in the stack, or is the H2 `test` profile enough for client tests?

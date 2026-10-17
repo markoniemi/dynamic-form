@@ -197,6 +197,18 @@ Config files:
 - **Repository Tests**: Use `@DataJpaTest` for fast, isolated JPA tests (e.g., `ItemRepositoryTest`).
 - **Integration Tests**: Use `@SpringBootTest` with `WebTestClient` and `Testcontainers` for full-context tests (e.g., `ItemControllerTest`, `FrontendIT`).
 
+## Published artifacts
+
+Every push to `master` publishes, from the same version:
+
+| Artifact | Where | Use |
+|----------|-------|-----|
+| `com.example:dynamic-form-api` | Repsy | Shared DTOs (`com.example.dynamicform.api`), no Spring |
+| `com.example:dynamic-form-testcontainers` | Repsy | `DynamicFormStack` starts auth server, Postgres and backend for client tests |
+| `ghcr.io/markoniemi/dynamic-form` | GHCR | The backend image |
+
+The stack's auth server listens on host port 9000, so stop anything else using it before running tests. The `backend` build creates the local image that the `testcontainers` module's ITs use (needs a Docker daemon; skipped with `-DskipTests`).
+
 ## Deployment
 
 ### AWS

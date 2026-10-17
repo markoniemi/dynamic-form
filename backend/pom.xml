@@ -207,6 +207,10 @@
             <goals>
               <goal>dockerBuild</goal>
             </goals>
+            <configuration>
+              <!-- deploy.sh and the CI publish step build with -DskipTests and need no local daemon -->
+              <skip>${skipTests}</skip>
+            </configuration>
           </execution>
         </executions>
         <configuration>
