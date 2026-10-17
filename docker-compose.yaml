@@ -33,7 +33,7 @@ services:
       retries: 10
 
   app:
-    image: dynamic-form:1.0.0-SNAPSHOT
+    image: ghcr.io/markoniemi/dynamic-form:1.0.0-SNAPSHOT
     ports:
       - "8080:8080"
     environment:

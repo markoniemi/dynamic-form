@@ -137,7 +137,7 @@ The application serves the frontend UI and backend API from `http://localhost:80
 mvn -pl backend jib:dockerBuild
 ```
 
-This creates `dynamic-form:1.0.0-SNAPSHOT` in your local Docker daemon. Then reference it in docker-compose or run it directly:
+This creates `ghcr.io/markoniemi/dynamic-form:1.0.0-SNAPSHOT` in your local Docker daemon. Then reference it in docker-compose or run it directly:
 
 ```bash
 docker run -e SPRING_PROFILES_ACTIVE=prod \
@@ -146,7 +146,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod \
   -e DB_PASSWORD=postgres \
   -e OAUTH2_ISSUER_URI=http://localhost:9000 \
   -p 8080:8080 \
-  dynamic-form:1.0.0-SNAPSHOT
+  ghcr.io/markoniemi/dynamic-form:1.0.0-SNAPSHOT
 ```
 
 **AWS deployment** — Build and push the backend image to ECR (no local Docker daemon needed):
