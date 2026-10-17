@@ -25,8 +25,12 @@ public class TestcontainersConfig {
             .withLogConsumer(new Slf4jLogConsumer(log))
             .withCreateContainerCmdModifier(getPortConfig());
     authorizationServer.start();
+    // Shared by cached test contexts, so stop it when the test JVM exits rather than per context.
+    // Without this the container keeps host port 9000 until Ryuk reaps it, which breaks the
+    // testcontainers module's ITs that run right after.
+    Runtime.getRuntime().addShutdownHook(new Thread(authorizationServer::stop));
     return authorizationServer;
-    }
+  }
 
   private static @NonNull Consumer<CreateContainerCmd> getPortConfig() {
     return cmd ->
