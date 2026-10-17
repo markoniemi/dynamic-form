@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -29,6 +32,48 @@ jobs:
             libsecret-1-0 libhyphen0 libmanette-0.2-0 \
             libflite1 libgles2 gstreamer1.0-libav
 
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <servers>
+              <server>
+                <id>repsy</id>
+                <username>\${env.MAVEN_USERNAME}</username>
+                <password>\${env.MAVEN_PASSWORD}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      # Tests of every module run before anything is published
       - name: Build with Maven
         run: mvn -B clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         working-directory: ./
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPSY_USER }}
+          MAVEN_PASSWORD: ${{ secrets.REPSY_TOKEN }}
+
+      # Only pushes to master publish: api and testcontainers jars to Repsy, image to GHCR
+      - name: Publish artifacts and image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: >
+          mvn -B -Pci deploy -DskipTests
+          -Djib.to.auth.username=${{ github.actor }}
+          -Djib.to.auth.password=${{ secrets.PACKAGE_UPDATE_TOKEN }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPSY_USER }}
+          MAVEN_PASSWORD: ${{ secrets.REPSY_TOKEN }}
+
+      # continue-on-error until dynamic-form-javafx has its dynamic-form-built workflow
+      - name: Trigger dynamic-form-javafx build
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        continue-on-error: true
+        run: |
+          gh api repos/markoniemi/dynamic-form-javafx/dispatches \
+            --input - <<'EOF'
+          {"event_type": "dynamic-form-built", "client_payload": {}}
+          EOF
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
