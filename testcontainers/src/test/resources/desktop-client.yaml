@@ -1,0 +1,15 @@
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          desktop-client:
+            registration:
+              client-id: desktop-client
+              client-authentication-methods: [none]
+              authorization-grant-types: [authorization_code]
+              redirect-uris: [http://localhost:8123/callback]
+              scopes: [openid, profile, email]
+            require-proof-key: true
+            token:
+              access-token-time-to-live: 1h

@@ -152,3 +152,11 @@ About 3 smaller items left out, such as the `/h2-console/**` permit in `Security
 - Most frontend pages (`EditForm`, `FormSubmission`)
 - Frontend test quality
 - Anything at runtime. Nothing was built or run, and no tests were run.
+
+## Found later
+
+### Validation runs before authorization on `POST /api/forms` (`FormController.java:43`)
+- [ ] Done
+- **Problem:** `@Valid` binds the body before `@PreAuthorize("hasAuthority('ROLE_ADMIN')")` runs. A non-admin posting an invalid body gets 400 with field errors instead of 403. Found by `DynamicFormStackIT.userCannotCreateForm` (the IT posts a valid form to reach the 403).
+- **Fix:** Authorize at the URL level, e.g. `requestMatchers(HttpMethod.POST, "/api/forms").hasAuthority("ROLE_ADMIN")` in `SecurityConfig`, or move the check ahead of validation. Same for the PUT and DELETE form endpoints. Add a test that posts an invalid body as a non-admin and expects 403.
+- **If we skip it:** Low risk. A non-admin learns the form schema's validation rules from the error messages.

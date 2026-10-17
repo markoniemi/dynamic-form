@@ -23,6 +23,7 @@
         <module>api</module>
         <module>frontend</module>
         <module>backend</module>
+        <module>testcontainers</module>
     </modules>
 
     <properties>
