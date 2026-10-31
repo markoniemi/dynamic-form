@@ -1,73 +1,21 @@
-# Claude Development Guidelines
+# Dynamic Form
 
-This document provides development guidelines for this project. Detailed coding conventions live in the project skills under `.claude/skills/` (`dynamic-form-backend`, `dynamic-form-frontend`, `dynamic-form-fullstack`, `dynamic-form-review`).
+Spring Boot + React monolith: the SPA is built into the backend jar and served from `classpath:/static/`. Postgres in prod, H2 in tests, OAuth 2.0 via the sibling `../../oauth2-server` project.
 
-## Key Resources
+## Modules (each has its own CLAUDE.md with commands and pitfalls)
+- `api/` — shared DTOs, published as a library
+- `backend/` — Spring Boot REST API and resource server
+- `frontend/` — React/TypeScript SPA
+- `testcontainers/` — published Testcontainers library for the app image
+- `terraform/` (AWS), `debt-bot/` (Python tooling), `docs/` (specs; start with TechnicalSpecification.md and RequirementsSpecification.md)
 
-- **TechnicalSpecification.md**: Defines the technical architecture and stack
-- **RequirementsSpecification.md**: Outlines project requirements and features
+Conventions live in the skills under `.claude/skills/` (`dynamic-form-backend`, `-frontend`, `-fullstack`, `-review`).
 
-## Integration with OAuth2 Server Project
+## Repo-wide rules
+- Errors are RFC 7807 `ProblemDetail`; validation errors add an `errors` array of `{ field, message, code }` that the frontend maps onto react-hook-form fields
+- Changes depending on the auth server (JWT claims/roles, issuer/JWKS, client registrations in `TestcontainersConfig` and docker-compose, demo users) must be verified against `../../oauth2-server`
+- Prefer IntelliJ MCP tools (`mcp__idea__*`) over generic file, search, build and git tools
 
-Authentication is provided by the [oauth2-server](../../oauth2-server) project. Tests use `OAuth2Container` from its `auth-server-testcontainers` library, and docker-compose runs its auth server image. When changing anything that depends on the auth server, verify against it, especially:
-- JWT claims, scopes and roles consumed by the resource server
-- OIDC discovery and JWKS endpoints (issuer URL, key fetching)
-- Client registrations (redirect URIs, PKCE, token TTL) in `TestcontainersConfig` and docker-compose
-- Demo users and their roles
-
-## IntelliJ MCP Tool Preferences
-
-When working with this project, prefer IntelliJ IDE MCP tools (`mcp__idea__*`) over generic alternatives:
-
-- **File operations**: Use `mcp__idea__read_file`, `mcp__idea__create_new_file` instead of Bash/generic Read/Write
-- **Project navigation**: Use `mcp__idea__search_symbol`, `mcp__idea__search_text`, `mcp__idea__list_directory_tree` for code exploration
-- **Building/testing**: Use `mcp__idea__build_project`, `mcp__idea__execute_run_configuration` instead of manual npm/gradle commands
-- **Refactoring**: Use `mcp__idea__rename_refactoring` for safe renames across the project
-- **Git operations**: Use `mcp__idea__git_status` to check repo state
-- **Linting/diagnostics**: Use `mcp__idea__get_file_problems`, `mcp__idea__lint_files` for code quality checks
-- **Debugging**: Use `mcp__idea__xdebug_*` tools for stepping through code when needed
-
-IntelliJ MCP tools are aware of the project structure, dependencies, and IDE state, making them more reliable than shell-based alternatives.
-
-## Architecture Overview
-
-This is a monolithic Spring Boot application with:
-- **Backend**: Java/Spring Boot REST API
-- **Frontend**: React/TypeScript SPA packaged into `classpath:/static/` and served by Spring Boot
-- **Database**: PostgreSQL with H2 for tests
-- **Authentication**: OAuth 2.0 with Spring Security
-- **Error Handling**: RFC 7807 Problem Details with validation error extensions
-
-### Key Architectural Patterns
-
-**Error Responses** — All API errors follow RFC 7807 (`ProblemDetail`). Validation errors include an `errors` array with field-level details (`{ field, message, code }`). Frontend wires these directly into form field errors using react-hook-form.
-
-**Validation** — Spring Validation Framework (`@Valid`, `@NotBlank`, etc.) on DTOs. Global exception handler extracts field errors and returns them in the `errors` extension of `ProblemDetail`.
-## Git Commit Messages
-
-Commit messages use a **one-line format with semicolons** to separate concerns:
-
-```
-Brief action; additional change; optional note
-```
-
-**Examples:**
-- `Add i18n for validation messages and form labels; replace 26 hardcoded strings in EditForm and FieldEditor with translation keys`
-- `Simplify service contracts: throw on non-JSON instead of returning null; remove nullable returns; simplify empty checks in components`
-- `Replace fireEvent with userEvent in 3 test files; modernize test patterns for better UX simulation`
-
-**Guidelines:**
-- One line only — concise and scannable in git log
-- Use semicolons to separate multiple logical changes
-- Use imperative mood: "add", "fix", "refactor" (not "added", "fixed")
-- Focus on **what changed and why**, not implementation details
-- Capitalize first word
-- No period at end
-
-## Implementation Tasks
-
-During implementation tasks (planning, coding, testing):
-- **Do not commit** unless explicitly asked
-- Work iteratively and validate completeness before committing
-- Use feature branches for significant work
-- Plan all changes upfront before execution
+## Workflow
+- Do not commit unless asked; plan all changes upfront; use feature branches for significant work
+- Commit messages: one line, imperative, capitalized, no period, semicolons between concerns, what and why: `Add i18n for validation messages; replace 26 hardcoded strings in EditForm with translation keys`
