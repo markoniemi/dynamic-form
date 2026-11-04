@@ -3,9 +3,12 @@
   <!-- Include Spring Boot defaults for colors and patterns -->
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
+  <!-- surefire sets logging.exception-depth=short to keep unit-test output small -->
+  <springProperty name="EX_DEPTH" source="logging.exception-depth" defaultValue="full"/>
+
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%highlight(%-5level %logger{1}: %msg%n)</pattern>
+      <pattern>%highlight(%-5level %logger{1}: %msg%n%ex{${EX_DEPTH}})</pattern>
     </encoder>
   </appender>
 

@@ -26,7 +26,9 @@
       "Read(**/.env)",
       "Read(**/.env.*)",
       "Read(**/deploy.env)",
-      "Read(**/deploy.*.env)"
+      "Read(**/deploy.*.env)",
+      "Read(**/node_modules/**)",
+      "Read(**/dist/**)"
     ],
     "defaultMode": "acceptEdits"
   },

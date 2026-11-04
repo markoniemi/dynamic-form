@@ -166,6 +166,18 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- @{argLine} keeps the jacoco agent; the flag hides Mockito's dynamic agent warning -->
+          <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
+          <systemPropertyVariables>
+            <!-- one-line exception logging in unit-test output; see logback-spring.xml -->
+            <logging.exception-depth>short</logging.exception-depth>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <executions>
           <execution>
