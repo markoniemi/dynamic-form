@@ -7,14 +7,12 @@ description: Expert knowledge for the Dynamic Form backend (Spring Boot, Java, P
 
 ## Overview
 
-This skill provides context and workflows for the `backend` module of the Dynamic Form application. It is a Spring Boot 3.5.6 application serving as an OAuth2 Resource Server.
+This skill provides context and workflows for the `backend` module of the Dynamic Form application. It is a Spring Boot application serving as an OAuth2 Resource Server. For the framework and language versions, see `backend/CLAUDE.md` — they are not repeated here.
 
 ## Technology Stack
 
-- **Framework:** Spring Boot 3.5.6
-- **Language:** Java 17+
 - **Security:** Spring Security OAuth2 Resource Server
-- **Data:** Spring Data JPA, Hibernate, PostgreSQL (Prod), H2 (Dev/Test)
+- **Data:** Spring Data JPA, Hibernate, PostgreSQL (prod and dev), H2 (test only)
 - **Utilities:** MapStruct (DTO mapping), Lombok (boilerplate reduction)
 - **Testing:** JUnit 5, Mockito, Testcontainers, WebTestClient
 
@@ -27,13 +25,14 @@ The backend follows a standard Maven/Spring Boot directory structure:
   - `service/`: Business logic services
   - `repository/`: Spring Data JPA repositories
   - `entity/`: JPA entities (Database models)
-  - `dto/`: Data Transfer Objects (API models)
   - `mapper/`: MapStruct mappers
   - `config/`: Configuration classes (Security, Web, etc.)
+- DTOs are **not** in this module: they live in the `api` module, package `com.example.dynamicform.api`
 - `src/main/resources/`:
   - `application.yaml`: Main configuration
-  - `application-dev.yaml`: Development profile (H2)
-  - `application-test.yaml`: Test profile
+  - `application-dev.yaml`: Development profile (Postgres)
+  - `application-prod.yaml`: Production profile (Postgres)
+  - `application-test.yaml`: Test profile (H2)
 - `src/test/java/`:
   - `com/example/backend/IntegrationTestBase.java`: Base class for integration tests (Testcontainers setup)
 
@@ -41,34 +40,36 @@ The backend follows a standard Maven/Spring Boot directory structure:
 
 ### Running the Application
 
-To run the application locally with the `dev` profile (using in-memory H2 database):
+Run every Maven command from the repository root with `-pl backend`. Never `cd backend` first: Maven can then report `BUILD SUCCESS` without running any tests (see `.claude/commands/test.md`).
+
+To run the application locally with the `dev` profile:
 
 ```bash
-cd backend
-mvn spring-boot:run
+mvn -pl backend spring-boot:run -Dspring-boot.run.profiles=dev
 ```
+
+The `dev` profile needs Postgres on `localhost:5432/template` and the auth server on `localhost:9000`. Starting `DevelopmentApplication` (in test sources) does the same thing.
 
 The API will be available at `http://localhost:8080/api`.
 
 ### Testing
 
 **Unit Tests:**
-Run standard unit tests:
 ```bash
-mvn test
+mvn -pl backend test
 ```
 
-**Integration Tests:**
-Run integration tests (requires Docker for Testcontainers):
+**Integration Tests** (requires Docker for Testcontainers):
 ```bash
-mvn verify
+mvn -pl backend verify
 ```
 
 ### Database
 
-- **Production:** PostgreSQL
-- **Development/Test:** H2 (in-memory)
-- **Schema Management:** Hibernate `ddl-auto` is used (validate in prod, update/create-drop in dev/test).
+- **Production:** PostgreSQL, Flyway on, `ddl-auto: validate`
+- **Development:** PostgreSQL on `localhost:5432/template`, `ddl-auto: update`
+- **Test:** H2 in-memory, `ddl-auto: create-drop`
+- **Schema Management:** Flyway is enabled in `prod` only; dev and test schemas come from Hibernate. A schema change needs a new `db/migration/V<n>__*.sql` — never edit an applied one.
 
 ## Coding Conventions
 

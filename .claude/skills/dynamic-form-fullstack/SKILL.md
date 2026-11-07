@@ -8,10 +8,10 @@ description: Full-stack feature implementation for the Dynamic Form app. Use whe
 ## Workflow: implement backend first, then frontend
 
 1. **Design the API contract** — define the endpoint, HTTP method, request/response DTOs, and error cases before writing any code.
-2. **Implement the backend** — entity changes → repository → service → controller → `@RestControllerAdvice` mapping → backend unit tests.
+2. **Implement the backend** — DTO changes in the `api` module → entity → repository → service → controller → `@RestControllerAdvice` mapping → backend unit tests.
 3. **Align the TypeScript types** — update `frontend/src/types/Form.ts` to match the new/changed DTOs exactly.
 4. **Implement the frontend** — service method in `formClient.ts` or `formDataClient.ts` → React Query query/mutation → page/component → i18n keys → frontend tests.
-5. **Verify end-to-end** — run `mvn test` (backend) and `npm test` (frontend); check the full flow manually if the dev server is running.
+5. **Verify end-to-end** — run `mvn -pl backend test` from the repository root and `npm test` in `frontend/`; check the full flow manually if the dev server is running.
 
 ---
 
@@ -94,12 +94,12 @@ When changing a DTO, always update the TypeScript type in the same change.
 | File | Purpose |
 |---|---|
 | `entity/` | JPA entity — add fields here first |
-| `dto/` | Request and response DTOs |
+| `api` module, `com.example.dynamicform.api` | Request and response DTOs — not in `backend` |
 | `mapper/` | MapStruct interface — add new mappings |
 | `repository/` | Spring Data JPA — add query methods if needed |
 | `service/` | Business logic — throws standard Java exceptions |
 | `controller/` | REST endpoint — delegates to service, uses `@PreAuthorize` |
-| `config/GlobalExceptionHandler.java` | Maps exceptions to HTTP status codes |
+| `controller/GlobalExceptionHandler.java` | Maps exceptions to HTTP status codes |
 
 ### Frontend
 | File | Purpose |
@@ -117,7 +117,7 @@ When changing a DTO, always update the TypeScript type in the same change.
 ## Adding a new API endpoint — checklist
 
 ### Backend
-- [ ] DTO created in `dto/` with Jakarta Validation annotations
+- [ ] DTO created in the `api` module (`com.example.dynamicform.api`) with Jakarta Validation annotations
 - [ ] MapStruct mapper updated in `mapper/`
 - [ ] Service method added; throws only standard Java exceptions
 - [ ] Controller method added with `@PreAuthorize`

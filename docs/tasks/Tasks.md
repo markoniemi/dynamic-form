@@ -53,7 +53,9 @@ prompt: `~/.claude/settings.json` runs `caveman-activate.js` and
 hooks. Remove the two manual entries from user settings, keep the plugin's.
 Outside the repo — user-level config.
 
-### fix stale skill facts [planned, high]
+### fix stale skill facts [in_review, high]
+
+plan: [fix-stale-skill-facts.md](fix-stale-skill-facts.md)
 
 Finding C-1. `dynamic-form-backend/SKILL.md` claims Spring Boot 3.5.6, Java 17+,
 H2 for dev and a `dto/` package; actual is 4.0.3, Java 21, Postgres for dev, DTOs

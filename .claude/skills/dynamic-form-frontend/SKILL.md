@@ -16,7 +16,7 @@ description: "Work on the dynamic-form React/Vite frontend (React 19 + TypeScrip
 
 - src/App.tsx: Router + AuthProvider.
 - src/main.tsx: QueryClientProvider + app bootstrap.
-- src/context/oidcConfig.tsx: OIDC client config.
+- src/types/oidcConfig.ts: OIDC client config.
 - src/services/http.ts: API wrapper; use for fetch.
 - src/services/formClient.ts: Form and submission API calls.
 - src/components/: reusable UI and dynamic form field controls.
