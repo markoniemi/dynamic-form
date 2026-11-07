@@ -3,6 +3,7 @@
     "allow": [
       "WebSearch",
       "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:www.moderne.ai)",
       "WebFetch(domain:dev.to)",
       "WebFetch(domain:www.baeldung.com)",
@@ -12,20 +13,13 @@
       "WebFetch(domain:ankurm.com)",
       "WebFetch(domain:serdaralkancode.medium.com)",
       "PowerShell(git *)",
-      "Bash(Get-ChildItem -Recurse -Filter \"*oauth*\" -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object FullName)",
-      "Bash(gh api *)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(gh run *)",
-      "Bash(gh workflow *)",
-      "Bash(git add *)",
-      "Bash(git commit -m ' *)",
-      "PowerShell(Get-ChildItem .claude -Recurse -Force | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName; \"---- rules dir? ----\"; Test-Path .claude\\\\rules; \"---- docs ----\"; Get-ChildItem docs -Recurse | Select-Object -ExpandProperty Name)",
-      "PowerShell(Get-ChildItem .claude\\\\skills -Recurse -Filter SKILL.md | ForEach-Object { \"=== $\\($_.FullName.Replace\\($PWD.Path,''\\)\\) ===\"; Get-Content $_.FullName -TotalCount 8 })",
-      "PowerShell(Get-Content *)",
       "PowerShell(Get-ChildItem *)",
-      "PowerShell(Get-ChildItem -Recurse .claude -File | Select-Object @{n='Path';e={$_.FullName.Replace\\(\\(Get-Location\\).Path+'\\\\',''\\)}}, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize)",
-      "PowerShell(foreach \\($f in @\\('.claude\\\\CLAUDE.md','api\\\\CLAUDE.md','backend\\\\CLAUDE.md','frontend\\\\CLAUDE.md','testcontainers\\\\CLAUDE.md','README.md','DEPLOY.md'\\)\\) { $c = Get-Content $f -Raw; \"$f lines=$\\(\\(Get-Content $f | Measure-Object -Line\\).Lines\\) chars=$\\($c.Length\\) tok~$\\([math]::Round\\($c.Length/4\\)\\)\" })"
+      "PowerShell(Get-Content *)",
+      "PowerShell(Select-String *)",
+      "PowerShell(Test-Path *)",
+      "Bash(gh api *)",
+      "Bash(gh run *)",
+      "Bash(gh workflow *)"
     ]
   }
 }

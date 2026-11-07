@@ -120,19 +120,25 @@ and `mvn compile` after every turn, including read-only ones. Gate it on
 `git diff --name-only`, and fix the `cmd` `&` chaining that swallows a `tsc`
 failure.
 
-### merge test command and test-all skill [planned, low]
+### merge test command and test-all skill [in_review, low]
+
+plan: [merge-test-command-and-test-all-skill.md](merge-test-command-and-test-all-skill.md)
 
 Finding C-9. `.claude/commands/test.md` (unit only) and
 `.claude/skills/test-all/SKILL.md` (unit + integration) are near-identical. One
 skill with a `--with-integration` argument.
 
-### clean settings local allowlist [planned, low]
+### clean settings local allowlist [in_review, low]
+
+plan: [clean-settings-local-allowlist.md](clean-settings-local-allowlist.md)
 
 Finding C-12. `.claude/settings.local.json:23-28` holds six allow entries that are
 whole one-off commands and will never match again. Replace with the broad
 `PowerShell(...)` patterns, or run `/fewer-permission-prompts`.
 
-### review ponytail codebase map [planned, low]
+### review ponytail codebase map [in_review, low]
+
+plan: [review-ponytail-codebase-map.md](review-ponytail-codebase-map.md)
 
 Finding C-6. The ponytail SessionStart hook injects a codebase map every session
 (~280 tok) that overlaps the Layout sections in each module `CLAUDE.md` and goes
