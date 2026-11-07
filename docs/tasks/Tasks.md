@@ -150,3 +150,9 @@ config.
 plan: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
+
+### ponytail [in_progress, low]
+
+file: [ponytail.md](ponytail.md)
+
+- run ponytail audit, write findings to a file. do not act on findings yet.
