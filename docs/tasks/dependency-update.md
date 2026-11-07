@@ -1,6 +1,6 @@
 ---
 id: dependency-update
-status: in_progress
+status: in_review
 priority: medium
 kind: feature
 ---
@@ -191,6 +191,67 @@ mapstruct 1.6.3 (1.7.0.Beta2 skipped), maven-compiler-plugin 3.16.0
 (4.0.0-beta-5 skipped), jib 3.5.2, frontend-maven-plugin 2.0.2,
 maven-resources-plugin 3.5.0 (4.0.0-beta-2 skipped), jacoco 0.8.16.
 `lombok-mapstruct-binding` 0.2.0 is already the latest release.
+
+## Result
+
+One commit per step on `master`, each one green on `/test --with-integration`
+before it was committed. Twelve steps planned, ten changed something:
+
+| Step | Outcome |
+| :- | :- |
+| 1 | 14 in-range npm packages updated; `package-lock.json` only |
+| 2 | `testcontainers` 2.0.3 → 2.0.5 |
+| 3 | `postgresql` and `jackson-dataformat-yaml` pins deleted; the BOM gives 42.7.10 and 2.20.2 |
+| 4 | mapstruct 1.6.3, maven-compiler-plugin 3.16.0, jib 3.5.2, frontend-maven-plugin 2.0.2, maven-resources-plugin 3.5.0, jacoco 0.8.16. **Playwright stayed on 1.48.0** |
+| 5 | Spring Boot parent 4.0.3 → 4.1.2, plus the two docs it falsified |
+| 6 | prettier 3.8.3 → 3.9.10; no reformatting (see below) |
+| 7 | `@testing-library/jest-dom` 6.9.1 → 7.0.1 |
+| 8 | vitest + `@vitest/coverage-v8` → 5.1.0; one-line fix in `test/setup.ts` |
+| 9 | i18next 27.0.1 + react-i18next 18.0.0; no config change |
+| 10 | **No change** — TypeScript stayed on 6.0.3 |
+| 11 | App image and the `testcontainers` module checked: `DynamicFormStackIT` 4/4 |
+| 12 | Nothing further to fix; `README.md:3` and `backend/CLAUDE.md:3` were corrected in step 5 |
+
+Final suite: 3 api, 52 frontend, 73 backend unit, 4 backend IT, 4 testcontainers
+IT — all passing.
+
+Two things the plan expected that did not happen. The Vitest 5 `clearMocks: true`
+default broke nothing, so `vitest.config.ts` is untouched; what broke instead was
+`tsc`, because vitest 5 types custom matchers differently and the plain
+`@testing-library/jest-dom` import no longer augments `Assertion`. And prettier
+3.9.10 reformats nothing new: it reports the same 101 files as 3.8.3, so that
+drift predates this task, and `npm run ci` does not check formatting anyway.
+
+Left undone, deliberately: Playwright (Java) 1.64.0 and TypeScript 7 (both above),
+and the two SNAPSHOT dependencies (note 5 below). `npm audit` reports 9 moderate
+advisories, all one `minimatch` ReDoS reached through `eslint` and
+`typescript-eslint`; `npm audit fix` cannot resolve it without `--force`, it is
+lint-only tooling that never ships, and it was not in this task's scope.
+
+## How to review
+
+Nothing is pushed and no request is open — `create_pull_request` is off — so this
+is the commits on `master`, `4b4740f..HEAD`.
+
+1. `git log --oneline 4b4740f..HEAD` — ten commits, one per step, in plan order.
+   Each message says what moved and why.
+2. `git diff 4b4740f..HEAD -- pom.xml backend/pom.xml frontend/pom.xml` is the
+   whole Maven change: 10 version lines and 2 deletions. The deletions in
+   `backend/pom.xml` are step 3 — confirm with
+   `mvn -pl backend dependency:tree "-Dincludes=org.postgresql:postgresql"`, which
+   prints 42.7.10 from the BOM.
+3. `git diff 4b4740f..HEAD -- frontend/test/setup.ts` is the only source file this
+   task changed: one import, `@testing-library/jest-dom` →
+   `@testing-library/jest-dom/vitest`.
+4. `/test --with-integration` from the repo root. Expect `BUILD SUCCESS` and the
+   counts above. It takes about four minutes and needs Docker.
+5. `mvn -pl testcontainers -am verify` — the step 11 check, not covered by the
+   above. Expect `DynamicFormStackIT` 4/4.
+6. To see the two reverts for yourself: `cd frontend; npm install typescript@7;
+   npm run lint` prints `typescript-eslint does not support TS 7.0`. Undo with
+   `git checkout -- frontend/package.json frontend/package-lock.json; npm install`.
+   The Playwright one costs a full `verify` run, so the failing assertions are
+   quoted in **Findings while implementing** instead.
 
 ## Decisions and remaining notes
 

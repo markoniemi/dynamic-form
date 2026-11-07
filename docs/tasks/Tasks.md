@@ -157,7 +157,7 @@ file: [ponytail.md](ponytail.md)
 
 - run ponytail audit, write findings to a file. do not act on findings yet.
 
-### dependency update [in_progress, medium]
+### dependency update [in_review, medium]
 
 plan: [dependency-update.md](dependency-update.md)
 
