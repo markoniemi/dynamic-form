@@ -157,8 +157,8 @@ file: [ponytail.md](ponytail.md)
 
 - run ponytail audit, write findings to a file. do not act on findings yet.
 
-### dep update [planned, medium]
+### dependency update [in_progress, medium]
 
-file: [dep-update.md](dep-update.md)
+plan: [dependency-update.md](dependency-update.md)
 
 - update maven and npm dependencies, use context7.

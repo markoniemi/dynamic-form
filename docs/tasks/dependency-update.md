@@ -1,8 +1,8 @@
 ---
-id: dep-update
-status: planned
+id: dependency-update
+status: in_progress
 priority: medium
-kind: task
+kind: feature
 ---
 
 - update maven and npm dependencies, use context7.
@@ -85,14 +85,19 @@ genuine unknown — see the open questions.
 
 ## Steps
 
-Each step is its own commit, and `/test` runs between steps so a failure points
-at one upgrade rather than twenty.
+One upgrade per step, one commit per step, so a failure points at one upgrade
+rather than twenty.
+
+**After every step: `/test --with-integration`** (`mvn -pl backend -am verify`,
+Docker required). Decided by the human on 2026-11-07, over the faster unit-only
+`/test`. It means the backend integration tests also run after the npm-only
+steps, so the whole task is roughly twelve Testcontainers runs — slow on purpose.
+A step does not get committed until that run is green; if it is red, fix it
+inside that step or revert that step alone.
 
 1. **npm, in-range** — `npm update` in `frontend/`, which takes the 14 packages
-   above and touches only `package-lock.json` plus the caret ranges. Run `/test`.
-2. **Maven, safe** — `testcontainers.version` to 2.0.5. Run
-   `mvn -pl backend -am verify` (this one needs the integration tests, since
-   Testcontainers is what they use).
+   above and touches only `package-lock.json` plus the caret ranges.
+2. **Testcontainers** — `testcontainers.version` 2.0.3 → 2.0.5.
 3. **Maven, delete rather than bump** — `postgresql` (`backend/pom.xml:67-70`) and
    `jackson-dataformat-yaml` (`:130-134`) both pin a version that Spring Boot's
    BOM already manages, which is why they have drifted. Remove the `<version>`
@@ -110,46 +115,56 @@ at one upgrade rather than twenty.
    Lombok in `pom.xml:78-94`, so bump them in one commit and check that the
    generated mappers still compile — `FormMapperTest` and `FormDataMapperTest`
    are the tests that prove it.
-5. **npm majors, one commit each**, in rising order of risk:
-   a. `prettier` to 3.9.10, then `npm run lint` — formatting-only, and it may
-      reformat files, which should land as its own commit.
-   b. `@testing-library/jest-dom` to 7.
-   c. `vitest` and `@vitest/coverage-v8` to 5 together. Expect `clearMocks`
-      fallout; fix the affected tests rather than setting `clearMocks: false`
-      unless there are many, and say which was chosen.
-   d. `i18next` 27 with `react-i18next` 18 together.
-   e. `typescript` to 7, last, with `npm run compile` and `npm run lint`.
-      `typescript-eslint` must support TS 7 or step 5e has to wait — see the open
-      questions.
-6. **Run the full suite** — `/test --with-integration`, which needs Docker. Also
-   build the image once (`mvn -pl backend jib:dockerBuild`), because the
-   `testcontainers` module's integration tests run against it and nothing in the
-   unit suite would catch a break there.
-7. **Update the docs the change makes wrong** — `README.md:3` says "Spring Boot
-   3" and `:41-45` lists prerequisites; `backend/CLAUDE.md` names the Spring Boot
-   and Java versions; `frontend/CLAUDE.md:3` names Vite and React versions and
-   `:6` the Node version. Whichever of these a step above falsifies gets fixed in
-   that step's commit.
+5. **Spring Boot parent** — `pom.xml:18`, currently 4.0.3. Resolve the latest
+   *stable* 4.x from Maven Central first (`4.2.0-RC2` was the only newer version
+   the reactor report offered, and an RC is excluded), and bump to that; if 4.0.3
+   is already the newest stable, record that and skip the step. This moves the
+   whole managed BOM — Hibernate, Jackson, Spring Security — so it is the one step
+   that can change backend runtime behaviour, and it comes after step 3 so the
+   two pins removed there take their versions from the new BOM. Done early rather
+   than last on purpose: everything after it is frontend-only, so a regression
+   here is not hidden behind npm churn. Watch for Hibernate schema differences
+   against H2 and for resource-server / JWT changes — those must be verified
+   against `../../oauth2-server` (repo rule).
+6. **prettier** 3.8.3 → 3.9.10, then `npm run lint`. Formatting-only, but it may
+   reformat files; that reformatting lands in this step's commit.
+7. **@testing-library/jest-dom** 6.9.1 → 7.
+8. **vitest + @vitest/coverage-v8** 4.1.x → 5.1.0, together — the coverage package
+   is pinned to vitest's major. Expect `clearMocks` fallout (now `true` by
+   default). Fix the affected tests rather than setting `clearMocks: false`,
+   unless there are many; say which was chosen.
+9. **i18next 27 + react-i18next 18**, together — the peer range forces it. The v18
+   breaking-change list could not be retrieved from context7, so this is the step
+   most likely to need unplanned work; read the upstream changelog at the start of
+   the step.
+10. **typescript** 6.0.3 → 7, last, with `npm run compile` and `npm run lint`.
+    None of the options TS 7 removes are in use (see above), so the risk is the
+    toolchain: if `typescript-eslint` 8.72 does not support TS 7, **revert this
+    step and leave TypeScript on 6** — do not move `typescript-eslint` to a
+    pre-release. Decided by the human on 2026-11-07.
+11. **App image and the `testcontainers` module** — `mvn -pl backend
+    jib:dockerBuild`, then the `testcontainers` module's own tests. Nothing in
+    steps 1-10 covers these: `/test --with-integration` builds only `backend -am`,
+    so a break in `DynamicFormContainer` / `DynamicFormStack` would go unseen.
+12. **Update the docs the change makes wrong** — `README.md:3` says "Spring Boot
+    3" and `:41-45` lists prerequisites; `backend/CLAUDE.md` names the Spring Boot
+    and Java versions; `frontend/CLAUDE.md:3` names Vite and React versions and
+    `:6` the Node version. Whichever of these a step above falsifies gets fixed in
+    that step's commit; this step is the sweep for whatever was missed.
 
-## Open questions for the human
+## Decisions and remaining notes
 
-1. **Spring Boot.** The reactor report offered only `4.2.0-RC2` as newer than the
-   current `4.0.3`, which suggests 4.0.3 may already be the newest stable — but I
-   did not confirm that, and a Spring Boot minor bump moves the whole managed BOM
-   (Hibernate, Jackson, Spring Security) in one go. Should this task bump Spring
-   Boot at all, or stay on the 4.0.x line and leave the framework for its own
-   task? **My recommendation: leave it out of this task.** It is the one change
-   here that can alter runtime behaviour across the whole backend, and it deserves
-   its own commit, its own test run and its own rollback.
-2. **TypeScript 7.** Worth doing now, or worth waiting? It is a brand-new major
-   and a whole new compiler implementation, and `typescript-eslint` 8.72 may not
-   support it yet. If step 5e fails on the lint side, should it be dropped from
-   this task or should `typescript-eslint` be moved to a pre-release that supports
-   TS 7?
-3. **Pre-releases.** I have assumed stable-only throughout, so `mapstruct`
-   1.7.0.Beta2 and `maven-compiler-plugin` 4.0.0-beta-5 are excluded. Confirm.
-4. **The two SNAPSHOT dependencies.** `interface-log:0.0.1-SNAPSHOT` and
+Answered by the human on 2026-11-07:
+
+1. **Spring Boot is in** — step 5, latest stable 4.x, no RC.
+2. **TypeScript 7 is in** — step 10, dropped if `typescript-eslint` blocks it.
+3. **Full suite after each step** — `/test --with-integration`, not unit-only.
+
+Still assumed, not asked:
+
+4. **Pre-releases are excluded** throughout, so `mapstruct` 1.7.0.Beta2 and
+   `maven-compiler-plugin` 4.0.0-beta-5 are out; each gets its latest stable.
+5. **The two SNAPSHOT dependencies stay.** `interface-log:0.0.1-SNAPSHOT` and
    `auth-server-testcontainers:0.1-SNAPSHOT` cannot be "updated" — a snapshot is
    already whatever was published last, which is finding 11 of
-   `docs/PonytailAuditFindings.md`. Out of scope here unless you want fixed
-   versions published as part of this task.
+   `docs/PonytailAuditFindings.md`. Out of scope here.
