@@ -165,6 +165,27 @@ this task needs a newer one. A human who wants 1.64 should look at
 card) and at the one-off browser download 1.64 triggers, which made
 `AdminRoleIT` take 138 s on the first run.
 
+**Step 10 — TypeScript 6.0.3 stays.** 7.0.2 installs and `tsc --noEmit` passes
+on this project's sources, so the config really was clean as planned. `npm run
+lint` is what blocks it:
+
+```
+Error: typescript-eslint does not support TS 7.0.
+See also https://github.com/typescript-eslint/typescript-eslint/issues/10940 for tracking typescript-eslint's support for TS >=7.1
+```
+
+Reverted per the human's decision of 2026-11-07, which excluded moving
+`typescript-eslint` to a pre-release. Retry once typescript-eslint ships TS 7
+support; the only other option upstream names is running typescript-eslint
+against the TS 6 API side by side, which is more machinery than this is worth.
+
+**Step 5 — Spring Boot 4.0.3 → 4.1.2**, the newest stable 4.x (4.2.0-RC2
+excluded). The first build failed on `error reading
+target/generated-sources/annotations/.../FormListItemMapperImpl.java`; a `clean`
+fixed it, so it was a stale incremental artifact from the MapStruct bump, not a
+Spring Boot break. No Hibernate/H2 or JWT fallout — the resource-server ITs
+against `../../oauth2-server` pass unchanged.
+
 Versions resolved from `maven-metadata.xml` on Central, latest stable only:
 mapstruct 1.6.3 (1.7.0.Beta2 skipped), maven-compiler-plugin 3.16.0
 (4.0.0-beta-5 skipped), jib 3.5.2, frontend-maven-plugin 2.0.2,
