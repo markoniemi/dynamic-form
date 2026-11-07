@@ -1,6 +1,6 @@
 # Dynamic form application
 
-A dynamic form application using multi-module Spring Boot 3 application with a modern React frontend.
+A dynamic form application using multi-module Spring Boot 4 application with a modern React frontend.
 
 ## Features
 

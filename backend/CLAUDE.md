@@ -1,6 +1,6 @@
 # backend
 
-Spring Boot 4.0.3 / Java 21 REST API and OAuth2 resource server. Packages under `com.example.backend`. Depends on `api` (DTOs) and `frontend` (built SPA, served as static resources).
+Spring Boot 4.1.2 / Java 21 REST API and OAuth2 resource server. Packages under `com.example.backend`. Depends on `api` (DTOs) and `frontend` (built SPA, served as static resources).
 
 ## Commands (from repo root)
 - Unit tests: `mvn -pl backend test`
