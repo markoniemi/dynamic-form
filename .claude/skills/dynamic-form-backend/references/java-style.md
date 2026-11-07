@@ -23,7 +23,7 @@ Generic Java and clean-code guidance moved out of `SKILL.md` so it is not loaded
 
 ### Methods and APIs
 - **Check parameters for validity** (Item 49): Validate method parameters at the start. Throw `IllegalArgumentException` for bad values, `NullPointerException` (or use `Objects.requireNonNull`) for nulls.
-- **Return empty collections or optionals, not null** (Item 54/55): Never return `null` for a collection â€” return `Collections.emptyList()`. For optional single values, return `Optional<T>` rather than null.
+- **Return empty collections or optionals, not null** (Item 54/55): Never return `null` for a collection — return `Collections.emptyList()`. For optional single values, return `Optional<T>` rather than null.
 - **Use `Optional` for optional return values** (Item 55): Return `Optional<T>` from methods that may produce no result. Never return `Optional` from a method that returns a collection.
 - **Keep APIs minimal** (Item 57 spirit): Don't expose more than necessary. Prefer package-private or private over public.
 

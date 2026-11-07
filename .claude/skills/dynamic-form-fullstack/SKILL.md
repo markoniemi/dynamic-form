@@ -31,7 +31,7 @@ All API errors follow [RFC 7807 Problem Details](https://tools.ietf.org/html/rfc
   }
   ```
 
-**Backend**: `GlobalExceptionHandler` catches exceptions and maps them to `ProblemDetail`:
+**Backend**: `controller/GlobalExceptionHandler` catches exceptions and maps them to `ProblemDetail`. That class is the source of truth for this mapping; the same list is in the `dynamic-form-backend` skill and both must change with it:
 - `MethodArgumentNotValidException` → 400 with `errors` array (field validation failures)
 - `NoSuchElementException` → 404 "Not found"
 - `IllegalArgumentException` → 400 "Bad request"
@@ -62,11 +62,7 @@ Before writing code, agree on:
 - **Method**: `GET` (read), `POST` (create), `PUT` (full update), `DELETE`
 - **Request DTO**: annotated with Jakarta Validation (`@NotNull`, `@Size`, `@Valid`)
 - **Response DTO**: never exposes JPA entities directly — always a dedicated DTO
-- **Error cases**: which standard Java exceptions the service throws, and what HTTP status they map to in `GlobalExceptionHandler`:
-  - `NoSuchElementException` → 404
-  - `IllegalArgumentException` → 400
-  - `IllegalStateException` → 409
-  - `SecurityException` → 403
+- **Error cases**: which standard Java exceptions the service throws — see the exception → status mapping in the RFC 7807 section above
 
 ---
 

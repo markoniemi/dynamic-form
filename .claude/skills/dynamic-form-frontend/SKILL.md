@@ -14,14 +14,10 @@ description: "Work on the dynamic-form React/Vite frontend (React 19 + TypeScrip
 
 ## Project map (frontend/)
 
+`frontend/CLAUDE.md` owns the layout — read it rather than restating it here. Two entry points it does not name:
+
 - src/App.tsx: Router + AuthProvider.
 - src/main.tsx: QueryClientProvider + app bootstrap.
-- src/types/oidcConfig.ts: OIDC client config.
-- src/services/http.ts: API wrapper; use for fetch.
-- src/services/formClient.ts: Form and submission API calls.
-- src/components/: reusable UI and dynamic form field controls.
-- src/pages/: route-level screens.
-- src/i18n.ts: i18next config and date formatting.
 
 ## Data access and caching
 
@@ -46,7 +42,7 @@ description: "Work on the dynamic-form React/Vite frontend (React 19 + TypeScrip
 
 ## i18n
 
-- No hardcoded user-visible strings in JSX or component logic â€” wrap every UI string with `t('key.path')`.
+- No hardcoded user-visible strings in JSX or component logic — wrap every UI string with `t('key.path')`.
 - Translation keys must be hardcoded string literals (e.g. `t('navigation.createForm')`). Dynamic key construction (e.g. `t(\`section.${var}\``) breaks static extraction tools like i18next-parser and typed-i18n plugins.
 - Keep date formatting in i18n (see common.date.long usage).
 

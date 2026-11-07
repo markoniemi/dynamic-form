@@ -103,7 +103,9 @@ changes — a common cause of repo-wide exploration. Same change: move "do not
 commit unless asked" to a deny rule, and narrow the "prefer IntelliJ MCP tools"
 line so reads and search stay on `Read`/`Grep`/`Glob`.
 
-### dedupe error table and project maps [planned, medium]
+### dedupe error table and project maps [in_review, medium]
+
+plan: [dedupe-error-table-and-project-maps.md](dedupe-error-table-and-project-maps.md)
 
 Finding C-8. The exception → HTTP table appears three times across the backend and
 fullstack skills, and the skills repeat project maps that the module `CLAUDE.md`
@@ -134,3 +136,9 @@ Finding C-6. The ponytail SessionStart hook injects a codebase map every session
 (~280 tok) that overlaps the Layout sections in each module `CLAUDE.md` and goes
 stale silently. Decide whether it earns its place. Outside the repo — user-level
 config.
+
+### commit deny rule [in_review, low]
+
+plan: [commit-deny-rule.md](commit-deny-rule.md)
+
+- remove commit deny rule, no need to ask for permission to commit files.

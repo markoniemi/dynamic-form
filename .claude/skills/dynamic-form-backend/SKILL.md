@@ -7,7 +7,7 @@ description: Expert knowledge for the Dynamic Form backend (Spring Boot, Java, P
 
 ## Overview
 
-This skill provides context and workflows for the `backend` module of the Dynamic Form application. It is a Spring Boot application serving as an OAuth2 Resource Server. For the framework and language versions, see `backend/CLAUDE.md` â€” they are not repeated here.
+This skill provides context and workflows for the `backend` module of the Dynamic Form application. It is a Spring Boot application serving as an OAuth2 Resource Server. For the framework and language versions, see `backend/CLAUDE.md` — they are not repeated here.
 
 ## Technology Stack
 
@@ -18,23 +18,11 @@ This skill provides context and workflows for the `backend` module of the Dynami
 
 ## Project Structure
 
-The backend follows a standard Maven/Spring Boot directory structure:
+`backend/CLAUDE.md` owns the package layout and the profile list — read it rather than restating it here. Three things it does not spell out:
 
-- `src/main/java/com/example/backend/`: Root package
-  - `controller/`: REST controllers (API endpoints)
-  - `service/`: Business logic services
-  - `repository/`: Spring Data JPA repositories
-  - `entity/`: JPA entities (Database models)
-  - `mapper/`: MapStruct mappers
-  - `config/`: Configuration classes (Security, Web, etc.)
 - DTOs are **not** in this module: they live in the `api` module, package `com.example.dynamicform.api`
-- `src/main/resources/`:
-  - `application.yaml`: Main configuration
-  - `application-dev.yaml`: Development profile (Postgres)
-  - `application-prod.yaml`: Production profile (Postgres)
-  - `application-test.yaml`: Test profile (H2)
-- `src/test/java/`:
-  - `com/example/backend/IntegrationTestBase.java`: Base class for integration tests (Testcontainers setup)
+- `src/main/resources/` holds `application.yaml` plus one file per profile: `application-dev.yaml` (Postgres), `application-prod.yaml` (Postgres), `application-test.yaml` (H2)
+- `src/test/java/com/example/backend/IntegrationTestBase.java` is the base class for integration tests (Testcontainers setup)
 
 ## Development Workflow
 
@@ -69,7 +57,7 @@ mvn -pl backend verify
 - **Production:** PostgreSQL, Flyway on, `ddl-auto: validate`
 - **Development:** PostgreSQL on `localhost:5432/template`, `ddl-auto: update`
 - **Test:** H2 in-memory, `ddl-auto: create-drop`
-- **Schema Management:** Flyway is enabled in `prod` only; dev and test schemas come from Hibernate. A schema change needs a new `db/migration/V<n>__*.sql` â€” never edit an applied one.
+- **Schema Management:** Flyway is enabled in `prod` only; dev and test schemas come from Hibernate. A schema change needs a new `db/migration/V<n>__*.sql` — never edit an applied one.
 
 ## Coding Conventions
 
@@ -77,14 +65,16 @@ mvn -pl backend verify
 - **Mappers:** Use MapStruct interfaces for converting between Entities and DTOs.
 - **Dependency Injection:** Use constructor injection (Lombok `@RequiredArgsConstructor`).
 - **Validation:** Use Jakarta Validation annotations (`@NotNull`, `@Size`, etc.) on DTOs.
-- **Error Handling:** Throw standard Java exceptions from the service layer â€” never HTTP-specific exceptions like `ResponseStatusException`. Map all exceptions to HTTP responses once, centrally, in a `@RestControllerAdvice`:
+- **Error Handling:** Throw standard Java exceptions from the service layer — never HTTP-specific exceptions like `ResponseStatusException`. Map all exceptions to HTTP responses once, centrally, in a `@RestControllerAdvice`. `controller/GlobalExceptionHandler` is the source of truth for this mapping; the `dynamic-form-fullstack` skill carries the same list and both must change with it:
 
   | Exception | HTTP status |
   |---|---|
+  | `MethodArgumentNotValidException` | 400, with the `errors` array |
   | `NoSuchElementException` | 404 Not Found |
   | `IllegalArgumentException` | 400 Bad Request |
   | `IllegalStateException` | 409 Conflict |
-  | `SecurityException` | 403 Forbidden |
+  | `SecurityException` / `AccessDeniedException` | 403 Forbidden |
+  | anything unhandled | 500 Internal Server Error |
 
 General Java and clean-code guidance is in `references/java-style.md`; read it only when a style question actually comes up.
 
