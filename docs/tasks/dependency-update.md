@@ -152,6 +152,25 @@ inside that step or revert that step alone.
     `:6` the Node version. Whichever of these a step above falsifies gets fixed in
     that step's commit; this step is the sweep for whatever was missed.
 
+## Findings while implementing
+
+**Step 4 — Playwright (Java) 1.48.0 stays.** 1.64.0 was tried and reverted:
+`FrontendIT.loginAndFormSubmission` (`:66`) and `FrontendIT.editSubmission`
+(`:102`) both fail on the final `submissionDetailPage.containsText(...)`
+assertion, reproducibly over two runs. The same verify is green with 1.48.0 and
+every other step-4 bump in place, so Playwright is the cause, not the plugin
+bumps. Not investigated further — it is a test-only dependency and nothing in
+this task needs a newer one. A human who wants 1.64 should look at
+`SubmissionDetailPage.containsText` (it calls `textContent()` on the details
+card) and at the one-off browser download 1.64 triggers, which made
+`AdminRoleIT` take 138 s on the first run.
+
+Versions resolved from `maven-metadata.xml` on Central, latest stable only:
+mapstruct 1.6.3 (1.7.0.Beta2 skipped), maven-compiler-plugin 3.16.0
+(4.0.0-beta-5 skipped), jib 3.5.2, frontend-maven-plugin 2.0.2,
+maven-resources-plugin 3.5.0 (4.0.0-beta-2 skipped), jacoco 0.8.16.
+`lombok-mapstruct-binding` 0.2.0 is already the latest release.
+
 ## Decisions and remaining notes
 
 Answered by the human on 2026-11-07:
