@@ -74,7 +74,9 @@ Finding C-3. Playwright is configured twice — repo `.mcp.json` and the
 the plugin, and drop the six redundant per-tool allow entries at
 `.claude/settings.json:16-21`.
 
-### trim generic advice from skills [planned, high]
+### trim generic advice from skills [in_review, high]
+
+plan: [trim-generic-advice-from-skills.md](trim-generic-advice-from-skills.md)
 
 Finding C-2. `dynamic-form-backend/SKILL.md:88-142` and
 `dynamic-form-frontend/SKILL.md:67-132` recite Effective Java, Clean Code,
