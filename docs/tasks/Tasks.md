@@ -151,7 +151,7 @@ plan: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
 
-### ponytail [in_progress, low]
+### ponytail [in_review, low]
 
 file: [ponytail.md](ponytail.md)
 
