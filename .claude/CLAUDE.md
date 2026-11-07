@@ -14,8 +14,13 @@ Conventions live in the skills under `.claude/skills/` (`dynamic-form-backend`, 
 ## Repo-wide rules
 - Errors are RFC 7807 `ProblemDetail`; validation errors add an `errors` array of `{ field, message, code }` that the frontend maps onto react-hook-form fields
 - Changes depending on the auth server (JWT claims/roles, issuer/JWKS, client registrations in `TestcontainersConfig` and docker-compose, demo users) must be verified against `../../oauth2-server`
-- Prefer IntelliJ MCP tools (`mcp__idea__*`) over generic file, search, build and git tools
+- Use IntelliJ MCP (`mcp__idea__*`) for problems, lint, format, build and rename; read and search with `Read`/`Grep`/`Glob` (`mcp__idea__read_file` has no line range)
+
+## Scope
+- Work in the module the task names; don't explore or refactor others
+- Run only that module's tests (`mvn -pl <module> test`, or `npm test` in `frontend/`)
+- Ask first before touching another module, the parent `pom.xml`, or `api/` (published DTOs — changes there hit `backend` and `frontend` together)
 
 ## Workflow
-- Do not commit unless asked; plan all changes upfront; use feature branches for significant work
+- Commits need an explicit request (also enforced: `git commit` asks for confirmation); plan all changes upfront; use feature branches for significant work
 - Commit messages: one line, imperative, capitalized, no period, semicolons between concerns, what and why: `Add i18n for validation messages; replace 26 hardcoded strings in EditForm with translation keys`

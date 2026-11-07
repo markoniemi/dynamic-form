@@ -93,7 +93,9 @@ overlapping review paths and three task/plan systems. Read `/usage` first to see
 which are actually used, then disable the rest. Outside the repo — user-level
 config.
 
-### add scope limits to root claude md [planned, high]
+### add scope limits to root claude md [in_review, high]
+
+plan: [add-scope-limits-to-root-claude-md.md](add-scope-limits-to-root-claude-md.md)
 
 Finding C-7. `.claude/CLAUDE.md` never says to stay in the module named in the
 task, run only that module's tests, or ask before cross-module and parent-pom
