@@ -84,7 +84,9 @@ Effective TypeScript and the React docs — about half of each body, and nothing
 project-specific. Keep only the rules where this project deviates; move or drop
 the rest.
 
-### prune unused plugins [planned, high]
+### prune unused plugins [in_review, high]
+
+plan: [prune-unused-plugins.md](prune-unused-plugins.md)
 
 Finding C-5. 7 plugins, 34 skills and 9 agents are paid at startup, with five
 overlapping review paths and three task/plan systems. Read `/usage` first to see
