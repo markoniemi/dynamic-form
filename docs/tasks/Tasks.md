@@ -111,7 +111,9 @@ Finding C-8. The exception → HTTP table appears three times across the backend
 fullstack skills, and the skills repeat project maps that the module `CLAUDE.md`
 files already own. Single-source each; C-1 is this duplication already failing.
 
-### gate stop hook on changed paths [planned, medium]
+### gate stop hook on changed paths [in_review, medium]
+
+plan: [gate-stop-hook-on-changed-paths.md](gate-stop-hook-on-changed-paths.md)
 
 Finding C-10. The Stop hook in `.claude/settings.json:45` runs frontend lint, tsc
 and `mvn compile` after every turn, including read-only ones. Gate it on

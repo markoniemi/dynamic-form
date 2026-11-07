@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cmd /c \"cd frontend && npm run lint:fix 2>nul & npx tsc --noEmit --pretty false & cd ../backend && mvn compile -q\"",
+            "command": "powershell -ExecutionPolicy Bypass -File \".claude/hooks/stop-check.ps1\"",
             "timeout": 150,
             "statusMessage": "Checking compilation..."
           }
