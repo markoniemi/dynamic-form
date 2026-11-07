@@ -43,7 +43,7 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### remove duplicate caveman hooks [in_progress, high]
+### remove duplicate caveman hooks [in_review, high]
 
 plan: [remove-duplicate-caveman-hooks.md](remove-duplicate-caveman-hooks.md)
 

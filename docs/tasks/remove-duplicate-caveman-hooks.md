@@ -1,6 +1,6 @@
 ---
 id: remove-duplicate-caveman-hooks
-status: in_progress
+status: in_review
 priority: high
 ---
 
@@ -39,3 +39,25 @@ Steps:
 No unit tests: the change deletes configuration and adds no logic. Verification
 is the next session start — one caveman block instead of two, one per-prompt line
 instead of two.
+
+# Outcome
+
+Done. The whole `"hooks"` block was removed from `~/.claude/settings.json`;
+`statusLine`, `skillOverrides`, `enabledPlugins`, `permissions`, `env` and
+`pluginConfigs` are untouched. Checked afterwards: the file still parses as JSON,
+`hooks` is gone, `statusLine` still points at `caveman-statusline.ps1`, and all
+six plugins are still enabled.
+
+**This change is outside the repo, so no commit contains it.** The backup taken
+before the edit is the only revert path:
+
+```
+C:\Users\marko\AppData\Local\Temp\claude\344861d702c5e497\73b7018c-6019-4b70-9a41-25a4a31924ad\scratchpad\settings.json.bak
+```
+
+That path is this session's scratchpad and disappears with the session. Copy it
+somewhere lasting if you want a revert available later.
+
+Not yet verified: that one caveman block appears instead of two. This session
+already loaded the old config, so it still shows the duplicate. The next session
+start is the check.
