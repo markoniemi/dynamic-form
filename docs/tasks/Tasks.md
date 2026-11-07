@@ -64,7 +64,9 @@ in `api`. It also tells the agent to `cd backend; mvn test`, which
 `config/GlobalExceptionHandler.java` in the fullstack skill and
 `src/context/oidcConfig.tsx` in the frontend skill.
 
-### dedupe mcp browser servers [planned, high]
+### dedupe mcp browser servers [in_review, high]
+
+plan: [dedupe-mcp-browser-servers.md](dedupe-mcp-browser-servers.md)
 
 Finding C-3. Playwright is configured twice — repo `.mcp.json` and the
 `playwright@claude-plugins-official` plugin — so both tool sets load at startup;
