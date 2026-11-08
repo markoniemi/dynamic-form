@@ -23,5 +23,5 @@ Conventions live in the skills under `.claude/skills/` (`dynamic-form-backend`, 
 - Ask first before touching another module, the parent `pom.xml`, or `api/` (published DTOs — changes there hit `backend` and `frontend` together)
 
 ## Workflow
-- Do not commit unless asked; plan all changes upfront; use feature branches for significant work
+- Do not commit unless asked; plan all changes upfront; use feature branches for significant work. This line is the whole mechanism by choice — there is deliberately no `ask`/`deny` permission rule for `git commit`, so leave `PowerShell(git *)` broad enough to cover it
 - Commit messages: one line, imperative, capitalized, no period, semicolons between concerns, what and why: `Add i18n for validation messages; replace 26 hardcoded strings in EditForm with translation keys`
