@@ -4,26 +4,31 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class FormSubmissionsPage extends BasePage {
-  private static final String HEADING = "h2:has-text('Form Submissions')";
-  private static final String EMPTY_ALERT = ".alert-info";
-  private static final String TABLE_ROWS = "table tbody tr";
+  private final Locator heading = page.locator("h2:has-text('Form Submissions')");
+  private final Locator emptyAlert = page.locator(".alert-info");
+  private final Locator tableRows = page.locator("table tbody tr");
+  private final Locator firstRowId = page.locator("//table/tbody/tr[1]/td[1]");
+  private final Locator firstRowViewButton =
+      page.locator("//table/tbody/tr[1]//button[contains(text(), 'View')]");
+  private final Locator firstRowEditButton =
+      page.locator("//table/tbody/tr[1]//button[contains(text(), 'Edit')]");
 
   public FormSubmissionsPage(Page page) {
     super(page);
   }
 
   public void waitForLoad() {
-    page.waitForSelector(HEADING);
+    heading.waitFor();
   }
 
   public boolean isSubmissionPresent(String text) {
     waitForLoad();
     try {
-      page.waitForSelector(TABLE_ROWS);
-      Locator rows = page.locator(TABLE_ROWS);
-      int count = rows.count();
+      // count() reads the page as it is now, so the rows have to be there first
+      tableRows.first().waitFor();
+      int count = tableRows.count();
       for (int i = 0; i < count; i++) {
-        if (rows.nth(i).textContent().contains(text)) {
+        if (tableRows.nth(i).textContent().contains(text)) {
           return true;
         }
       }
@@ -34,29 +39,23 @@ public class FormSubmissionsPage extends BasePage {
   }
 
   public String getFirstSubmissionId() {
-    waitForLoad();
-    return page.textContent("//table/tbody/tr[1]/td[1]");
+    return firstRowId.textContent();
   }
 
   public void viewFirstSubmission() {
-    waitForLoad();
-    page.click("//table/tbody/tr[1]//button[contains(text(), 'View')]");
+    firstRowViewButton.click();
   }
 
   public void editFirstSubmission() {
-    waitForLoad();
-    page.click("//table/tbody/tr[1]//button[contains(text(), 'Edit')]");
+    firstRowEditButton.click();
   }
 
-  public int getSubmissionCount() {
-    waitForLoad();
-    return page.locator(TABLE_ROWS).count();
-  }
-
+  // isVisible() never waits, so the alert needs a bounded wait of its own: a timeout here means
+  // "not empty", which is an answer, not a failure.
   public boolean isEmpty() {
     try {
-      page.waitForSelector(EMPTY_ALERT, new Page.WaitForSelectorOptions().setTimeout(2000));
-      return page.locator(EMPTY_ALERT).isVisible();
+      emptyAlert.waitFor(new Locator.WaitForOptions().setTimeout(2000));
+      return emptyAlert.isVisible();
     } catch (Exception e) {
       return false;
     }

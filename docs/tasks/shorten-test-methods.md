@@ -1,6 +1,6 @@
 ---
 id: shorten-test-methods
-status: in_progress
+status: in_review
 priority: medium
 kind: task
 ---
@@ -112,3 +112,57 @@ coverage these page objects have, and every line this task touches is on their p
 or a bad rewrite fails there. Expect `BUILD SUCCESS`. Run `verify` twice: the change is partly
 about waiting, so a flake matters more than a pass. Playwright stays on 1.48.0 (see
 `update-playwright`).
+
+## Result
+
+Five page objects, 82 insertions and 88 deletions, nothing outside
+`backend/src/test/java/com/example/backend/e2e/pages/`. `BasePage` is untouched, no IT body
+changed, and no selector text changed.
+
+Done as planned:
+
+* Deleted `FormSubmissionsPage.getSubmissionCount`, `FormSubmissionPage.isSubmitDisabled`,
+  `FormSubmissionPage.cancel`, `FormsPage.openFirstForm`, and the `CANCEL_BUTTON` and
+  `ERROR_ALERT` constants.
+* Dropped eight redundant waits: five in `FormSubmissionPage`'s `fill*`/`select*`/`checkCheckbox`,
+  the `waitForLoad()` in `getFormTitle`, the one in `LoginPage.login`, and the three internal
+  `waitForLoad()` calls in `FormSubmissionsPage`'s first-row methods.
+* Every surviving selector constant is now a `private final Locator` field. The five
+  name-parameterized selectors are private methods returning a `Locator`, so each public method is
+  one line: `textField(fieldName).fill(value)`.
+* `page.waitForSelector(X)` became `x.waitFor()`, same default (visible) state. The two bounded
+  waits became `waitFor(new Locator.WaitForOptions().setTimeout(2000))` and still return `boolean`,
+  each with a one-line comment saying why the wait stays.
+* `isSubmissionPresent`'s row wait is `tableRows.first().waitFor()`;
+  `SubmissionDetailPage.fieldValueContains` is `detailsCard.locator("input, textarea")` instead of
+  concatenating `.card-body` into two selectors.
+
+Three things went differently:
+
+* `fillTextArea`'s duplicated selector was already fixed in the IDE before I got there, so that
+  part of the entry was done by hand.
+* `toTitleCase` is `Character.toUpperCase(key.charAt(0)) + key.substring(1)`, not the
+  `substring(0, 1).toUpperCase()` the plan wrote. Same result for the one caller and no default
+  locale involved. The `shortcut:` note about hyphenated keys still applies, and is in the code.
+* `FormsPage.openForm` keeps its internal `waitForLoad()`. The plan's step 2 did not list it, and
+  it is not the same case as the others: it waits for the list to be on screen after the login
+  redirect before locating a row in it.
+
+No unit test added. These classes have no logic beyond the one-line `toTitleCase`, which both ITs
+cover through `openForm("contact")` — a wrong title there fails the next assertion. No
+documentation needed fixing: `backend/CLAUDE.md` only says page objects live in `e2e/pages/`.
+
+## How to review
+
+1. `git show HEAD -- backend/src/test/java/com/example/backend/e2e/pages/` is the whole change.
+   Read `LoginPage` first — it is the pattern in nine lines — then `FormSubmissionPage`.
+2. The claim that no selector changed: every string in the new `Locator` fields and the five
+   private methods appears verbatim in the old constants. `git show HEAD -- ...FormSubmissionPage.java`
+   side by side is enough to check it.
+3. The claim that the four deleted methods were dead: `Grep` `getSubmissionCount|isSubmitDisabled|cancel\(|openFirstForm`
+   over `backend/src` returns nothing.
+4. `mvn -pl backend -am verify` from the repo root, Docker running. I ran it twice on this change:
+   `BUILD SUCCESS` both times, `Tests run: 4, Failures: 0, Errors: 0, Skipped: 0` from failsafe
+   (`AdminRoleIT` 1, `FrontendIT` 3), `FrontendIT` at 15.7 s and 15.7 s.
+5. The judgement call worth a second opinion is in `## Result`: `openForm` keeps one wait the other
+   methods lost.

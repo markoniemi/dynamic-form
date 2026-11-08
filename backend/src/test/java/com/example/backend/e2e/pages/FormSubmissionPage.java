@@ -1,77 +1,81 @@
 package com.example.backend.e2e.pages;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class FormSubmissionPage extends BasePage {
-  private static final String FORM_TITLE = "h2.card-title";
-  private static final String SUBMIT_BUTTON = "button:has-text('Submit')";
-  private static final String CANCEL_BUTTON = "button:has-text('Cancel')";
-  private static final String SUCCESS_ALERT = ".alert-success";
-  private static final String ERROR_ALERT = ".alert-danger";
+  private final Locator formTitle = page.locator("h2.card-title");
+  private final Locator submitButton = page.locator("button:has-text('Submit')");
+  private final Locator successAlert = page.locator(".alert-success");
 
   public FormSubmissionPage(Page page) {
     super(page);
   }
 
   public void waitForLoad() {
-    page.waitForSelector(FORM_TITLE);
+    formTitle.waitFor();
   }
 
   public String getFormTitle() {
-    waitForLoad();
-    return page.textContent(FORM_TITLE);
+    return formTitle.textContent();
   }
 
   public void fillTextField(String fieldName, String value) {
-    String selector = String.format("input[name='%s']", fieldName);
-    page.waitForSelector(selector);
-    page.fill(selector, value);
+    textField(fieldName).fill(value);
   }
 
   public void fillTextArea(String fieldName, String value) {
-    String selector = String.format("textarea[name='%s']", fieldName);
-    page.waitForSelector(selector);
-    page.fill(selector, value);
+    textArea(fieldName).fill(value);
   }
 
   public void selectOption(String fieldName, String visibleText) {
-    String selector = String.format("select[name='%s']", fieldName);
-    page.waitForSelector(selector);
-    page.selectOption(selector, visibleText);
+    select(fieldName).selectOption(visibleText);
   }
 
   public void selectRadio(String fieldName, String value) {
-    String selector = String.format("input[type='radio'][name='%s'][value='%s']", fieldName, value);
-    page.waitForSelector(selector);
-    page.click(selector);
+    radio(fieldName, value).click();
   }
 
   public void checkCheckbox(String fieldName, String value) {
-    String selector = String.format("input[type='checkbox'][name='%s'][value='%s']", fieldName, value);
-    page.waitForSelector(selector);
-    if (!page.locator(selector).isChecked()) {
-      page.click(selector);
+    Locator box = checkbox(fieldName, value);
+    if (!box.isChecked()) {
+      box.click();
     }
   }
 
   public void submit() {
-    page.click(SUBMIT_BUTTON);
+    submitButton.click();
   }
 
+  // isVisible() never waits, so the alert needs a bounded wait of its own: a timeout here means
+  // "not displayed", which is an answer, not a failure.
   public boolean isSuccessMessageDisplayed() {
     try {
-      page.waitForSelector(SUCCESS_ALERT, new Page.WaitForSelectorOptions().setTimeout(2000));
-      return page.locator(SUCCESS_ALERT).isVisible();
+      successAlert.waitFor(new Locator.WaitForOptions().setTimeout(2000));
+      return successAlert.isVisible();
     } catch (Exception e) {
       return false;
     }
   }
 
-  public boolean isSubmitDisabled() {
-    return page.locator(SUBMIT_BUTTON).isDisabled();
+  private Locator textField(String fieldName) {
+    return page.locator("input[name='%s']".formatted(fieldName));
   }
 
-  public void cancel() {
-    page.click(CANCEL_BUTTON);
+  private Locator textArea(String fieldName) {
+    return page.locator("textarea[name='%s']".formatted(fieldName));
+  }
+
+  private Locator select(String fieldName) {
+    return page.locator("select[name='%s']".formatted(fieldName));
+  }
+
+  private Locator radio(String fieldName, String value) {
+    return page.locator("input[type='radio'][name='%s'][value='%s']".formatted(fieldName, value));
+  }
+
+  private Locator checkbox(String fieldName, String value) {
+    return page.locator(
+        "input[type='checkbox'][name='%s'][value='%s']".formatted(fieldName, value));
   }
 }

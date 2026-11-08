@@ -4,15 +4,15 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class SubmissionDetailPage extends BasePage {
-  private static final String HEADING = "//h2";
-  private static final String DETAILS_CARD = ".card-body";
+  private final Locator heading = page.locator("//h2");
+  private final Locator detailsCard = page.locator(".card-body");
 
   public SubmissionDetailPage(Page page) {
     super(page);
   }
 
   public void waitForLoad() {
-    page.waitForSelector(HEADING);
+    heading.waitFor();
   }
 
   /**
@@ -30,13 +30,13 @@ public class SubmissionDetailPage extends BasePage {
   }
 
   private boolean cardTextContains(String text) {
-    String cardText = page.locator(DETAILS_CARD).first().textContent();
+    String cardText = detailsCard.first().textContent();
     return cardText != null && cardText.contains(text);
   }
 
   // ReadOnlyDynamicForm renders values into inputs, so they are not in textContent
   private boolean fieldValueContains(String text) {
-    Locator fields = page.locator(DETAILS_CARD + " input, " + DETAILS_CARD + " textarea");
+    Locator fields = detailsCard.locator("input, textarea");
     int count = fields.count();
     for (int i = 0; i < count; i++) {
       String value = fields.nth(i).inputValue();

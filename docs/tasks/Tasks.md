@@ -195,7 +195,7 @@ file: [lombok.md](lombok.md)
 
 - lombok is not used in all places where it could. Check where lombok could be used.
 
-### shorten test methods [in_progress, medium]
+### shorten test methods [in_review, medium]
 
 file: [shorten-test-methods.md](shorten-test-methods.md)
 
