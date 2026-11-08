@@ -45,14 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### dedupe error table and project maps [done, medium]
-
-file: [dedupe-error-table-and-project-maps.md](dedupe-error-table-and-project-maps.md)
-
-Finding C-8. The exception → HTTP table appears three times across the backend and
-fullstack skills, and the skills repeat project maps that the module `CLAUDE.md`
-files already own. Single-source each; C-1 is this duplication already failing.
-
 ### gate stop hook on changed paths [done, medium]
 
 file: [gate-stop-hook-on-changed-paths.md](gate-stop-hook-on-changed-paths.md)
