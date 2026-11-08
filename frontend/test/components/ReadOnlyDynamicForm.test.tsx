@@ -47,6 +47,12 @@ describe('ReadOnlyDynamicForm Component', () => {
     expect(screen.getByDisplayValue('common.no')).toBeInTheDocument();
   });
 
+  it('renders an object value as JSON, not [object Object]', () => {
+    render(<ReadOnlyDynamicForm fields={[text]} data={{[text.name]: {city: 'Tampere'}}}/>);
+
+    expect(screen.getByDisplayValue('{"city":"Tampere"}')).toBeInTheDocument();
+  });
+
   it('renders date field formatted', () => {
     render(<ReadOnlyDynamicForm fields={[date]} data={{[date.name]: '1990-05-15'}}/>);
 

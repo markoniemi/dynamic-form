@@ -16,7 +16,8 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/translation.json',
     },
-  });
+  })
+  .catch((err: unknown) => console.error('i18n init failed', err));
 
 // i18next v26: Use formatter.add() for custom formatters
 i18n.services.formatter?.add('date', (value: unknown, lng: string | undefined, options: { format?: 'short' | 'long' } | undefined) => {

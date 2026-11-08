@@ -35,7 +35,7 @@ export const EditForm: React.FC = () => {
       return formClient.saveForm(form, token);
     },
     onSuccess: () => {
-      navigate('/forms');
+      void navigate('/forms');
     },
     onError: (err: Error) => {
       setError(err.message);

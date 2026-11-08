@@ -4,7 +4,7 @@ import {vi} from 'vitest';
 // Default mock for /api/config/oauth2-issuer-uri endpoint
 globalThis.fetch = vi.fn(
   (url: string | Request) => {
-    const urlStr = typeof url === 'string' ? url : url.toString();
+    const urlStr = typeof url === 'string' ? url : url.url;
 
     if (urlStr.includes('/api/config/oauth2-issuer-uri')) {
       return Promise.resolve(

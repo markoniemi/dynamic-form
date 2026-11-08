@@ -75,13 +75,13 @@ export const FormSubmission: React.FC = () => {
       }
 
       // Invalidate queries to ensure fresh data is fetched
-      queryClient.invalidateQueries({ queryKey: ['form-submissions'] });
+      void queryClient.invalidateQueries({ queryKey: ['form-submissions'] });
       if (isEditMode) {
-        queryClient.invalidateQueries({ queryKey: ['submission', id] });
+        void queryClient.invalidateQueries({ queryKey: ['submission', id] });
       }
 
       setTimeout(() => {
-        navigate('/submissions');
+        void navigate('/submissions');
       }, 2000);
     },
     onError: (err) => {

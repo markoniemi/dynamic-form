@@ -12,11 +12,12 @@ export const Navigation: React.FC = () => {
 
   const handleLogout = () => {
     queryClient.clear(); // Clear the cache
-    signoutRedirect();
+    // A rejection here leaves the user signed in, so it must not be silent
+    signoutRedirect().catch((err: unknown) => console.error('Sign-out failed', err));
   };
 
   const changeLanguage = (language: string) => {
-    i18n.changeLanguage(language);
+    i18n.changeLanguage(language).catch((err: unknown) => console.error('Language change failed', err));
   };
 
   return (
