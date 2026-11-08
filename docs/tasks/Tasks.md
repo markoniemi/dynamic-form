@@ -59,12 +59,6 @@ file: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
 
-### waitForCondition [done, low]
-
-file: [waitforcondition.md](waitforcondition.md)
-
-- remove BasePage.sleep
-
 ### lombok [planned, medium]
 
 file: [lombok.md](lombok.md)
