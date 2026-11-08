@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 @Slf4j
 @TestConfiguration(proxyBeanMethods = false)
 public class PlaywrightConfig {
+  private static final int DEFAULT_TIMEOUT_MS = 10000;
   private static Playwright playwrightInstance;
   private static Browser browserInstance;
 
@@ -43,8 +44,13 @@ public class PlaywrightConfig {
   @Bean
   @Scope("prototype")
   public BrowserContext browserContext(Browser browser) {
-    return browser.newContext(
-        new Browser.NewContextOptions().setViewportSize(1920, 1080));
+    BrowserContext context =
+        browser.newContext(new Browser.NewContextOptions().setViewportSize(1920, 1080));
+    // Playwright's own default is 30 s. Every waiting call made without explicit options uses this
+    // one instead, so the page objects do not repeat it; a call that wants a shorter budget — a
+    // check that may legitimately find nothing — still passes its own.
+    context.setDefaultTimeout(DEFAULT_TIMEOUT_MS);
+    return context;
   }
 
   @Bean

@@ -14,7 +14,7 @@ public class FormSubmissionPage extends BasePage {
   }
 
   public void waitForLoad() {
-    page.waitForSelector(FORM_TITLE, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(FORM_TITLE);
   }
 
   public String getFormTitle() {
@@ -24,31 +24,31 @@ public class FormSubmissionPage extends BasePage {
 
   public void fillTextField(String fieldName, String value) {
     String selector = String.format("input[name='%s']", fieldName);
-    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(selector);
     page.fill(selector, value);
   }
 
   public void fillTextArea(String fieldName, String value) {
     String selector = String.format("textarea[name='%s']", fieldName);
-    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(selector);
     page.fill(selector, value);
   }
 
   public void selectOption(String fieldName, String visibleText) {
     String selector = String.format("select[name='%s']", fieldName);
-    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(selector);
     page.selectOption(selector, visibleText);
   }
 
   public void selectRadio(String fieldName, String value) {
     String selector = String.format("input[type='radio'][name='%s'][value='%s']", fieldName, value);
-    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(selector);
     page.click(selector);
   }
 
   public void checkCheckbox(String fieldName, String value) {
     String selector = String.format("input[type='checkbox'][name='%s'][value='%s']", fieldName, value);
-    page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(selector);
     if (!page.locator(selector).isChecked()) {
       page.click(selector);
     }

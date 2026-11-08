@@ -12,7 +12,7 @@ public class LoginPage extends BasePage {
   }
 
   public void login(String username, String password) {
-    page.waitForSelector(USERNAME_INPUT, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(USERNAME_INPUT);
     page.fill(USERNAME_INPUT, username);
     page.fill(PASSWORD_INPUT, password);
     page.click(LOGIN_BUTTON);

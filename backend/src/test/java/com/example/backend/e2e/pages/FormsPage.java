@@ -25,7 +25,7 @@ public class FormsPage extends BasePage {
   }
 
   public void waitForLoad() {
-    page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(HEADING);
   }
 
   public void openForm(String formKey) {

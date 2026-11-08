@@ -12,7 +12,7 @@ public class SubmissionDetailPage extends BasePage {
   }
 
   public void waitForLoad() {
-    page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(HEADING);
   }
 
   /**

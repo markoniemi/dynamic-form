@@ -13,13 +13,13 @@ public class FormSubmissionsPage extends BasePage {
   }
 
   public void waitForLoad() {
-    page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+    page.waitForSelector(HEADING);
   }
 
   public boolean isSubmissionPresent(String text) {
     waitForLoad();
     try {
-      page.waitForSelector(TABLE_ROWS, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
+      page.waitForSelector(TABLE_ROWS);
       Locator rows = page.locator(TABLE_ROWS);
       int count = rows.count();
       for (int i = 0; i < count; i++) {
