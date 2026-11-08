@@ -183,7 +183,7 @@ file: [eslint-rules.md](eslint-rules.md)
 
 - Add no-misused-promises, no-floating-promises and no-base-to-string to eslint.
 
-### waitForCondition [in_progress, low]
+### waitForCondition [in_review, low]
 
 file: [waitforcondition.md](waitforcondition.md)
 

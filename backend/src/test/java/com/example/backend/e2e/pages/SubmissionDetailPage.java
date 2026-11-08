@@ -22,7 +22,7 @@ public class SubmissionDetailPage extends BasePage {
    * <p>The card renders before the submission data resolves, so this has to wait rather than read
    * once: {@code Locator.count()} and {@code Locator.inputValue()} report the page as it is right
    * now. {@code waitForCondition} dispatches Playwright events while it polls, which a
-   * {@link #sleep} loop does not.
+   * {@code Thread.sleep} loop does not.
    */
   public void waitForText(String text) {
     waitForLoad();
