@@ -45,16 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### remove duplicate caveman hooks [done, high]
-
-file: [remove-duplicate-caveman-hooks.md](remove-duplicate-caveman-hooks.md)
-
-Finding C-4. The caveman mode text is injected twice per session and twice per
-prompt: `~/.claude/settings.json` runs `caveman-activate.js` and
-`caveman-mode-tracker.js` while the `caveman@caveman` plugin registers the same
-hooks. Remove the two manual entries from user settings, keep the plugin's.
-Outside the repo — user-level config.
-
 ### fix stale skill facts [done, high]
 
 file: [fix-stale-skill-facts.md](fix-stale-skill-facts.md)
