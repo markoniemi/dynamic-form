@@ -22,20 +22,12 @@ public class SubmissionDetailPage extends BasePage {
 
   /**
    * True when the details card shows this text, either as visible text or as the value of one of
-   * its fields. Retries until {@link #TIMEOUT_MS}, the way Playwright's own assertions do: the card
-   * renders before the submission data resolves, and {@code Locator.count()} does not auto-wait, so
-   * a single pass can run against fields that are not there yet and report a false negative.
+   * its fields. The card renders before the submission data resolves, so this has to wait for the
+   * fields rather than read them once — see {@link #waitUntil}.
    */
   public boolean containsText(String text) {
     waitForLoad();
-    long deadline = System.currentTimeMillis() + TIMEOUT_MS;
-    do {
-      if (cardTextContains(text) || fieldValueContains(text)) {
-        return true;
-      }
-      sleep(100);
-    } while (System.currentTimeMillis() < deadline);
-    return false;
+    return waitUntil(() -> cardTextContains(text) || fieldValueContains(text));
   }
 
   private boolean cardTextContains(String text) {

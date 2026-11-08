@@ -154,10 +154,17 @@ renders them as `Form.Control`. The method reached those inputs through
 ran zero times and the method returned `false`. 1.48.0 happened to lose that race
 less often.
 
-The fix retries the whole check until `TIMEOUT_MS`, the way Playwright's own
-assertions do, and splits the two lookups into `cardTextContains` and
-`fieldValueContains`. `.first()` was added to the card lookup as well, since
-`.card-body` is a class that may match more than one element.
+The fix retries the whole check until `TIMEOUT_MS` and splits the two lookups
+into `cardTextContains` and `fieldValueContains`. `.first()` was added to the
+card lookup as well, since `.card-body` is a class that may match more than one
+element.
+
+The retry itself is `BasePage.waitUntil(BooleanSupplier)`, so any page object can
+use it. It wraps Playwright's own `Page.waitForCondition` (Java binding, since
+v1.32) and converts its `TimeoutError` into `false`, because these page methods
+answer a boolean rather than assert. `waitForCondition` dispatches Playwright
+events while it polls, which a `Thread.sleep` loop — what `BasePage.sleep` does —
+cannot; Playwright's own javadoc warns against the latter for exactly this.
 
 Counts: 3 runs failed before the fix (2, 2 and 1 failures — the varying count is
 the race), and **3 consecutive runs passed after it**, all on 1.64.0.
