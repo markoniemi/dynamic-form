@@ -163,7 +163,7 @@ plan: [dependency-update.md](dependency-update.md)
 
 - update maven and npm dependencies, use context7.
 
-### update playwright [in_review, medium]
+### update playwright [approved, medium]
 
 file: [update-playwright.md](update-playwright.md)
 
@@ -183,8 +183,34 @@ file: [eslint-rules.md](eslint-rules.md)
 
 - Add no-misused-promises, no-floating-promises and no-base-to-string to eslint.
 
-### waitForCondition [in_review, low]
+### waitForCondition [approved, low]
 
 file: [waitforcondition.md](waitforcondition.md)
 
 - remove BasePage.sleep
+
+### lombok [planned, medium]
+
+file: [lombok.md](lombok.md)
+
+- lombok is not used in all places where it could. Check where lombok could be used.
+
+### shorten test methods [in_progress, medium]
+
+file: [shorten-test-methods.md](shorten-test-methods.md)
+
+Merged in `FindBy annotation` ("Selenium has FindBy annotation, using it makes easy
+to act on page elements. Does playwright have something similar?") — both rewrite
+the same five page objects.
+
+- FormSubmissionPage.fillTextArea could be written as
+```java
+  public void fillTextArea(String fieldName, String value) {
+  page.fill("textarea[name='%s']".formatted(fieldName), value);
+}
+```
+- is waitForSelector required? looks like overkill to wait for selector in every method. loginAndFormSubmission test calls formSubmissionPage.waitForLoad(); before setting input values.
+
+### Migrate selectors [planning, medium]
+
+Migrating the selectors from CSS/XPath to getByRole/getByLabel/getByTestId. That is what Playwright actually recommends, but it rewrites every selector against the real DOM, so it is a different risk from a mechanical field swap. Own backlog entry if wanted.
