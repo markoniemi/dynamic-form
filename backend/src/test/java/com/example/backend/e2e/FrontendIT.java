@@ -60,16 +60,16 @@ public class FrontendIT extends IntegrationTestBase {
     formsPage.clickFormSubmissions();
     assertTrue(formSubmissionsPage.isSubmissionPresent("contact"));
     // 11. View the submission details
-    formSubmissionsPage.viewFirstSubmission();
+    formSubmissionsPage.viewSubmission(formSubmissionsPage.getFirstSubmissionId());
     submissionDetailPage.waitForLoad();
     // 12. Verify submission details are correct
-    submissionDetailPage.waitForText("Test User");
-    submissionDetailPage.waitForText("test@example.com");
-    submissionDetailPage.waitForText("+1 555 000 0001");
-    submissionDetailPage.waitForText("General Inquiry");
-    submissionDetailPage.waitForText("This is an automated e2e test message.");
-    submissionDetailPage.waitForText("Low");
-    submissionDetailPage.waitForText("admin");
+    submissionDetailPage.waitForFieldValue("name", "Test User");
+    submissionDetailPage.waitForFieldValue("email", "test@example.com");
+    submissionDetailPage.waitForFieldValue("phone", "+1 555 000 0001");
+    submissionDetailPage.waitForFieldValue("subject", "General Inquiry");
+    submissionDetailPage.waitForFieldValue("message", "This is an automated e2e test message.");
+    submissionDetailPage.waitForFieldValue("urgency", "Low");
+    submissionDetailPage.waitForMetadata("admin");
   }
 
   @Test
@@ -84,7 +84,7 @@ public class FrontendIT extends IntegrationTestBase {
     formsPage.clickFormSubmissions();
     formSubmissionsPage.waitForLoad();
     // 3. Click edit on the first submission
-    formSubmissionsPage.editFirstSubmission();
+    formSubmissionsPage.editSubmission(formSubmissionsPage.getFirstSubmissionId());
     // 4. Verify the form page loaded in edit mode
     formSubmissionPage.waitForLoad();
     assertTrue(formSubmissionPage.getFormTitle().contains("Edit:"));
@@ -96,10 +96,10 @@ public class FrontendIT extends IntegrationTestBase {
     assertTrue(formSubmissionPage.isSuccessMessageDisplayed());
     formSubmissionsPage.waitForLoad();
     // 8. View the submission details
-    formSubmissionsPage.viewFirstSubmission();
+    formSubmissionsPage.viewSubmission(formSubmissionsPage.getFirstSubmissionId());
     submissionDetailPage.waitForLoad();
     // 9. Verify the change was saved
-    submissionDetailPage.waitForText("Test User Updated");
+    submissionDetailPage.waitForFieldValue("name", "Test User Updated");
   }
 
   @Test

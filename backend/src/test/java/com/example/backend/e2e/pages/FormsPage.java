@@ -4,10 +4,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class FormsPage extends BasePage {
-  private final Locator loginButton = page.locator("button:has-text('Login with OAuth2')");
-  private final Locator heading = page.locator("h2:has-text('Available Forms')");
-  private final Locator submissionsLink = page.locator("a:has-text('Submissions')");
-  private final Locator logoutButton = page.locator("button:has-text('Logout')");
+  private final Locator loginButton = page.locator("#login-button");
+  private final Locator heading = page.locator("#forms-heading");
+  private final Locator submissionsLink = page.locator("#nav-submissions");
+  private final Locator logoutButton = page.locator("#logout-button");
 
   public FormsPage(Page page) {
     super(page);
@@ -31,16 +31,6 @@ public class FormsPage extends BasePage {
 
   public void openForm(String formKey) {
     waitForLoad();
-    openFormButton(toTitleCase(formKey)).click();
-  }
-
-  private Locator openFormButton(String formTitle) {
-    return page.locator(
-        "//td[contains(text(), '%s')]/..//button[contains(text(), 'Open Form')]"
-            .formatted(formTitle));
-  }
-
-  private String toTitleCase(String key) {
-    return Character.toUpperCase(key.charAt(0)) + key.substring(1);
+    page.locator("#open-%s".formatted(formKey)).click();
   }
 }

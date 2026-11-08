@@ -4,14 +4,11 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class FormSubmissionsPage extends BasePage {
-  private final Locator heading = page.locator("h2:has-text('Form Submissions')");
-  private final Locator emptyAlert = page.locator(".alert-info");
-  private final Locator tableRows = page.locator("table tbody tr");
-  private final Locator firstRowId = page.locator("//table/tbody/tr[1]/td[1]");
-  private final Locator firstRowViewButton =
-      page.locator("//table/tbody/tr[1]//button[contains(text(), 'View')]");
-  private final Locator firstRowEditButton =
-      page.locator("//table/tbody/tr[1]//button[contains(text(), 'Edit')]");
+  private final Locator heading = page.locator("#submissions-heading");
+  private final Locator emptyAlert = page.locator("#no-submissions");
+  private final Locator tableRows = page.locator("#submissions-table tbody tr");
+  private final Locator firstRowId =
+      page.locator("#submissions-table tbody tr:first-child td:first-child");
 
   public FormSubmissionsPage(Page page) {
     super(page);
@@ -42,12 +39,12 @@ public class FormSubmissionsPage extends BasePage {
     return firstRowId.textContent();
   }
 
-  public void viewFirstSubmission() {
-    firstRowViewButton.click();
+  public void viewSubmission(String submissionId) {
+    page.locator("#view-%s".formatted(submissionId)).click();
   }
 
-  public void editFirstSubmission() {
-    firstRowEditButton.click();
+  public void editSubmission(String submissionId) {
+    page.locator("#edit-%s".formatted(submissionId)).click();
   }
 
   // isVisible() never waits, so the alert needs a bounded wait of its own: a timeout here means

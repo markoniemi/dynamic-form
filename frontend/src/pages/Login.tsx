@@ -20,7 +20,7 @@ export const Login: React.FC = () => {
             <Card.Body>
               <Card.Title>{t('content.welcome')}</Card.Title>
               <Card.Text>{t('content.pleaseLogIn')}</Card.Text>
-              <Button variant="primary" onClick={() => signinRedirect()}>
+              <Button id="login-button" variant="primary" onClick={() => signinRedirect()}>
                 {t('navigation.login')}
               </Button>
             </Card.Body>

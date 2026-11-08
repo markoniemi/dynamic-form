@@ -195,7 +195,7 @@ file: [lombok.md](lombok.md)
 
 - lombok is not used in all places where it could. Check where lombok could be used.
 
-### shorten test methods [in_review, medium]
+### shorten test methods [approved, medium]
 
 file: [shorten-test-methods.md](shorten-test-methods.md)
 
@@ -211,6 +211,8 @@ the same five page objects.
 ```
 - is waitForSelector required? looks like overkill to wait for selector in every method. loginAndFormSubmission test calls formSubmissionPage.waitForLoad(); before setting input values.
 
-### Migrate selectors [planning, medium]
+### Migrate selectors [in_review, medium]
+
+file: [migrate-selectors.md](migrate-selectors.md)
 
 Migrating the selectors from CSS/XPath to getByRole/getByLabel/getByTestId. That is what Playwright actually recommends, but it rewrites every selector against the real DOM, so it is a different risk from a mechanical field swap. Own backlog entry if wanted.

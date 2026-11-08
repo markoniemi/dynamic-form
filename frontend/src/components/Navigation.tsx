@@ -32,7 +32,7 @@ export const Navigation: React.FC = () => {
             <Nav.Link as={Link} to="/forms">
               {t('navigation.forms')}
             </Nav.Link>
-            <Nav.Link as={Link} to="/submissions">
+            <Nav.Link id="nav-submissions" as={Link} to="/submissions">
               {t('navigation.submissions')}
             </Nav.Link>
             <Nav.Link as={Link} to="/create-form">
@@ -45,7 +45,7 @@ export const Navigation: React.FC = () => {
               {/* Add more languages here */}
             </NavDropdown>
             <div className="d-flex align-items-center ms-2">
-              <Button variant="danger" size="sm" onClick={handleLogout}>
+              <Button id="logout-button" variant="danger" size="sm" onClick={handleLogout}>
                 {t('navigation.logout')}
               </Button>
             </div>

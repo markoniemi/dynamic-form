@@ -4,46 +4,36 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public class SubmissionDetailPage extends BasePage {
-  private final Locator heading = page.locator("//h2");
-  private final Locator detailsCard = page.locator(".card-body");
+  private final Locator metadata = page.locator("#submission-meta");
 
   public SubmissionDetailPage(Page page) {
     super(page);
   }
 
   public void waitForLoad() {
-    heading.waitFor();
+    metadata.waitFor();
   }
 
   /**
-   * Waits until the details card shows this text, either as visible text or as the value of one of
-   * its fields, and throws {@link com.microsoft.playwright.TimeoutError} if it never does.
+   * Waits until this field shows this value, and throws {@link
+   * com.microsoft.playwright.TimeoutError} if it never does.
    *
    * <p>The card renders before the submission data resolves, so this has to wait rather than read
-   * once: {@code Locator.count()} and {@code Locator.inputValue()} report the page as it is right
-   * now. {@code waitForCondition} dispatches Playwright events while it polls, which a
+   * once: {@code Locator.inputValue()} reports the page as it is right now.
+   * {@code waitForCondition} dispatches Playwright events while it polls, which a
    * {@code Thread.sleep} loop does not.
+   *
+   * <p>ReadOnlyDynamicForm renders each value into a control that carries the field name as its id,
+   * so the value is addressed rather than searched for. Select and radio fields show the option
+   * label, not the stored value.
    */
-  public void waitForText(String text) {
-    waitForLoad();
-    page.waitForCondition(() -> cardTextContains(text) || fieldValueContains(text));
+  public void waitForFieldValue(String fieldName, String value) {
+    Locator field = page.locator("#%s".formatted(fieldName));
+    page.waitForCondition(() -> value.equals(field.inputValue()));
   }
 
-  private boolean cardTextContains(String text) {
-    String cardText = detailsCard.first().textContent();
-    return cardText != null && cardText.contains(text);
-  }
-
-  // ReadOnlyDynamicForm renders values into inputs, so they are not in textContent
-  private boolean fieldValueContains(String text) {
-    Locator fields = detailsCard.locator("input, textarea");
-    int count = fields.count();
-    for (int i = 0; i < count; i++) {
-      String value = fields.nth(i).inputValue();
-      if (value != null && value.contains(text)) {
-        return true;
-      }
-    }
-    return false;
+  /** Waits for text in the submission metadata: its id, form key, timestamp or submitter. */
+  public void waitForMetadata(String text) {
+    page.waitForCondition(() -> metadata.textContent().contains(text));
   }
 }

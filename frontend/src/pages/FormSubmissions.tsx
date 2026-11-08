@@ -44,16 +44,16 @@ export const FormSubmissions: React.FC = () => {
     <Container className="mt-5">
       <Row className="mb-4">
         <Col>
-          <h2>{t('submissions.title')}</h2>
+          <h2 id="submissions-heading">{t('submissions.title')}</h2>
         </Col>
       </Row>
 
       {submissions.length === 0 ? (
-        <Alert variant="info">{t('submissions.noSubmissions')}</Alert>
+        <Alert id="no-submissions" variant="info">{t('submissions.noSubmissions')}</Alert>
       ) : (
         <Card className="shadow-sm">
           <Card.Body>
-            <Table striped bordered hover responsive>
+            <Table id="submissions-table" striped bordered hover responsive>
               <thead>
               <tr>
                 <th>{t('submissions.table.id')}</th>
@@ -72,6 +72,7 @@ export const FormSubmissions: React.FC = () => {
                   <td>{submission.submittedBy}</td>
                   <td>
                     <Button
+                      id={`view-${submission.id}`}
                       variant="outline-primary"
                       size="sm"
                       className="me-2"
@@ -80,6 +81,7 @@ export const FormSubmissions: React.FC = () => {
                       {t('submissions.table.view')}
                     </Button>
                     <Button
+                      id={`edit-${submission.id}`}
                       variant="outline-secondary"
                       size="sm"
                       onClick={() => navigate(`/forms/${submission.formKey}/submissions/${submission.id}/edit`)}

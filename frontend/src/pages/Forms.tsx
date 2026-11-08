@@ -26,7 +26,7 @@ export const Forms: React.FC = () => {
     <Container className="mt-5">
       <Row className="mb-4">
         <Col>
-          <h2>{t('forms.title')}</h2>
+          <h2 id="forms-heading">{t('forms.title')}</h2>
           <p className="text-muted">{t('forms.subtitle')}</p>
         </Col>
       </Row>
@@ -62,6 +62,7 @@ export const Forms: React.FC = () => {
                 <td className="align-middle">{form.title}</td>
                 <td className="text-center">
                   <Button
+                    id={`open-${form.formKey}`}
                     variant="primary"
                     size="sm"
                     onClick={() => navigate(`/forms/${form.formKey}`)}

@@ -131,11 +131,11 @@ export const FormSubmission: React.FC = () => {
     <Container className="mt-5">
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title as="h2">{isEditMode ? t('form.editTitle', {title: form.title}) : form.title}</Card.Title>
+          <Card.Title id="form-title" as="h2">{isEditMode ? t('form.editTitle', {title: form.title}) : form.title}</Card.Title>
           <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
           {showSuccess && (
-            <Alert variant="success" onClose={() => setShowSuccess(false)} dismissible>
+            <Alert id="submit-success" variant="success" onClose={() => setShowSuccess(false)} dismissible>
               {isEditMode ? t('form.updateSuccess') : t('form.success')}
             </Alert>
           )}
@@ -153,6 +153,7 @@ export const FormSubmission: React.FC = () => {
 
             <div className="d-flex gap-2">
               <Button
+                id="submit-button"
                 variant="primary"
                 type="submit"
                 disabled={mutation.isPending}

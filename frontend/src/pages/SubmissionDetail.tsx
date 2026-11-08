@@ -85,7 +85,7 @@ export const SubmissionDetail: React.FC = () => {
           <Card.Title as="h2">{form.title}</Card.Title>
           <Card.Text className="text-muted mb-4">{form.description}</Card.Text>
 
-          <Alert variant="info" className="mb-4">
+          <Alert id="submission-meta" variant="info" className="mb-4">
             <strong>{t('submissionDetail.id')}:</strong> {submission.id}
             <br/>
             <strong>{t('submissionDetail.formKey')}:</strong> {submission.formKey}
