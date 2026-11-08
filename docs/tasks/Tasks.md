@@ -59,12 +59,6 @@ file: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
 
-### dependency update [done, medium]
-
-file: [dependency-update.md](dependency-update.md)
-
-- update maven and npm dependencies, use context7.
-
 ### update playwright [done, medium]
 
 file: [update-playwright.md](update-playwright.md)
