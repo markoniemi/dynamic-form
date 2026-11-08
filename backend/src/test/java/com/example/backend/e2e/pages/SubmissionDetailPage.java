@@ -15,19 +15,18 @@ public class SubmissionDetailPage extends BasePage {
     page.waitForSelector(HEADING, new Page.WaitForSelectorOptions().setTimeout(TIMEOUT_MS));
   }
 
-  public boolean isDetailPresent(String label, String value) {
-    waitForLoad();
-    return containsText(value);
-  }
-
   /**
-   * True when the details card shows this text, either as visible text or as the value of one of
-   * its fields. The card renders before the submission data resolves, so this has to wait for the
-   * fields rather than read them once — see {@link #waitUntil}.
+   * Waits until the details card shows this text, either as visible text or as the value of one of
+   * its fields, and throws {@link com.microsoft.playwright.TimeoutError} if it never does.
+   *
+   * <p>The card renders before the submission data resolves, so this has to wait rather than read
+   * once: {@code Locator.count()} and {@code Locator.inputValue()} report the page as it is right
+   * now. {@code waitForCondition} dispatches Playwright events while it polls, which a
+   * {@link #sleep} loop does not.
    */
-  public boolean containsText(String text) {
+  public void waitForText(String text) {
     waitForLoad();
-    return waitUntil(() -> cardTextContains(text) || fieldValueContains(text));
+    page.waitForCondition(() -> cardTextContains(text) || fieldValueContains(text));
   }
 
   private boolean cardTextContains(String text) {

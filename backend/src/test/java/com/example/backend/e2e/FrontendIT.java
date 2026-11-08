@@ -63,13 +63,13 @@ public class FrontendIT extends IntegrationTestBase {
     formSubmissionsPage.viewFirstSubmission();
     submissionDetailPage.waitForLoad();
     // 12. Verify submission details are correct
-    assertTrue(submissionDetailPage.containsText("Test User"));
-    assertTrue(submissionDetailPage.containsText("test@example.com"));
-    assertTrue(submissionDetailPage.containsText("+1 555 000 0001"));
-    assertTrue(submissionDetailPage.containsText("General Inquiry"));
-    assertTrue(submissionDetailPage.containsText("This is an automated e2e test message."));
-    assertTrue(submissionDetailPage.containsText("Low"));
-    assertTrue(submissionDetailPage.containsText("admin"));
+    submissionDetailPage.waitForText("Test User");
+    submissionDetailPage.waitForText("test@example.com");
+    submissionDetailPage.waitForText("+1 555 000 0001");
+    submissionDetailPage.waitForText("General Inquiry");
+    submissionDetailPage.waitForText("This is an automated e2e test message.");
+    submissionDetailPage.waitForText("Low");
+    submissionDetailPage.waitForText("admin");
   }
 
   @Test
@@ -99,7 +99,7 @@ public class FrontendIT extends IntegrationTestBase {
     formSubmissionsPage.viewFirstSubmission();
     submissionDetailPage.waitForLoad();
     // 9. Verify the change was saved
-    assertTrue(submissionDetailPage.containsText("Test User Updated"));
+    submissionDetailPage.waitForText("Test User Updated");
   }
 
   @Test

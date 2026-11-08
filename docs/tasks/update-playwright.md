@@ -154,17 +154,25 @@ renders them as `Form.Control`. The method reached those inputs through
 ran zero times and the method returned `false`. 1.48.0 happened to lose that race
 less often.
 
-The fix retries the whole check until `TIMEOUT_MS` and splits the two lookups
-into `cardTextContains` and `fieldValueContains`. `.first()` was added to the
-card lookup as well, since `.card-body` is a class that may match more than one
+The fix retries the whole check until the timeout and splits the two lookups into
+`cardTextContains` and `fieldValueContains`. `.first()` was added to the card
+lookup as well, since `.card-body` is a class that may match more than one
 element.
 
-The retry itself is `BasePage.waitUntil(BooleanSupplier)`, so any page object can
-use it. It wraps Playwright's own `Page.waitForCondition` (Java binding, since
-v1.32) and converts its `TimeoutError` into `false`, because these page methods
-answer a boolean rather than assert. `waitForCondition` dispatches Playwright
-events while it polls, which a `Thread.sleep` loop — what `BasePage.sleep` does —
-cannot; Playwright's own javadoc warns against the latter for exactly this.
+The retry is Playwright's own `Page.waitForCondition` (Java binding, since
+v1.32), called directly. It dispatches Playwright events while it polls, which a
+`Thread.sleep` loop — what `BasePage.sleep` does — cannot; Playwright's own
+javadoc warns against the latter for exactly this. Its timeout comes from
+`page.setDefaultTimeout(TIMEOUT_MS)`, set once in the `BasePage` constructor, so
+no call site repeats it.
+
+`containsText` became `waitForText` and returns nothing. The boolean it used to
+return was wrapped in `assertTrue` at all nine call sites and nowhere else, so it
+only converted Playwright's `TimeoutError` — which names the timeout — into
+`expected: <true> but was: <false>`, which names nothing. Letting it throw
+deleted the `BasePage.waitUntil` wrapper, the boolean and the nine `assertTrue`
+calls. The unused `isDetailPresent` went with it, as it existed only to call
+`containsText`.
 
 Counts: 3 runs failed before the fix (2, 2 and 1 failures — the varying count is
 the race), and **3 consecutive runs passed after it**, all on 1.64.0.
@@ -185,10 +193,11 @@ Also checked, nothing to do:
 Nothing is pushed — `create_pull_request` is off — so this is the commits on
 `master`.
 
-1. `git diff HEAD~1 -- backend/src/test/java/com/example/backend/e2e/pages/SubmissionDetailPage.java`
-   is the fix. The claim to check is the comment's: `Locator.count()` does not
-   auto-wait, so the old single pass could run before the fields rendered.
-2. `git diff HEAD~1 -- backend/pom.xml` is the one-line bump to 1.64.0.
+1. `git log -p 39451bc..HEAD -- backend/src/test/java/com/example/backend/e2e/`
+   is the fix and the two rounds of trimming that followed it. The claim to check
+   is the comment's: `Locator.count()` does not auto-wait, so the old single pass
+   could run before the fields rendered.
+2. `git show 39451bc -- backend/pom.xml` is the one-line bump to 1.64.0.
 3. `/test --with-integration` from the repo root. Expect `BUILD SUCCESS` with 4
    ITs. **Run it more than once** — this was an intermittent failure, and a single
    green run would not have been evidence either way.
