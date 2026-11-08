@@ -45,7 +45,7 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### lombok [planned, medium]
+### lombok [in_progress, medium]
 
 file: [lombok.md](lombok.md)
 

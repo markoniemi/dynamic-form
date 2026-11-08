@@ -1,6 +1,6 @@
 ---
 id: lombok
-status: planned
+status: in_progress
 priority: medium
 kind: task
 ---
