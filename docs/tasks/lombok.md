@@ -1,6 +1,6 @@
 ---
 id: lombok
-status: in_progress
+status: in_review
 priority: medium
 kind: task
 ---
@@ -60,3 +60,37 @@ covered: the SPA calls `/api/config/oauth2-issuer-uri` on load via `loadOidcConf
 because `@Data` generates `equals`/`hashCode` over the generated `id` and `Form.fields` — the
 Hibernate identity pitfall. The human's answer: keep `@Data`. So the entities are not touched by
 this task.
+
+## Result
+
+Step 2 landed as planned. `ConfigController` has `@RequiredArgsConstructor` with `@Value` on the
+field, and `backend/lombok.config` holds the `copyableAnnotations` line.
+
+**Step 1 could not be done with Lombok.** `@UtilityClass` on `SecurityUtils` breaks annotation
+processing for the whole `backend` module: every `@Slf4j` `log`, every generated entity accessor
+and the class's own static-ness vanish, 58 `cannot find symbol` errors, and Lombok emits no
+diagnostic at all. Reproduced on lombok 1.18.48 / JDK 21.0.1, with and without the explicit
+`static` keywords, and with `backend/lombok.config` moved out of the way — so neither the new
+config nor dropping `static` is the cause. Removing `@UtilityClass` alone makes the module compile
+again.
+
+So `SecurityUtils` gets step 1's effect without Lombok: the class is `final` with a private
+constructor, three lines, and the methods keep `static`, which leaves the two static imports in
+`FormDataController` untouched. A one-line comment points back here.
+
+`backend/CLAUDE.md` gained two pitfalls: keep the `copyableAnnotations` line or `@Value` fields
+inject as `null`, and do not reach for `@UtilityClass` in this module.
+
+## How to review
+
+1. `mvn -pl backend -am verify` from the repo root — ran green: 73 unit tests, and the ITs
+   including `AdminRoleIT` and `FrontendIT`, which load the SPA and therefore prove
+   `/api/config/oauth2-issuer-uri` still returns the injected value.
+2. The injection is also provable without Spring:
+   `javap -v -p -cp backend/target/classes com.example.backend.controller.ConfigController`
+   shows `RuntimeVisibleParameterAnnotations` on the generated constructor carrying
+   `value="${spring.security.oauth2.resourceserver.jwt.issuer-uri}"`. That is the
+   `copyableAnnotations` line working; without it the parameter has no annotation.
+3. To see the `@UtilityClass` failure for yourself, put `@UtilityClass` on `SecurityUtils` and run
+   `mvn -q -pl backend compile`: the errors land in `DatabaseInitializer`, `FormService` and
+   `GlobalExceptionHandler`, nowhere near the file you changed.

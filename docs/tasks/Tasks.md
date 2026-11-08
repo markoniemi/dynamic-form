@@ -42,10 +42,7 @@ Priorities: `high` | `medium` | `low`.
 
 ## Backlog
 
-Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
-2026-11-07). Each names the finding that explains it.
-
-### lombok [in_progress, medium]
+### lombok [in_review, medium]
 
 file: [lombok.md](lombok.md)
 
