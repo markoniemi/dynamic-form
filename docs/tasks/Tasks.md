@@ -73,12 +73,6 @@ on the details card. Note 1.64 downloads new browsers on its first run — that 
 what made `AdminRoleIT` take 138 s, not a test failure.
 - perhaps test 1.61.0 first.
 
-### eslint-rules [done, medium]
-
-file: [eslint-rules.md](eslint-rules.md)
-
-- Add no-misused-promises, no-floating-promises and no-base-to-string to eslint.
-
 ### waitForCondition [done, low]
 
 file: [waitforcondition.md](waitforcondition.md)
