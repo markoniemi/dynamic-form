@@ -45,16 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### dedupe mcp browser servers [done, high]
-
-file: [dedupe-mcp-browser-servers.md](dedupe-mcp-browser-servers.md)
-
-Finding C-3. Playwright is configured twice — repo `.mcp.json` and the
-`playwright@claude-plugins-official` plugin — so both tool sets load at startup;
-`claude-in-chrome` is a third browser stack. Keep the repo-pinned server, disable
-the plugin, and drop the six redundant per-tool allow entries at
-`.claude/settings.json:16-21`.
-
 ### trim generic advice from skills [done, high]
 
 file: [trim-generic-advice-from-skills.md](trim-generic-advice-from-skills.md)
