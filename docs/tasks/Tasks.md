@@ -53,12 +53,6 @@ Finding C-12. `.claude/settings.local.json:23-28` holds six allow entries that a
 whole one-off commands and will never match again. Replace with the broad
 `PowerShell(...)` patterns, or run `/fewer-permission-prompts`.
 
-### commit deny rule [done, low]
-
-file: [commit-deny-rule.md](commit-deny-rule.md)
-
-- remove commit deny rule, no need to ask for permission to commit files.
-
 ### lombok [planned, medium]
 
 file: [lombok.md](lombok.md)
