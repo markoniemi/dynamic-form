@@ -45,17 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### fix stale skill facts [done, high]
-
-file: [fix-stale-skill-facts.md](fix-stale-skill-facts.md)
-
-Finding C-1. `dynamic-form-backend/SKILL.md` claims Spring Boot 3.5.6, Java 17+,
-H2 for dev and a `dto/` package; actual is 4.0.3, Java 21, Postgres for dev, DTOs
-in `api`. It also tells the agent to `cd backend; mvn test`, which
-`.claude/commands/test.md` explicitly forbids. Two wrong paths as well:
-`config/GlobalExceptionHandler.java` in the fullstack skill and
-`src/context/oidcConfig.tsx` in the frontend skill.
-
 ### dedupe mcp browser servers [done, high]
 
 file: [dedupe-mcp-browser-servers.md](dedupe-mcp-browser-servers.md)
