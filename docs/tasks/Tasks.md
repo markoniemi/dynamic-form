@@ -45,16 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### add scope limits to root claude md [done, high]
-
-file: [add-scope-limits-to-root-claude-md.md](add-scope-limits-to-root-claude-md.md)
-
-Finding C-7. `.claude/CLAUDE.md` never says to stay in the module named in the
-task, run only that module's tests, or ask before cross-module and parent-pom
-changes — a common cause of repo-wide exploration. Same change: move "do not
-commit unless asked" to a deny rule, and narrow the "prefer IntelliJ MCP tools"
-line so reads and search stay on `Read`/`Grep`/`Glob`.
-
 ### dedupe error table and project maps [done, medium]
 
 file: [dedupe-error-table-and-project-maps.md](dedupe-error-table-and-project-maps.md)
