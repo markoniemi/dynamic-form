@@ -1,6 +1,6 @@
 ---
 id: prune-unused-plugins
-status: in_review
+status: done
 priority: high
 ---
 

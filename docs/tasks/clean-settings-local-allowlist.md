@@ -1,6 +1,6 @@
 ---
 id: clean-settings-local-allowlist
-status: in_review
+status: done
 priority: low
 ---
 

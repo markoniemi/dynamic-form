@@ -1,6 +1,6 @@
 ---
 id: dedupe-error-table-and-project-maps
-status: in_review
+status: done
 priority: medium
 ---
 

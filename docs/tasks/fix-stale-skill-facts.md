@@ -1,6 +1,6 @@
 ---
 id: fix-stale-skill-facts
-status: in_review
+status: done
 priority: high
 ---
 

@@ -1,6 +1,6 @@
 ---
 id: shorten-test-methods
-status: in_review
+status: done
 priority: medium
 kind: task
 ---

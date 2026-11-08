@@ -1,6 +1,6 @@
 ---
 id: dedupe-mcp-browser-servers
-status: in_review
+status: done
 priority: high
 ---
 

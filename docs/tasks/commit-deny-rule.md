@@ -1,6 +1,6 @@
 ---
 id: commit-deny-rule
-status: in_review
+status: done
 priority: low
 ---
 

@@ -1,6 +1,6 @@
 ---
 id: gate-stop-hook-on-changed-paths
-status: in_review
+status: done
 priority: medium
 ---
 

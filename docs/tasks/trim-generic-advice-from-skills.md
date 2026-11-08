@@ -1,6 +1,6 @@
 ---
 id: trim-generic-advice-from-skills
-status: in_review
+status: done
 priority: high
 ---
 

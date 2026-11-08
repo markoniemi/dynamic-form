@@ -1,6 +1,6 @@
 ---
 id: dependency-update
-status: in_review
+status: done
 priority: medium
 kind: feature
 ---

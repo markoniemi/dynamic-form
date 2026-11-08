@@ -1,6 +1,6 @@
 ---
 id: update-playwright
-status: in_review
+status: done
 priority: medium
 kind: task
 ---

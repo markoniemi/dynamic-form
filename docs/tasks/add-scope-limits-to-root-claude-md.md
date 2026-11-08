@@ -1,6 +1,6 @@
 ---
 id: add-scope-limits-to-root-claude-md
-status: in_review
+status: done
 priority: high
 ---
 

@@ -1,6 +1,6 @@
 ---
 id: migrate-selectors
-status: in_review
+status: done
 priority: medium
 kind: task
 ---

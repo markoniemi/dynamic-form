@@ -1,6 +1,6 @@
 ---
 id: review-ponytail-codebase-map
-status: in_review
+status: done
 priority: low
 ---
 

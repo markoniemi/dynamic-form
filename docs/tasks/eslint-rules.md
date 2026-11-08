@@ -1,6 +1,6 @@
 ---
 id: eslint-rules
-status: in_review
+status: done
 priority: medium
 kind: task
 ---

@@ -1,6 +1,6 @@
 ---
 id: merge-test-command-and-test-all-skill
-status: in_review
+status: done
 priority: low
 ---
 
