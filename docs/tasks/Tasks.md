@@ -45,16 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### trim generic advice from skills [done, high]
-
-file: [trim-generic-advice-from-skills.md](trim-generic-advice-from-skills.md)
-
-Finding C-2. `dynamic-form-backend/SKILL.md:88-142` and
-`dynamic-form-frontend/SKILL.md:67-132` recite Effective Java, Clean Code,
-Effective TypeScript and the React docs — about half of each body, and nothing
-project-specific. Keep only the rules where this project deviates; move or drop
-the rest.
-
 ### prune unused plugins [done, high]
 
 file: [prune-unused-plugins.md](prune-unused-plugins.md)
