@@ -45,14 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### clean settings local allowlist [done, low]
-
-file: [clean-settings-local-allowlist.md](clean-settings-local-allowlist.md)
-
-Finding C-12. `.claude/settings.local.json:23-28` holds six allow entries that are
-whole one-off commands and will never match again. Replace with the broad
-`PowerShell(...)` patterns, or run `/fewer-permission-prompts`.
-
 ### lombok [planned, medium]
 
 file: [lombok.md](lombok.md)
