@@ -1,11 +1,14 @@
 package com.example.backend.util;
 
-import java.util.Collection;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-public class SecurityUtils {
+public final class SecurityUtils {
+
+  // Lombok's @UtilityClass would do this, but it silently kills annotation processing here
+  // (see docs/tasks/lombok.md).
+  private SecurityUtils() {}
 
   public static String getUsername(Jwt jwt) {
     if (jwt == null) {

@@ -25,3 +25,5 @@ Spring Boot 4.1.2 / Java 21 REST API and OAuth2 resource server. Packages under 
 - Port 9000 is fixed: the token `iss` must equal the backend's issuer. The shutdown hook in `TestcontainersConfig` frees it for the `testcontainers` module ITs, so keep it
 - `jib` builds the Docker image in `pre-integration-test` (skipped with `-DskipTests`); the `ci` profile pushes it to ghcr.io on `deploy`
 - Validation errors must come back as RFC 7807 `ProblemDetail` with an `errors` array; the frontend maps it onto form fields
+- `lombok.config` copies `@Value` onto generated constructor parameters, so `@RequiredArgsConstructor` works on beans with `@Value` fields; keep it, or those fields inject as `null`
+- Do not use Lombok's `@UtilityClass` here: with lombok 1.18.48 on this JDK it kills annotation processing for the whole module — every `@Slf4j` `log` and generated accessor disappears, with no Lombok diagnostic, only `cannot find symbol`. Non-instantiable helpers use a private constructor
