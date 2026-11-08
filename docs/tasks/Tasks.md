@@ -59,20 +59,6 @@ file: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
 
-### update playwright [done, medium]
-
-file: [update-playwright.md](update-playwright.md)
-
-Split out of `dependency update`, which reverted it. Playwright (Java) 1.48.0 →
-1.64.0 makes `FrontendIT.loginAndFormSubmission` (`:66`) and
-`FrontendIT.editSubmission` (`:102`) fail on their final
-`submissionDetailPage.containsText(...)` assertion, reproducibly, while the same
-verify is green on 1.48.0. Find out why and bump, or record that we stay on
-1.48.0. Start at `SubmissionDetailPage.containsText`, which calls `textContent()`
-on the details card. Note 1.64 downloads new browsers on its first run — that is
-what made `AdminRoleIT` take 138 s, not a test failure.
-- perhaps test 1.61.0 first.
-
 ### waitForCondition [done, low]
 
 file: [waitforcondition.md](waitforcondition.md)
