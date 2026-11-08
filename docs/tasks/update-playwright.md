@@ -1,6 +1,6 @@
 ---
 id: update-playwright
-status: planned
+status: in_progress
 priority: medium
 kind: task
 ---
@@ -117,12 +117,11 @@ returned `false`, not what the page actually held.
 
 ## Open questions for a human
 
-1. **Is rewriting `SubmissionDetailPage` in scope?** Step 5 changes e2e test code,
-   not a version pin. If the answer is no, the task can only bisect and report,
-   and will likely end at step 7.
-2. **Is `AdminRoleIT` in scope if it turns out to be affected too?** It passed on
-   1.64.0, but it drives the same UI through the same page objects, so a racy
-   page object may be failing silently there (it asserts less).
-3. **How much is a newer Playwright worth here?** It is a test-only dependency.
-   If the honest answer is "little", step 7 is the cheap outcome and steps 3-6 are
-   not worth the runs. Say so and the task closes at a decision record.
+Answered yes to all three on 2026-11-08:
+
+1. **Rewriting `SubmissionDetailPage` is in scope.** The fix may change e2e test
+   code, not only the version pin.
+2. **`AdminRoleIT` is in scope** if the same racy page object turns out to affect
+   it.
+3. **A newer Playwright is worth the runs.** Steps 3-6 are on; step 7 is the
+   fallback, not the expected outcome.

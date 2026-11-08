@@ -163,7 +163,7 @@ plan: [dependency-update.md](dependency-update.md)
 
 - update maven and npm dependencies, use context7.
 
-### update playwright [planned, medium]
+### update playwright [in_progress, medium]
 
 file: [update-playwright.md](update-playwright.md)
 
