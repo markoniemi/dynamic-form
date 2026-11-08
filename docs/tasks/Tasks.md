@@ -157,13 +157,15 @@ file: [ponytail.md](ponytail.md)
 
 - run ponytail audit, write findings to a file. do not act on findings yet.
 
-### dependency update [in_review, medium]
+### dependency update [approved, medium]
 
 plan: [dependency-update.md](dependency-update.md)
 
 - update maven and npm dependencies, use context7.
 
-### update playwright [draft, medium]
+### update playwright [planned, medium]
+
+file: [update-playwright.md](update-playwright.md)
 
 Split out of `dependency update`, which reverted it. Playwright (Java) 1.48.0 →
 1.64.0 makes `FrontendIT.loginAndFormSubmission` (`:66`) and
@@ -173,22 +175,9 @@ verify is green on 1.48.0. Find out why and bump, or record that we stay on
 1.48.0. Start at `SubmissionDetailPage.containsText`, which calls `textContent()`
 on the details card. Note 1.64 downloads new browsers on its first run — that is
 what made `AdminRoleIT` take 138 s, not a test failure.
+- perhaps test 1.61.0 first.
 
-### update typescript [draft, low]
-
-Split out of `dependency update`, which reverted it. TypeScript 7.0.2 installs
-and `tsc --noEmit` passes — none of the options TS 7 removes are in this
-project's config — but `npm run lint` dies with `typescript-eslint does not
-support TS 7.0`. Blocked upstream:
-<https://github.com/typescript-eslint/typescript-eslint/issues/10940>. Retry when
-typescript-eslint ships TS 7 support; running it against the TS 6 API side by
-side is more machinery than this is worth, and switching linters is ruled out.
-
-The cap is `typescript: >=4.8.4 <6.1.0` in typescript-eslint 8.72.0, so this
-blocks TypeScript **6.1** too, not only 7.x. The next in-range npm update that
-offers a TS 6.1 will hit the same error.
-
-### eslint-rules [in_review, medium]
+### eslint-rules [approved, medium]
 
 file: [eslint-rules.md](eslint-rules.md)
 
