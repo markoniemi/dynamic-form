@@ -53,15 +53,6 @@ Finding C-12. `.claude/settings.local.json:23-28` holds six allow entries that a
 whole one-off commands and will never match again. Replace with the broad
 `PowerShell(...)` patterns, or run `/fewer-permission-prompts`.
 
-### review ponytail codebase map [done, low]
-
-file: [review-ponytail-codebase-map.md](review-ponytail-codebase-map.md)
-
-Finding C-6. The ponytail SessionStart hook injects a codebase map every session
-(~280 tok) that overlaps the Layout sections in each module `CLAUDE.md` and goes
-stale silently. Decide whether it earns its place. Outside the repo — user-level
-config.
-
 ### commit deny rule [done, low]
 
 file: [commit-deny-rule.md](commit-deny-rule.md)
