@@ -182,3 +182,7 @@ what made `AdminRoleIT` take 138 s, not a test failure.
 file: [eslint-rules.md](eslint-rules.md)
 
 - Add no-misused-promises, no-floating-promises and no-base-to-string to eslint.
+
+### waitForCondition [planning, low]
+
+- remove BasePage.sleep, and use playwright waitForCondition.

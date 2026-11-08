@@ -12,6 +12,9 @@ public abstract class BasePage {
 
   public BasePage(Page page) {
     this.page = page;
+    // Every waiting call without explicit options uses this, waitForCondition included. All page
+    // objects share one Page and set the same value, so repeating it is harmless.
+    page.setDefaultTimeout(TIMEOUT_MS);
   }
 
   /**
@@ -21,10 +24,13 @@ public abstract class BasePage {
    * before the data has rendered and report a false negative.
    *
    * <p>Playwright dispatches its events while this waits, which a {@link #sleep} loop does not.
+   *
+   * <p>The wrapper exists for the {@code catch}: {@code waitForCondition} throws on timeout, while
+   * these page methods answer a boolean that a test asserts on.
    */
   protected boolean waitUntil(BooleanSupplier condition) {
     try {
-      page.waitForCondition(condition, new Page.WaitForConditionOptions().setTimeout(TIMEOUT_MS));
+      page.waitForCondition(condition);
       return true;
     } catch (TimeoutError e) {
       return false;
