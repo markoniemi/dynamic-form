@@ -45,14 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### merge test command and test-all skill [done, low]
-
-file: [merge-test-command-and-test-all-skill.md](merge-test-command-and-test-all-skill.md)
-
-Finding C-9. `.claude/commands/test.md` (unit only) and
-`.claude/skills/test-all/SKILL.md` (unit + integration) are near-identical. One
-skill with a `--with-integration` argument.
-
 ### clean settings local allowlist [done, low]
 
 file: [clean-settings-local-allowlist.md](clean-settings-local-allowlist.md)
