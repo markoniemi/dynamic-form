@@ -55,7 +55,13 @@ $failures = @()
 
 if ($checkFrontend) {
     Push-Location frontend
-    npm run lint:fix 2>$null | Out-Null       # auto-fix pass; its own exit code is not fatal
+    # lint, not lint:fix: a Stop hook must not rewrite files after the turn has
+    # already been reported. The type-aware rules here catch real bugs
+    # (no-floating-promises, no-base-to-string), so report them.
+    $out = npm run lint 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $failures += "eslint failed:`n" + (($out | Select-Object -Last 30) -join "`n")
+    }
     $out = npx tsc --noEmit --pretty false 2>&1
     if ($LASTEXITCODE -ne 0) {
         $failures += "tsc failed:`n" + (($out | Select-Object -Last 30) -join "`n")
