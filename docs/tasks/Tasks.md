@@ -45,15 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### prune unused plugins [done, high]
-
-file: [prune-unused-plugins.md](prune-unused-plugins.md)
-
-Finding C-5. 7 plugins, 34 skills and 9 agents are paid at startup, with five
-overlapping review paths and three task/plan systems. Read `/usage` first to see
-which are actually used, then disable the rest. Outside the repo — user-level
-config.
-
 ### add scope limits to root claude md [done, high]
 
 file: [add-scope-limits-to-root-claude-md.md](add-scope-limits-to-root-claude-md.md)
