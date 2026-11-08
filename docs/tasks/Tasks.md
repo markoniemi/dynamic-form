@@ -65,8 +65,3 @@ file: [lombok.md](lombok.md)
 
 - lombok is not used in all places where it could. Check where lombok could be used.
 
-### Migrate selectors [done, medium]
-
-file: [migrate-selectors.md](migrate-selectors.md)
-
-Migrating the selectors from CSS/XPath to getByRole/getByLabel/getByTestId. That is what Playwright actually recommends, but it rewrites every selector against the real DOM, so it is a different risk from a mechanical field swap. Own backlog entry if wanted.
