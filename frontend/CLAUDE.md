@@ -19,3 +19,6 @@ React 19 + TypeScript + Vite 8 SPA. Maven (`frontend-maven-plugin`, Node v24.13.
 - Backend validation errors (`{ field, message, code }`) are wired into react-hook-form field errors; keep that mapping when changing forms or `http.ts`
 - Test files must match `test/**/*.{test,spec}.*` (see `vitest.config.ts`) or they are not picked up
 - `dist/` and `node_modules/` are generated and read-denied; do not edit
+- TypeScript stays on 6.x: 7.0 compiles this project fine but `typescript-eslint` rejects it (upstream issue 10940), and moving that to a pre-release is out. Retry when it ships TS 7 support
+- ESLint is type-aware (`parserOptions.projectService`); `strictTypeChecked` was measured and rejected (106 findings, ~100 test idioms), and `no-misused-promises` needs `checksVoidReturn: { attributes: false }` or every async `onClick` reports
+- Elements the e2e ITs drive carry an `id` (`login-button`, `submissions-table`, `open-${formKey}`, `view-${id}`, …). The page objects address them by id because button and heading text comes from i18n — keep the ids when editing these components

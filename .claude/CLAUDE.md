@@ -15,6 +15,7 @@ Conventions live in the skills under `.claude/skills/` (`dynamic-form-backend`, 
 - Errors are RFC 7807 `ProblemDetail`; validation errors add an `errors` array of `{ field, message, code }` that the frontend maps onto react-hook-form fields
 - Changes depending on the auth server (JWT claims/roles, issuer/JWKS, client registrations in `TestcontainersConfig` and docker-compose, demo users) must be verified against `../../oauth2-server`
 - Use IntelliJ MCP (`mcp__idea__*`) for problems, lint, format, build and rename; read and search with `Read`/`Grep`/`Glob` (`mcp__idea__read_file` has no line range)
+- Change files with `Edit`, never a `Get-Content`/`Set-Content` round-trip: PowerShell 5.1 mangles UTF-8 (em dashes became mojibake, files gained a BOM). A script that must write a file uses `[System.IO.File]::WriteAllText($p, $s, (New-Object System.Text.UTF8Encoding($false)))`
 
 ## Scope
 - Work in the module the task names; don't explore or refactor others

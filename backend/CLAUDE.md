@@ -17,6 +17,8 @@ Spring Boot 4.1.2 / Java 21 REST API and OAuth2 resource server. Packages under 
 - Unit/slice tests are `*Test`; integration tests are `*IT` and extend `IntegrationTestBase` (`@SpringBootTest` on port 8080, profile `test`)
 - `TestcontainersConfig` starts the auth server from `src/test/resources/oauth2-server.yaml`, bound to host port 9000
 - `e2e/` ITs drive the real UI with Playwright (`PlaywrightConfig`, page objects in `e2e/pages/`)
+- Page objects address elements by `id`, never by visible text — the UI is translated. The ids live in the frontend components
+- Playwright actions (`fill`, `click`, `selectOption`, `textContent`, `waitFor`) auto-wait up to the context default timeout, so never precede one with a `waitForSelector`. `count()` and `isVisible()` do **not** wait — those need an explicit wait first, which is what made the detail page flaky. Poll with `Page.waitForCondition`, never `Thread.sleep`
 
 ## Pitfalls
 - Flyway is disabled outside `prod`: schema changes need a new `db/migration/V<n>__*.sql`, never edit an applied one; dev/test schemas come from Hibernate
