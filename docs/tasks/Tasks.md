@@ -45,15 +45,6 @@ Priorities: `high` | `medium` | `low`.
 Entries below come from `docs/ContextAuditFindings.md` (context/token audit,
 2026-11-07). Each names the finding that explains it.
 
-### gate stop hook on changed paths [done, medium]
-
-file: [gate-stop-hook-on-changed-paths.md](gate-stop-hook-on-changed-paths.md)
-
-Finding C-10. The Stop hook in `.claude/settings.json:45` runs frontend lint, tsc
-and `mvn compile` after every turn, including read-only ones. Gate it on
-`git diff --name-only`, and fix the `cmd` `&` chaining that swallows a `tsc`
-failure.
-
 ### merge test command and test-all skill [done, low]
 
 file: [merge-test-command-and-test-all-skill.md](merge-test-command-and-test-all-skill.md)
