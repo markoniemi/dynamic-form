@@ -59,12 +59,6 @@ file: [commit-deny-rule.md](commit-deny-rule.md)
 
 - remove commit deny rule, no need to ask for permission to commit files.
 
-### ponytail [done, low]
-
-file: [ponytail.md](ponytail.md)
-
-- run ponytail audit, write findings to a file. do not act on findings yet.
-
 ### dependency update [done, medium]
 
 file: [dependency-update.md](dependency-update.md)
