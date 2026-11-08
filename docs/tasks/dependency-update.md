@@ -154,7 +154,10 @@ inside that step or revert that step alone.
 
 ## Findings while implementing
 
-**Step 4 — Playwright (Java) 1.48.0 stays.** 1.64.0 was tried and reverted:
+**Step 4 — Playwright (Java) 1.48.0 stays.** *(Superseded: the `update
+playwright` task found the cause — a race in `SubmissionDetailPage`, not a
+Playwright regression — and the pin is now 1.64.0. See
+[update-playwright.md](update-playwright.md).)* 1.64.0 was tried and reverted:
 `FrontendIT.loginAndFormSubmission` (`:66`) and `FrontendIT.editSubmission`
 (`:102`) both fail on the final `submissionDetailPage.containsText(...)`
 assertion, reproducibly over two runs. The same verify is green with 1.48.0 and

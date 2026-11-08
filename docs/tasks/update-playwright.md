@@ -1,6 +1,6 @@
 ---
 id: update-playwright
-status: in_progress
+status: in_review
 priority: medium
 kind: task
 ---
@@ -114,6 +114,82 @@ returned `false`, not what the page actually held.
    on 1.48.0 and write down here which versions were tried and what the trace
    showed. That is a complete outcome for this task, not a failure — the entry
    says "or record that we stay on 1.48.0".
+
+## Result
+
+**Playwright is on 1.64.0, and the bug was ours.** `SubmissionDetailPage` had a
+race that 1.64.0's timing exposed; nothing in Playwright regressed, so the
+planned bisect (steps 3-4) was never needed and was not run.
+
+The evidence, in the order it arrived:
+
+1. `-Dit.test=FrontendIT` alone on 1.64.0: **3/3 pass**. So the failure needs
+   `AdminRoleIT` to have run first — it is not a property of `FrontendIT`.
+   (`-Dit.test` does keep the jib image build in `pre-integration-test`, so the
+   fast loop in step 1 of the plan works as written.)
+2. A temporary diagnostic inside `containsText` printed, immediately after
+   `waitForLoad()` returned:
+
+   ```
+   DIAG url: http://localhost:8080/forms/submissions/2
+   DIAG .card-body count: 0
+   DIAG allTextContents: []
+   DIAG textContent: Contact UsGet in touch…Your NameEmail Address…
+   DIAG input/textarea count: 6
+   ```
+
+   `count()` says zero while `textContent()` returns the card's text, because
+   **`textContent()` auto-waits and `count()` does not**. The card was still
+   rendering when the method started.
+3. With that diagnostic in place, all 4 ITs passed — the diagnostic's own round
+   trips delay the next call enough to hide the bug. A Heisenbug, which is itself
+   the proof that this is a race.
+4. Diagnostic removed, same 1.64.0: failures returned.
+
+So the mechanism: `waitForLoad()` waits for `//h2`, which appears before the
+submission data resolves. `textContent()` on the card then auto-waits and returns
+the labels — but the *values* live in inputs, because `ReadOnlyDynamicForm`
+renders them as `Form.Control`. The method reached those inputs through
+`count()`, which does not wait, so when the fields had not rendered yet the loop
+ran zero times and the method returned `false`. 1.48.0 happened to lose that race
+less often.
+
+The fix retries the whole check until `TIMEOUT_MS`, the way Playwright's own
+assertions do, and splits the two lookups into `cardTextContains` and
+`fieldValueContains`. `.first()` was added to the card lookup as well, since
+`.card-body` is a class that may match more than one element.
+
+Counts: 3 runs failed before the fix (2, 2 and 1 failures — the varying count is
+the race), and **3 consecutive runs passed after it**, all on 1.64.0.
+
+Also checked, nothing to do:
+
+* `AdminRoleIT` (scope question 2) never touches a page object — it reads the
+  access token out of `sessionStorage` and calls `/api/forms` over HTTP. It
+  cannot have this bug.
+* `FormSubmissionsPage.isSubmissionPresent` already guards its `count()` with a
+  `waitForSelector`, which is why it was never flaky.
+* `FormSubmissionsPage.getSubmissionCount` (`:51-54`) counts without waiting and
+  has the same latent bug, but it has no caller anywhere in the test sources. Left
+  alone rather than fixed or deleted, as neither is this task's job.
+
+## How to review
+
+Nothing is pushed — `create_pull_request` is off — so this is the commits on
+`master`.
+
+1. `git diff HEAD~1 -- backend/src/test/java/com/example/backend/e2e/pages/SubmissionDetailPage.java`
+   is the fix. The claim to check is the comment's: `Locator.count()` does not
+   auto-wait, so the old single pass could run before the fields rendered.
+2. `git diff HEAD~1 -- backend/pom.xml` is the one-line bump to 1.64.0.
+3. `/test --with-integration` from the repo root. Expect `BUILD SUCCESS` with 4
+   ITs. **Run it more than once** — this was an intermittent failure, and a single
+   green run would not have been evidence either way.
+4. To see the old failure: `git stash` is not enough, since the pin and the page
+   object must move together. Set `playwright` back to 1.64.0 with the old
+   `containsText` body (it is in `git show HEAD~1:backend/src/test/java/com/example/backend/e2e/pages/SubmissionDetailPage.java`)
+   and run the full `verify` — not `-Dit.test=FrontendIT`, which passes either
+   way because `AdminRoleIT` must run first.
 
 ## Open questions for a human
 

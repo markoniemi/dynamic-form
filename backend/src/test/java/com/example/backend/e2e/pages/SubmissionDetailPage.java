@@ -20,23 +20,39 @@ public class SubmissionDetailPage extends BasePage {
     return containsText(value);
   }
 
+  /**
+   * True when the details card shows this text, either as visible text or as the value of one of
+   * its fields. Retries until {@link #TIMEOUT_MS}, the way Playwright's own assertions do: the card
+   * renders before the submission data resolves, and {@code Locator.count()} does not auto-wait, so
+   * a single pass can run against fields that are not there yet and report a false negative.
+   */
   public boolean containsText(String text) {
     waitForLoad();
-    // Check visible text (labels, etc.)
-    if (page.locator(DETAILS_CARD).textContent().contains(text)) {
-      return true;
-    }
+    long deadline = System.currentTimeMillis() + TIMEOUT_MS;
+    do {
+      if (cardTextContains(text) || fieldValueContains(text)) {
+        return true;
+      }
+      sleep(100);
+    } while (System.currentTimeMillis() < deadline);
+    return false;
+  }
 
-    // Check input values (since ReadOnlyDynamicForm uses inputs for values)
-    Locator inputs = page.locator(DETAILS_CARD + " input, " + DETAILS_CARD + " textarea");
-    int count = inputs.count();
+  private boolean cardTextContains(String text) {
+    String cardText = page.locator(DETAILS_CARD).first().textContent();
+    return cardText != null && cardText.contains(text);
+  }
+
+  // ReadOnlyDynamicForm renders values into inputs, so they are not in textContent
+  private boolean fieldValueContains(String text) {
+    Locator fields = page.locator(DETAILS_CARD + " input, " + DETAILS_CARD + " textarea");
+    int count = fields.count();
     for (int i = 0; i < count; i++) {
-      String val = inputs.nth(i).inputValue();
-      if (val != null && val.contains(text)) {
+      String value = fields.nth(i).inputValue();
+      if (value != null && value.contains(text)) {
         return true;
       }
     }
-
     return false;
   }
 }
