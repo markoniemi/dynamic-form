@@ -183,6 +183,8 @@ file: [eslint-rules.md](eslint-rules.md)
 
 - Add no-misused-promises, no-floating-promises and no-base-to-string to eslint.
 
-### waitForCondition [planned, low]
+### waitForCondition [in_progress, low]
+
+file: [waitforcondition.md](waitforcondition.md)
 
 - remove BasePage.sleep
